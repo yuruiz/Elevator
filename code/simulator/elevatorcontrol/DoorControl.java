@@ -67,9 +67,6 @@ public class DoorControl extends Controller {
         this.dwell = 10000;
         this.countdown = this.dwell;
 
-
-        this.currentState = State.Opening;
-
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
 
         networkAtFloor = new ReadableCanMailbox[height];
@@ -114,6 +111,12 @@ public class DoorControl extends Controller {
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
 
 
+        localDoorMotor.set(DoorCommand.CLOSE);
+        while (!mDoorClosed.getValue()){}
+        this.currentState = State.Closed;
+
+
+
         timer.start(period);
     }
 
@@ -124,7 +127,7 @@ public class DoorControl extends Controller {
         switch (currentState) {
             case Opening:
                 localDoorMotor.set(DoorCommand.OPEN);
-                mDoorMotor.setValue(DoorCommand.OPEN);
+                mDoorMotor.setCommand(DoorCommand.OPEN);
                 dwell = mDesiredDwell.getValue();
                 countdown = dwell;
 
@@ -134,7 +137,7 @@ public class DoorControl extends Controller {
                 break;
             case Opened:
                 localDoorMotor.set(DoorCommand.STOP);
-                mDoorMotor.setValue(DoorCommand.STOP);
+                mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 countdown--;
                 if (countdown < 0 && !mCarWeight.getValue()) {
@@ -143,7 +146,7 @@ public class DoorControl extends Controller {
                 break;
             case Nudge:
                 localDoorMotor.set(DoorCommand.NUDGE);
-                mDoorMotor.setValue(DoorCommand.STOP);
+                mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 if (mDoorClosed.getValue()) {
                     currentState = State.Closed;
@@ -153,7 +156,7 @@ public class DoorControl extends Controller {
                 break;
             case Closed:
                 localDoorMotor.set(DoorCommand.STOP);
-                mDoorMotor.setValue(DoorCommand.STOP);
+                mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 if (mCarWeight.getValue() || atFloor() == mDesiredFloor.getFloor() ||
                         localDriveSpeed.direction() == Direction.STOP) {
