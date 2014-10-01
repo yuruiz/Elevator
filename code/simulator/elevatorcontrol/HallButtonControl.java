@@ -5,7 +5,6 @@ import simulator.elevatormodules.AtFloorCanPayloadTranslator;
 import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
 import simulator.framework.Controller;
 import simulator.framework.Direction;
-import simulator.framework.DoorCommand;
 import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
 import simulator.framework.Side;
@@ -82,7 +81,7 @@ public class HallButtonControl extends Controller {
      */
     public HallButtonControl(SimTime period, int floor, Hallway hallway, Direction direction, boolean verbose) {
         //call to the Controller superclass constructor is required
-        super("TestLight" + ReplicationComputer.makeReplicationString(floor, hallway, direction), verbose);
+        super(getReplicationName(), verbose);
         
         //stored the constructor arguments in internal state
         this.period = period;
@@ -95,7 +94,7 @@ public class HallButtonControl extends Controller {
          * array of objects which will be converted to strings and concatenated
          * only if the log message is actually written.  
          */
-        log("Created testlight with period = ", period);
+        log("Created HallButtonLight with period = ", period);
 
         /* 
          * Create readable payloads and translators for all messages in input interface
@@ -119,7 +118,7 @@ public class HallButtonControl extends Controller {
         // HallCall
         localHallCall = HallCallPayload.getReadablePayload(floor, hallway, direction);
 
-        /* Register input messages periodically */
+        // Register input messages periodically
         canInterface.registerTimeTriggered(networkAtFloor);
         canInterface.registerTimeTriggered(networkDesiredFloor);
         canInterface.registerTimeTriggered(networkDoorClosedLeft);
@@ -176,8 +175,14 @@ public class HallButtonControl extends Controller {
             	}
                 break;
         }
+    	log(getReplicationName() + ": " + state.toString() + " -> " + newState.toString());
+        state = newState;
 
         timer.start(period);
+	}
+	
+	private String getReplicationName() {
+		return "HallButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway, direction);
 	}
 
 }
