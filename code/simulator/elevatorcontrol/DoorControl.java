@@ -64,18 +64,16 @@ public class DoorControl extends Controller {
         this.period = period;
         this.hallway = hallway;
         this.side = side;
-        this.dwell = 10000;
+        this.dwell = 0;
         this.countdown = this.dwell;
-
-        physicalInterface.sendTimeTriggered(localDoorMotor, period);
 
         networkAtFloor = new ReadableCanMailbox[height];
 
         mAtFloor = new AtFloorCanPayloadTranslator[height];
-        for (int i = 0; i < height; i++) {
-            networkAtFloor[i] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
-            mAtFloor[i] = new AtFloorCanPayloadTranslator(networkAtFloor[i], i, hallway);
-            canInterface.registerTimeTriggered(networkAtFloor[i]);
+        for (int i = 1; i <= height; i++) {
+            networkAtFloor[i - 1] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
+            mAtFloor[i-1] = new AtFloorCanPayloadTranslator(networkAtFloor[i - 1], i, hallway);
+            canInterface.registerTimeTriggered(networkAtFloor[i - 1]);
         }
 
         networkDesiredDwell = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway));
@@ -90,7 +88,7 @@ public class DoorControl extends Controller {
         mDoorOpened = new DoorOpenedCanPayloadTranslator(networkDoorOpened, hallway, side);
         canInterface.registerTimeTriggered(networkDoorOpened);
 
-        networkCarWeight = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_CAN_ID);
+        networkCarWeight = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_ALARM_CAN_ID);
         mCarWeight = new CarWeightAlarmCanPayloadTranslator(networkCarWeight);
         canInterface.registerTimeTriggered(networkCarWeight);
 
@@ -103,7 +101,6 @@ public class DoorControl extends Controller {
         canInterface.sendTimeTriggered(networkDoorMotor, period);
 
 
-
         localDriveSpeed = DriveSpeedPayload.getReadablePayload();
         physicalInterface.registerTimeTriggered(localDriveSpeed);
 
@@ -112,10 +109,8 @@ public class DoorControl extends Controller {
 
 
         localDoorMotor.set(DoorCommand.CLOSE);
-        while (!mDoorClosed.getValue()){}
+//        while (!mDoorClosed.getValue()){}
         this.currentState = State.Closed;
-
-
 
         timer.start(period);
     }
@@ -125,39 +120,48 @@ public class DoorControl extends Controller {
         log("Executing state" + currentState);
 
         switch (currentState) {
-            case Opening:
+            case Opening:    /*State 1 Opening*/
                 localDoorMotor.set(DoorCommand.OPEN);
                 mDoorMotor.setCommand(DoorCommand.OPEN);
                 dwell = mDesiredDwell.getValue();
                 countdown = dwell;
 
+                //#Transition T.1
                 if (mDoorOpened.getValue()) {
                     currentState = State.Opened;
                 }
                 break;
-            case Opened:
+            case Opened:    /*State 2 Opened*/
                 localDoorMotor.set(DoorCommand.STOP);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 countdown--;
+
+                //#Transition T.2
                 if (countdown < 0 && !mCarWeight.getValue()) {
                     currentState = State.Nudge;
                 }
                 break;
-            case Nudge:
+            case Nudge:    /*State 4 Nudge*/
                 localDoorMotor.set(DoorCommand.NUDGE);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
+
+                //#Transition T.3
                 if (mDoorClosed.getValue()) {
                     currentState = State.Closed;
-                } else if (mCarWeight.getValue()) {
+                }
+                //#Transition T.5
+                else if (mCarWeight.getValue()) {
                     currentState = State.Opening;
                 }
                 break;
-            case Closed:
+            case Closed:  /*State 3 Closed*/
                 localDoorMotor.set(DoorCommand.STOP);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
+
+                //#Transition T.4
                 if (mCarWeight.getValue() || atFloor() == mDesiredFloor.getFloor() ||
                         localDriveSpeed.direction() == Direction.STOP) {
                     currentState = State.Opening;
