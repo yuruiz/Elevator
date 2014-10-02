@@ -149,6 +149,7 @@ public class HallLightPayload extends PhysicalPayload {
     }
 
     public HallLightPayload set(boolean lampOn) {
+    	System.out.println(this);
         this.lighted = lampOn;
         return this;
     }

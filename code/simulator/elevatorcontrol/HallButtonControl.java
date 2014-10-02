@@ -14,9 +14,11 @@ import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.HallCallPayload;
 import simulator.payloads.HallCallPayload.ReadableHallCallPayload;
 import simulator.payloads.HallLightPayload;
+import simulator.payloads.HallLightPayload.ReadableHallLightPayload;
 import simulator.payloads.HallLightPayload.WriteableHallLightPayload;
 import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
+/* Author: Vijay Jayaram (vijayj) */
 public class HallButtonControl extends Controller {
 	
     /***************************************************************************
@@ -81,7 +83,7 @@ public class HallButtonControl extends Controller {
      */
     public HallButtonControl(SimTime period, int floor, Hallway hallway, Direction direction, boolean verbose) {
         //call to the Controller superclass constructor is required
-        super(getReplicationName(), verbose);
+        super("HallButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway, direction), verbose);
         
         //stored the constructor arguments in internal state
         this.period = period;
@@ -94,7 +96,7 @@ public class HallButtonControl extends Controller {
          * array of objects which will be converted to strings and concatenated
          * only if the log message is actually written.  
          */
-        log("Created HallButtonLight with period = ", period);
+        log("Created " + getReplicationName() + " with period = ", period);
 
         /* 
          * Create readable payloads and translators for all messages in input interface
@@ -102,7 +104,7 @@ public class HallButtonControl extends Controller {
          */
        
         // mAtFloor
-        networkAtFloor = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID);
+        networkAtFloor = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mAtFloor = new AtFloorCanPayloadTranslator(networkAtFloor, floor, hallway);
         
         // mDesiredFloor
@@ -154,28 +156,41 @@ public class HallButtonControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 		State newState = state;
+		log("Entering " + state);
         switch(state) {
             case STATE_IDLE:
             	localHallLight.set(false);
             	mHallLight.set(false);
+            	log("Hall light is set to " + localHallLight.lighted());
             	mHallCall.set(false);
             	//#transition HBC.T.1
             	if (localHallCall.pressed()) {
             		newState = State.STATE_ACTIVE;
             	}
                 break;
+                
+                /* Design issue: 
+                 * 	- In STATE_ACTIVE, transition back to STATE_IDLE
+                 *  - localHallCall will assume the value of mHallCall, which is true
+                 *  - It will be pressed regardless
+                 *  - Need to add an off state that will always transition back to IDLE
+                 */
             case STATE_ACTIVE:
             	localHallLight.set(true);
             	mHallLight.set(true);
+            	log("Hall light is set to " + localHallLight.lighted());
             	mHallCall.set(true);
             	//#transition HBC.T.2
-            	if (mAtFloor.getValue() && mDesiredFloor.getDirection().equals(direction) 
-            							&& !localHallCall.pressed()) {
+            	//XXX: Change: Removed && !localHallCall.pressed() (Should turn off as soon as floor is reached)
+            	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
+            			mDesiredFloor.getDirection().equals(direction)) {
             		newState = State.STATE_IDLE;
             	}
                 break;
+            default:
+            	throw new RuntimeException("State " + state + " was not recognized.");
         }
-    	log(getReplicationName() + ": " + state.toString() + " -> " + newState.toString());
+    	log(state.toString() + " -> " + newState.toString());
         state = newState;
 
         timer.start(period);
