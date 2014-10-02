@@ -14,7 +14,6 @@ import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.HallCallPayload;
 import simulator.payloads.HallCallPayload.ReadableHallCallPayload;
 import simulator.payloads.HallLightPayload;
-import simulator.payloads.HallLightPayload.ReadableHallLightPayload;
 import simulator.payloads.HallLightPayload.WriteableHallLightPayload;
 import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
@@ -32,11 +31,11 @@ public class HallButtonControl extends Controller {
     //network interface
     private WriteableCanMailbox networkHallLightOut;
     // translator for the hall light message -- this is a generic translator
-    private BooleanCanPayloadTranslator mHallLight;
+    private HallLightCanPayloadTranslator mHallLight;
     
     // network interface
     private WriteableCanMailbox networkHallCall;
-    private BooleanCanPayloadTranslator mHallCall;
+    private HallCallCanPayloadTranslator mHallCall;
 
     //received door closed message
     private ReadableCanMailbox networkDoorClosedLeft;
@@ -68,7 +67,8 @@ public class HallButtonControl extends Controller {
     //enumerate states
     private enum State {
         STATE_IDLE,
-        STATE_ACTIVE
+        STATE_ACTIVE,
+        STATE_SWITCH_OFF
     }
     
     //state variable initialized to the initial state FLASH_OFF
@@ -138,11 +138,11 @@ public class HallButtonControl extends Controller {
         
         // mHallLight
         networkHallLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
-        mHallLight = new BooleanCanPayloadTranslator(networkHallLightOut);
+        mHallLight = new HallLightCanPayloadTranslator(networkHallLightOut, floor, hallway, direction);
         
         // mHallCall
-        networkHallCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID);
-        mHallCall = new BooleanCanPayloadTranslator(networkHallCall);
+        networkHallCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
+        mHallCall = new HallCallCanPayloadTranslator(networkHallCall, floor, hallway, direction);
         
         /* Send/broadcast output messages periodically */
         physicalInterface.sendTimeTriggered(localHallLight, period);
@@ -161,7 +161,6 @@ public class HallButtonControl extends Controller {
             case STATE_IDLE:
             	localHallLight.set(false);
             	mHallLight.set(false);
-            	log("Hall light is set to " + localHallLight.lighted());
             	mHallCall.set(false);
             	//#transition HBC.T.1
             	if (localHallCall.pressed()) {
@@ -178,15 +177,25 @@ public class HallButtonControl extends Controller {
             case STATE_ACTIVE:
             	localHallLight.set(true);
             	mHallLight.set(true);
-            	log("Hall light is set to " + localHallLight.lighted());
             	mHallCall.set(true);
             	//#transition HBC.T.2
             	//XXX: Change: Removed && !localHallCall.pressed() (Should turn off as soon as floor is reached)
             	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
             			mDesiredFloor.getDirection().equals(direction)) {
-            		newState = State.STATE_IDLE;
+            		newState = State.STATE_SWITCH_OFF;
             	}
                 break;
+            case STATE_SWITCH_OFF:
+            	/* XXX: Addition:
+            	 *  Temporary state to reset all output messages for one period before re-entering idle */
+            	localHallLight.set(false);
+            	mHallLight.set(false);
+            	mHallCall.set(false);
+            	//#transition HBC.T.3
+            	if (true) {
+            		newState = State.STATE_IDLE;
+            	}
+            	break;
             default:
             	throw new RuntimeException("State " + state + " was not recognized.");
         }

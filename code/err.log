@@ -1,0 +1,143 @@
+Simulator Parameters:
+Command line = -cf hallbuttoncontrol.cf -mf hallbuttoncontrol.mf -rt 1s
+RandomSeed = 1412220867273
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = hallbuttoncontrol.mf
+Controller File = hallbuttoncontrol.cf
+
+
+[HallButtonControl[3][FRONT][UP]] @0.000000000: Created HallButtonControl[3][FRONT][UP] with period = 0.1s
+[Elevator] @0.000000000: Starting Simulation ***
+[HallButtonControl[3][FRONT][UP]] @0.100000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @0.100000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @0.100000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @0.200000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @0.200000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @0.200000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @0.300000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @0.300000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @0.300000000: STATE_IDLE -> STATE_IDLE
+[AssertionMonitor] @0.301000000: ********************************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@68207d99 :: lighted ?== false PASSED
+[AssertionMonitor] @0.301000000: ********************************************************************************************************
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7ea33d00 :: getValue ?== false PASSED
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@4226c7da :: getValue ?== false PASSED
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @0.400000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @0.400000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @0.400000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.500000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @0.500000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @0.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.600000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @0.600000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @0.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[AssertionMonitor] @0.622000000: *******************************************************************************************************
+[AssertionMonitor] @0.622000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@48b91881 :: lighted ?== true PASSED
+[AssertionMonitor] @0.622000000: *******************************************************************************************************
+[AssertionMonitor] @0.622000000: ********************************************************************************************
+[AssertionMonitor] @0.622000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7b342572 :: getValue ?== true PASSED
+[AssertionMonitor] @0.622000000: ********************************************************************************************
+[AssertionMonitor] @0.622000000: ////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.622000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@4a13ccea :: getValue ?== true FAILED
+[AssertionMonitor] @0.622000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[HallButtonControl[3][FRONT][UP]] @0.700000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @0.700000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @0.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.800000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @0.800000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @0.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.900000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @0.900000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @0.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[AssertionMonitor] @0.933000000: *******************************************************************************************************
+[AssertionMonitor] @0.933000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@2e6b611e :: lighted ?== true PASSED
+[AssertionMonitor] @0.933000000: *******************************************************************************************************
+[AssertionMonitor] @0.933000000: ********************************************************************************************
+[AssertionMonitor] @0.933000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@1c465648 :: getValue ?== true PASSED
+[AssertionMonitor] @0.933000000: ********************************************************************************************
+[AssertionMonitor] @0.933000000: ////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.933000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@31aba72e :: getValue ?== true FAILED
+[AssertionMonitor] @0.933000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[HallButtonControl[3][FRONT][UP]] @1.000000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.000000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @1.000000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @1.100000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.100000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @1.100000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.200000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @1.200000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @1.200000000: STATE_ACTIVE -> STATE_IDLE
+[AssertionMonitor] @1.254000000: ////////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @1.254000000: FAILED simulator.payloads.HallLightPayload$ReadableHallLightPayload@4d75650e :: lighted ?== false FAILED
+[AssertionMonitor] @1.254000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @1.254000000: /////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @1.254000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@684d9ebf :: getValue ?== false FAILED
+[AssertionMonitor] @1.254000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @1.254000000: *********************************************************************************************
+[AssertionMonitor] @1.254000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@786bfd73 :: getValue ?== false PASSED
+[AssertionMonitor] @1.254000000: *********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @1.300000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.300000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @1.300000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.400000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @1.400000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @1.400000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @1.500000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.500000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @1.500000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.600000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @1.600000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @1.600000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @1.700000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.700000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @1.700000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.800000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @1.800000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @1.800000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @1.900000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @1.900000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @1.900000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.000000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @2.000000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @2.000000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @2.100000000: Entering STATE_IDLE
+HallLightPayload[3,FRONT,UP](true)
+[HallButtonControl[3][FRONT][UP]] @2.100000000: Hall light is set to false
+[HallButtonControl[3][FRONT][UP]] @2.100000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.200000000: Entering STATE_ACTIVE
+HallLightPayload[3,FRONT,UP](false)
+[HallButtonControl[3][FRONT][UP]] @2.200000000: Hall light is set to true
+[HallButtonControl[3][FRONT][UP]] @2.200000000: STATE_ACTIVE -> STATE_IDLE
+[Elevator] @2.254000000: Simulation Finished ***
+******************Summary******************
+Passed:  8
+Failed:  4
+Total :  12
+

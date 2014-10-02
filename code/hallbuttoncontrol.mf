@@ -1,0 +1,92 @@
+; 18649 <semester>
+; group 5
+; student names andk andrewID's
+; hallbuttoncontrol_test.mf
+
+#INCLUDE canid.mf
+#DEFINE MESSAGE_PERIOD 10ms
+
+;initialize (physical message with little delay)
+0ms I 1ms F HallCall 3 FRONT UP = false
+
+; check physical HallLight off 
++301ms A F HallLight 3 FRONT UP : lighted == false
+; check network HallLight off
++0ms A N HALL_LIGHT_[3][FRONT][UP]_CAN_ID HallLight 3 FRONT UP : getValue == false
+; check network HallCall false
++0ms A N HALL_CALL_[3][FRONT][UP]_CAN_ID HallCall 3 FRONT UP : getValue == false
+
+;send a hall call (physical message)
++10ms I 1ms F HallCall 3 FRONT UP = true
+
+; check physical HallLight on
++311ms A F HallLight 3 FRONT UP : lighted == true
+; check network HallLight on
++0ms A N HALL_LIGHT_[3][FRONT][UP]_CAN_ID HallLight 3 FRONT UP : getValue == true
+; check network HallCall true
++1000ms A N HALL_CALL_[3][FRONT][UP]_CAN_ID HallCall 3 FRONT UP : getValue == true
+
+; send an AtFloor message (except DesiredDirection is down instead of UP)
++10ms I 1ms N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = true
++0ms I 1ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 DOWN FRONT
+
+; expect no change (light is still on)
++301ms A F HallLight 3 FRONT UP : lighted == true
+; check network HallLight on
++0ms A N HALL_LIGHT_[3][FRONT][UP]_CAN_ID HallLight 3 FRONT UP : getValue == true
+; check network HallCall true
++0ms A N HALL_CALL_[3][FRONT][UP]_CAN_ID HallCall 3 FRONT UP : getValue == true
+
+; reset messages
++10ms I 1ms N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = false
+;+0ms I 1ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 DOWN FRONT
+
+; send an AtFloor message (and DesiredDirection is UP)
++10ms I 1ms N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = true
++0ms I 1ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 UP FRONT
+
+; check physical HallLight turned off
++301ms A F HallLight 3 FRONT UP : lighted == false
+; check network HallLight off
++0ms A N HALL_LIGHT_[3][FRONT][UP]_CAN_ID HallLight 3 FRONT UP : getValue == false
+; check network HallCall off
++0ms A N HALL_CALL_[3][FRONT][UP]_CAN_ID HallCall 3 FRONT UP : getValue == false
+
+
+
+
+
+;check door Closed
+;+21ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == ;STOP
+;+0ms A F DoorMotor FRONT LEFT : command == STOP
+;
+;;set condition for T.4.1
+;+19ms I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = true
+;
+;;check Door Opening
+;+21ms A F DoorMotor FRONT LEFT : command == OPEN
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == ;OPEN
+;
+;;set condition for T.1
+;+19ms I MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID  DoorClosed FRONT LEFT ;= false
+;+0ms I MESSAGE_PERIOD N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT = ;true
+;+0ms I MESSAGE_PERIOD N DESIRED_DWELL_[FRONT]_CAN_ID Integer = 2
+;
+;;check Door Opened
+;+21ms A F DoorMotor FRONT LEFT : command == STOP
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == ;STOP
+;
+;;set condition for T.2
+;+19ms I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
+;
+;;check Door Nudge
+;+21ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == ;STOP
+;+0ms A F DoorMotor FRONT LEFT : command == NUDGE
+;
+;;set condition for T.3
+;+19ms I MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID  DoorClosed FRONT LEFT ;= true
+;+0ms I MESSAGE_PERIOD N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT = ;false
+;
+;;check Door Closed
+;+21ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == ;STOP
+;+0ms A F DoorMotor FRONT LEFT : command == STOP;

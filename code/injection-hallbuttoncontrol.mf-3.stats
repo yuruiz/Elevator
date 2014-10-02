@@ -1,0 +1,31 @@
+
+Simulator Parameters:
+Command line = -cf hallbuttoncontrol.cf -mf hallbuttoncontrol.mf -rt 1s
+RandomSeed = 1412220852193
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = hallbuttoncontrol.mf
+Controller File = hallbuttoncontrol.cf
+
+Assertion Results:
+@0.301s:  PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@68207d99 :: lighted ?== false PASSED
+@0.301s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7ea33d00 :: getValue ?== false PASSED
+@0.301s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@4226c7da :: getValue ?== false PASSED
+@0.622s:  PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@48b91881 :: lighted ?== true PASSED
+@0.622s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7b342572 :: getValue ?== true PASSED
+@0.622s:  FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@4a13ccea :: getValue ?== true FAILED
+@0.933s:  PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@2e6b611e :: lighted ?== true PASSED
+@0.933s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@1c465648 :: getValue ?== true PASSED
+@0.933s:  FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@31aba72e :: getValue ?== true FAILED
+@1.254s:  FAILED simulator.payloads.HallLightPayload$ReadableHallLightPayload@4d75650e :: lighted ?== false FAILED
+@1.254s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@684d9ebf :: getValue ?== false PASSED
+@1.254s:  PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@786bfd73 :: getValue ?== false PASSED
+
+
+******************Summary******************
+Passed:  9
+Failed:  3
+Total :  12
+

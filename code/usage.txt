@@ -1,0 +1,316 @@
+SYNOPSIS
+  Elevator [options] {-cf <file> -mf <file> | -pf <file> [-ff <file>]}
+
+DESCRIPTION
+  Either a unit/integration test (-cf with mandatory -mf) or an acceptance
+  test (-pf with optional -ff) must be specified.
+
+OUTPUT
+  A file with the "stats" extension will be placed in the working directory.
+  where the simulator is executed.  The name of the file will be related to the
+  unit, integration, or acceptance test files used.  Files include an incrementing
+  index value so that previous results will not be overwritten.
+  NOTE:  The stats file is printed at the end of the simulation, so if the
+  elevator terminates on an exception, a stats file is usually not printed, or
+  may be incomplete.
+  
+  Acceptance test results include detailed passenger delivery information and
+  detailed information on passenger satisfaction scores.
+  
+  Unit and integration test results include information on passed and failed
+  assertions
+  
+  In addition to the stats file, some information will be printed to stdout,
+  including a progress message every 60 seconds and a summary of the test 
+  results.
+
+TIME REPRESENTATIONS
+  Any part of the simulator that requires a time specification expects input
+  in the following format.  This includes any time columns in any of the input
+  files describe below.
+  
+  The time representation is a postive integer or floating point value followed
+  by one of the units specified below.  For example, "1.5s" will parse as 1.5
+  seconds or 1500 ms.  Note that the simulator will round to the minimum
+  resolution (1ns) so if you specify a time smaller than that (e.g.  "0.3ns",
+  this value will be rounded to zero.
+
+       h - hour
+       m - minute
+       s - second
+       ms - millisecond
+       us - microsecond
+       ns - nanosecond
+
+  Depending on the context, time values may represent a duration or they may
+  represent a moment in time in the simulation (an offset from the simulation
+  start time).
+
+OPTIONS
+  -pd
+    Print an exhaustive set of #DEFINE statements for all controller periods
+    and CAN Ids.  This flag
+    causes all other options to be ignored.  The recommended way to use this is
+    to save the output into a file which is included in unit and integration
+    tests using the #INCLUDE directive.  This will simplify your update task
+    if you change CAN IDs or controller periods later on.
+
+  -cf filename
+    Do a unit/integration test.  <filename> is a list of controllers to 
+    instantiate.  Each line should be of the form
+
+        ControllerClassName param param ...
+
+    On each line, all text after and including the first semi-colon will be
+    ignored.  The <param> will be parsed as arguments to the appropriate
+    constructor.  A message file must also be specified (see -mf).
+
+    Also, for constructors which take types such as Hallway or Side
+    you can use the enumeration constant as the value in your .cf file.
+    For example, for a Hallway param, you can use FRONT or BACK.
+
+    The cf file also supports the #INCLUDE syntax.  See the -mf section for
+    details.
+
+  -mf filename
+    Only valid when -cf is specified.  Each line of <filename> describes a 
+    message to inject or an assertion to check.  
+    Injections are inputs to the system, assertions check outputs.
+
+    Physical message injections should be of the form
+        time  type  period  context  payload  param param ... = arg arg ...
+
+    and network messages should be of the form
+        time  type  period  context  msgid  translator  param param ... = arg arg ...
+
+    and assertions on physical messages should have the form 
+        time  type  context  payload param param ... : member operator value 
+
+    and assertions on network messages messages should have the form 
+        time  type  context msgid translator param param ... : member operator value 
+
+    and assertions on controller state should have the form 
+        time  type  controllername : key operator value
+    (see the documentation for Controller.checkState() for more details on
+    state assertions.)
+
+    On each line, all text after and including the first semi-colon will be
+    ignored.
+    - <time> is the time at which to send the message. This should be in 
+             SimTime format (i.e. <value><unit>, where unit can be s, ms, etc.) 
+             Also, you can choose for this value to be an increment from the 
+             previous message, or an absolute time to fire the event. By preceeding 
+             the time with a '+' it will increment from the previous time. 
+             For example, if the first event fires at time 5s and the second fires 
+             at time +2s, the second event will fire at absolute time 7s. 
+    - <type> is I for injected message, A for assertion, or S for controller state.
+    
+    - <period> is a time interval between subsequent messages.  A zero <period>
+      will make the message not repeat.
+
+    - <context> is F or N, for framework or network message.
+
+    - <payload> is the type of the message.  For example, AtFloor or
+      DesiredFloor.  The string "Payload" will be appended to the end of
+      <payload> to make a class name (which must exist in simulator.payloads).
+      Note that even though you use a static factory method to create Readable
+      and Writeable payloads in your code, this item in the test file should
+      refer to the outer payload class, e.g. "HallCallPayload", not
+      "ReadableHallCallPayload" or "HallCallPayload.getReadablePayload()"
+    - <msgid> is an integer, the CAN message ID for this message.  It can be given
+      in hexadecimal format by prepending '0x'
+    - <translator> is the type of translator to use with this message.  The
+      string "CanPayloadTranslator" will be appended to the end of
+      <translator> to make a class name (which must exist in
+      simulator.elevatormodules, simulator.elevatorcontrol, or
+      simulator.payloads.translators).
+    - <params> will be passed to the constructor of <payload> or <translator>.
+    - <args> will be passed to the set() method of the Payload or the translator
+      after it is constructed.
+    - <member> is the public field or method of the payload or translator that is 
+      checked by the assertion.  Methods must have no arguments and not be void.
+    - <operator> one of ==, !=, <, >, <=, >=.  The value read from the member is
+      the left operator, and the specified value is the right operator.  Equals and
+      not equals can be used on all types.  A exception will be thrown is the
+      comparison operators are used on a non-numeric type.
+      For state assertions, only == and != are allowed, and the comparison is.
+      a case-sensitive string comparison.
+    - <value> must be a value that is compatible with the <member> type (for fields)
+      or return value (for methods).  At the appointed time, the specified value will be
+      compared to member value and the assertion will indicate whether it passes
+      or fails by printing the results.
+    - <controllername> is the name of the controller whose state you wish to check.
+    - <statevalue> a list of parameters that will be passed to the checkState() 
+      method of the controller
+
+    Note: "=" must separate the constructor parameters from the
+    the arguments to set().
+
+    Message Injector Macro Feature:
+
+    The syntax for the macro is:
+      #DEFINE <macro> <value>
+    Whereever the <macro> token appears in the test file, <value> will
+    automatically be substituted.  This is especially useful
+    for values which might change, like CAN message IDs and message periods.
+    Note:  the macro is a single token replacement, so you cannot use a macro
+    to replace multiple fields in the message injector file.
+
+    Message Injector Include Feature:
+
+    The syntax for the include directive is:
+      #INCLUDE <newfile>
+    the contents of newfile will be parsed inline at the point where the
+    #INCLUDE line is placed in the file.  Including a file in itself, or
+    creating a series of include files that form a cycle will result in an
+    error.
+
+
+  -pf filename
+    Do an acceptance test.  All controllers, sensors, and actuators will be
+    instantiated.  Passenger information will be read from <filename>.
+    Each line should be of the form
+
+        time startFloor startHallway endFloor endHallway
+
+    All text after and including the first semi-colon will be ignored.
+    - <time>, <startFloor>, and <endFloor> have the obvious meanings.
+             Also, you can choose for the <time> value to be an increment from the 
+             previous message, or an absolute time to fire the event. By preceeding 
+             the time with a '+' it will increment from the previous time. 
+             For example, if the first event fires at time 5s and the second fires 
+             at time +2s, the second event will fire at absolute time 7s. 
+    - Floor 1 is the lowest floor in the simulation.
+    - If <startFloor> is 0, the passenger will start inside the car. In this
+      case, the <startHallway> parameter should be specified even though it is
+      ignored.
+    - <startHallway> and <endHallway> must be FRONT or BACK, but the value for
+      <startHallway> may be different from <endHallway>.
+
+    The passenger file also supports the #INCLUDE syntax.  See the -mf section
+    for details.
+
+  -il
+    When present passengers will ignore the requirement that the elevator car
+    must be level with a floor for the passengers to enter. Only effective
+    during acceptance tests.
+
+  -ff filename
+    Inject faults into the simulation.  The faults are read from <filename>.
+    
+    The fault file also supports the #INCLUDE syntax.  See the -mf section
+    for details.
+
+    The fault file name contains one fault type on each row.  Different fault
+    types require different arguments.  The fault types are summarized here:
+    
+    Network DropMessages <DropPercentage>
+       This model randomly drops messages from the CAN network at a rate
+       specified by DropPercentage.
+       This fault will not drop two messages in a row of any type
+       DropPercentage - must be a number in the range 0-100.  
+    
+    FailedButton <StartTime> <Duration> <HallCall|CarCall> <Location>
+       This model causes the specified button to fail silent.
+       StartTime - a time string representing the time to start the button
+           failure.
+       Duration - a time string specifying how long the fault should last.
+           use "FOREVER" for a permanent fault.
+       HallCall|CarCall - specify which button type fails.  Specify only one.
+       Location - series of space-separated arguments that describe which
+           button has failed.
+           For Car calls, it is FLOOR SIDE.
+           For Hall calls, it is FLOOR SIDE DIRECTION.
+    
+    DoorMotorBlackout <duration>
+       This fault causes a total blackout on the CAN network for the specified
+       duration every time the door motors are activated to open or close the
+       doors.
+       Duration - how long each blackout lasts.
+
+   -monitor <MonitorName>
+     Locates and instantiates a class named MonitorName in the elevatorcontrol 
+     or elevatormodules package.  Note that monitors submitted by students  
+     must be located in the elevatorcontrol package.
+     The monitor class must be descended from simulator.framework.RuntimeMonitor
+     and must have a constructor that takes no arguments.
+
+  -gui
+    Display a realtime graphical representation of the simulation.  For detailed
+    passenger information, hover the mouse over the passenger counts for the
+    hall landings or car.  A complete list of passengers if visible in the
+    tooltip.  This feature works best if the simulation is paused or running
+    very slowly.
+
+  -rt time
+    - For acceptance tests: the amount of time to run the simulator after
+      the last passenger is injected.  Default value is 1 hour.
+    - For unit/integration tests: the amoung of time to run the test
+      test after the last message is injected into the network.
+      default is 5 seconds.
+
+  -rate R
+    (Only valid when the GUI is enabled.)  Sets the initial execution speed of
+    the simulator to a multiple of realtime.  For every second that passes in
+    real time, R seconds will pass in the simulator.  If R is 1.0, the simulator
+    will try to execute in realtime.  If R is INFINITE, the simulator will run
+    as quickly as it can.  Note that this only constrains the maximum speed of
+    the simulator.  Other factors (such as lots of printed output) may slow the
+    simulator significantly.
+
+    If the -rate flag is not specified, the default values are INFINITE if the
+    GUI is disabled and 1.0 if the GUI is enabled.
+
+  -break BREAKPOINTLIST
+    (Only valid when the GUI is enabled.)  BREAKPOINTLIST shall be a
+    comma-separated list of breakpoint times.  Each breakpoint pauses the
+    simulator execution (drops the runtimerate to 0).  Each breakpoint occurs
+    before any simulation events scheduled at that time.
+
+  -seed RANDOMSEED
+    Specify a random seed for the simulation run.  All the 'random' behavior in
+    the simulator is pseudorandom, so specifying a particular random seed should
+    make the simulation run repeatable.  If the -seed flag is omitted, the
+    system timestamp is used.  The random seed for each run is printed at the
+    beginning of the run.
+
+  -head HEADERFILE
+    HEADERFILE specifies a path to a header file.  The contents of this file
+    will be printed to the console to at the beginning of the simulation and
+    into the elevator.stats file after an acceptance test.
+
+  -b N
+    Set the bandwidth to N*1000 bits/sec.  N must be a positive integer. The
+    default is 200 kbps.
+
+  -fs FASTSPEED
+    Specify the FASTSPEED of the elevator in m/s.  Default is 1.0 m/s.  This
+    option accepts any value in the range [1.0, 10.0].
+
+  -cv
+    Get verbose output from the Controller factory.  If you want verbose output
+    from a Control object, have the controller's constructor accept a verbosity
+    parameter, and then change the control file (see the -cf option).
+
+  -nv
+    Get verbose output from the network modules.
+
+  -fnv
+    Get verbose output from the framework messages.
+
+  -fv
+    Get verbose output from the framework objects (such as the
+    AtFloor sensors).
+
+  -pv
+    Get verbose output from the passengers.
+
+  -miv
+    Get verbose output from the MessageInjector.
+
+  -fiv
+    Get verbose output from the FaultInjector.
+
+  -dropv
+    Get a lot of information about which messages are dropped.
+

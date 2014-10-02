@@ -37,6 +37,7 @@ public class HallCallCanPayloadTranslator extends CanPayloadTranslator {
         BitSet b = new BitSet(32);
         b.set(31, value);
         setMessagePayload(b, getByteSize());
+        System.out.println(payloadToString());
     }
     
     public boolean getValue() {
