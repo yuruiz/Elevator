@@ -2,7 +2,6 @@ package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
 import simulator.elevatormodules.AtFloorCanPayloadTranslator;
-import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
 import simulator.framework.Controller;
 import simulator.framework.Direction;
 import simulator.framework.Hallway;
@@ -31,20 +30,15 @@ public class HallButtonControl extends Controller {
     //network interface
     private WriteableCanMailbox networkHallLightOut;
     // translator for the hall light message -- this is a generic translator
-    private HallLightCanPayloadTranslator mHallLight;
+    private BooleanCanPayloadTranslator mHallLight;
     
     // network interface
     private WriteableCanMailbox networkHallCall;
-    private HallCallCanPayloadTranslator mHallCall;
+    private BooleanCanPayloadTranslator mHallCall;
 
     //received door closed message
     private ReadableCanMailbox networkDoorClosedLeft;
     private ReadableCanMailbox networkDoorClosedRight;
-    
-    //translator for the doorClosed message -- this translator is specific
-    //to this messages, and is provided the elevatormodules package
-    private DoorClosedCanPayloadTranslator mDoorClosedLeft;
-    private DoorClosedCanPayloadTranslator mDoorClosedRight;
     
     //translator for the AtFloor message -- this translator is specific
     //to this message and is provided elevatormodules package
@@ -67,8 +61,7 @@ public class HallButtonControl extends Controller {
     //enumerate states
     private enum State {
         STATE_IDLE,
-        STATE_ACTIVE,
-        STATE_SWITCH_OFF
+        STATE_ACTIVE
     }
     
     //state variable initialized to the initial state FLASH_OFF
@@ -114,9 +107,7 @@ public class HallButtonControl extends Controller {
         // mDoorClosedLeft, mDoorClosedRight
         networkDoorClosedLeft = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.LEFT));
         networkDoorClosedRight = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.RIGHT));
-        mDoorClosedLeft = new DoorClosedCanPayloadTranslator(networkDoorClosedLeft, hallway, Side.LEFT);
-        mDoorClosedRight = new DoorClosedCanPayloadTranslator(networkDoorClosedRight, hallway, Side.RIGHT);
-
+        
         // HallCall
         localHallCall = HallCallPayload.getReadablePayload(floor, hallway, direction);
 
@@ -138,13 +129,13 @@ public class HallButtonControl extends Controller {
         
         // mHallLight
         networkHallLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
-        mHallLight = new HallLightCanPayloadTranslator(networkHallLightOut, floor, hallway, direction);
+        mHallLight = new BooleanCanPayloadTranslator(networkHallLightOut);
         
         // mHallCall
         networkHallCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
-        mHallCall = new HallCallCanPayloadTranslator(networkHallCall, floor, hallway, direction);
+        mHallCall = new BooleanCanPayloadTranslator(networkHallCall);
         
-        /* Send/broadcast output messages periodically */
+        // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localHallLight, period);
         canInterface.sendTimeTriggered(networkHallLightOut, period);
         canInterface.sendTimeTriggered(networkHallCall, period);
@@ -156,49 +147,31 @@ public class HallButtonControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 		State newState = state;
-		log("Entering " + state);
         switch(state) {
             case STATE_IDLE:
             	localHallLight.set(false);
             	mHallLight.set(false);
             	mHallCall.set(false);
-            	//#transition HBC.T.1
+            	//#transition HBC.1
             	if (localHallCall.pressed()) {
             		newState = State.STATE_ACTIVE;
             	}
                 break;
-                
-                /* Design issue: 
-                 * 	- In STATE_ACTIVE, transition back to STATE_IDLE
-                 *  - localHallCall will assume the value of mHallCall, which is true
-                 *  - It will be pressed regardless
-                 *  - Need to add an off state that will always transition back to IDLE
-                 */
             case STATE_ACTIVE:
+            	/* Someone made a hall call */
             	localHallLight.set(true);
             	mHallLight.set(true);
             	mHallCall.set(true);
-            	//#transition HBC.T.2
+            	//#transition HBC.2
             	//XXX: Change: Removed && !localHallCall.pressed() (Should turn off as soon as floor is reached)
-            	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
-            			mDesiredFloor.getDirection().equals(direction)) {
-            		newState = State.STATE_SWITCH_OFF;
-            	}
-                break;
-            case STATE_SWITCH_OFF:
-            	/* XXX: Addition:
-            	 *  Temporary state to reset all output messages for one period before re-entering idle */
-            	localHallLight.set(false);
-            	mHallLight.set(false);
-            	mHallCall.set(false);
-            	//#transition HBC.T.3
-            	if (true) {
+            	if (mAtFloor.getValue() && mDesiredFloor.getDirection().equals(direction)) {
             		newState = State.STATE_IDLE;
             	}
-            	break;
+                break;
             default:
             	throw new RuntimeException("State " + state + " was not recognized.");
         }
+        
     	log(state.toString() + " -> " + newState.toString());
         state = newState;
 
