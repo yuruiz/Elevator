@@ -1,7 +1,9 @@
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
-import simulator.elevatormodules.*;
+import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
+import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
+import simulator.elevatormodules.DoorOpenedCanPayloadTranslator;
 import simulator.framework.*;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
@@ -36,8 +38,8 @@ public class DoorControl extends Controller {
     private WriteableDoorMotorPayload localDoorMotor;
 
     /*Input network Interface*/
-    private ReadableCanMailbox networkAtFloor[];
-    private AtFloorCanPayloadTranslator mAtFloor[];
+//    private ReadableCanMailbox networkAtFloor[];
+//    private AtFloorCanPayloadTranslator mAtFloor[];
     private ReadableCanMailbox networkDesiredDwell;
     private IntegerCanPayloadTranslator mDesiredDwell;
     private ReadableCanMailbox networkDoorClosed;
@@ -48,6 +50,7 @@ public class DoorControl extends Controller {
     private CarWeightAlarmCanPayloadTranslator mCarWeight;
     private ReadableCanMailbox networkDesiredFloor;
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
+    private Utility.AtFloorArray mAtFloor;
 
     /*Input Physical Interface*/
     private ReadableDriveSpeedPayload localDriveSpeed;
@@ -67,14 +70,15 @@ public class DoorControl extends Controller {
         this.dwell = 0;
         this.countdown = this.dwell;
 
-        networkAtFloor = new ReadableCanMailbox[height];
+//        networkAtFloor = new ReadableCanMailbox[height];
 
-        mAtFloor = new AtFloorCanPayloadTranslator[height];
-        for (int i = 1; i <= height; i++) {
-            networkAtFloor[i - 1] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
-            mAtFloor[i-1] = new AtFloorCanPayloadTranslator(networkAtFloor[i - 1], i, hallway);
-            canInterface.registerTimeTriggered(networkAtFloor[i - 1]);
-        }
+//        mAtFloor = new AtFloorCanPayloadTranslator[height];
+//        for (int i = 1; i <= height; i++) {
+//            networkAtFloor[i - 1] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
+//            mAtFloor[i-1] = new AtFloorCanPayloadTranslator(networkAtFloor[i - 1], i, hallway);
+//            canInterface.registerTimeTriggered(networkAtFloor[i - 1]);
+//        }
+        mAtFloor = new Utility.AtFloorArray(canInterface);
 
         networkDesiredDwell = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway));
         mDesiredDwell = new IntegerCanPayloadTranslator(networkDesiredDwell);
@@ -108,7 +112,8 @@ public class DoorControl extends Controller {
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
 
 
-        localDoorMotor.set(DoorCommand.CLOSE);
+        localDoorMotor.set(DoorCommand.STOP);
+        mDoorMotor.setCommand(DoorCommand.STOP);
 //        while (!mDoorClosed.getValue()){}
         this.currentState = State.Closed;
 
@@ -117,7 +122,7 @@ public class DoorControl extends Controller {
 
     @Override
     public void timerExpired(Object callbackData) {
-        log("Executing state" + currentState);
+        log("Executing state " + currentState);
 
         switch (currentState) {
             case Opening:    /*State 1 Opening*/
@@ -125,7 +130,6 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.OPEN);
                 dwell = mDesiredDwell.getValue();
                 countdown = dwell;
-
                 //#Transition T.1
                 if (mDoorOpened.getValue()) {
                     currentState = State.Opened;
@@ -157,13 +161,14 @@ public class DoorControl extends Controller {
                 }
                 break;
             case Closed:  /*State 3 Closed*/
+//                log("Start Door Closed State");
                 localDoorMotor.set(DoorCommand.STOP);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
                 //#Transition T.4
-                if (mCarWeight.getValue() || atFloor() == mDesiredFloor.getFloor() ||
-                        localDriveSpeed.direction() == Direction.STOP) {
+                if (mCarWeight.getValue() || (atFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() ==
+                        hallway && localDriveSpeed.speed() == 0) || localDriveSpeed.direction() == Direction.STOP) {
                     currentState = State.Opening;
                 }
                 break;
@@ -171,12 +176,14 @@ public class DoorControl extends Controller {
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
 
+        timer.start(period);
+
     }
 
     private int atFloor() {
         for (int i = 0; i < height; i++) {
-            if (mAtFloor[i].getValue()) {
-                return i+1;
+            if(this.mAtFloor.isAtFloor(i+1, hallway)){
+                return i;
             }
         }
         return 0;
