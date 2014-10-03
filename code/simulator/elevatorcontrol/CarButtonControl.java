@@ -125,11 +125,11 @@ public class CarButtonControl extends Controller {
         localCarLight = CarLightPayload.getWriteablePayload(floor, hallway);
         
         // mCarLight
-        networkCarLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
+        networkCarLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mCarLight = new BooleanCanPayloadTranslator(networkCarLightOut);
         
         // mCarCall
-        networkCarCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
+        networkCarCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mCarCall = new BooleanCanPayloadTranslator(networkCarCall);
         
         // Send/broadcast output messages periodically
