@@ -130,7 +130,7 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.OPEN);
                 dwell = mDesiredDwell.getValue();
                 countdown = dwell;
-                //#Transition T.1
+                //#transition T.1
                 if (mDoorOpened.getValue()) {
                     currentState = State.Opened;
                 }
@@ -141,7 +141,7 @@ public class DoorControl extends Controller {
                 dwell = mDesiredDwell.getValue();
                 countdown--;
 
-                //#Transition T.2
+                //#transition T.2
                 if (countdown < 0 && !mCarWeight.getValue()) {
                     currentState = State.Nudge;
                 }
@@ -151,11 +151,11 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#Transition T.3
+                //#transition T.3
                 if (mDoorClosed.getValue()) {
                     currentState = State.Closed;
                 }
-                //#Transition T.5
+                //#transition T.5
                 else if (mCarWeight.getValue()) {
                     currentState = State.Opening;
                 }
@@ -166,7 +166,7 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#Transition T.4
+                //#transition T.4
                 if (mCarWeight.getValue() || (atFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() ==
                         hallway && localDriveSpeed.speed() == 0) || localDriveSpeed.direction() == Direction.STOP) {
                     currentState = State.Opening;
