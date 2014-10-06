@@ -18,7 +18,7 @@ import simulator.payloads.translators.IntegerCanPayloadTranslator;
  * Created by yuruiz on 9/28/14.
  */
 public class DoorControl extends Controller {
-    public static enum State {
+    private static enum State {
         Opening,
         Opened,
         Closed,
@@ -70,14 +70,6 @@ public class DoorControl extends Controller {
         this.dwell = 0;
         this.countdown = this.dwell;
 
-//        networkAtFloor = new ReadableCanMailbox[height];
-
-//        mAtFloor = new AtFloorCanPayloadTranslator[height];
-//        for (int i = 1; i <= height; i++) {
-//            networkAtFloor[i - 1] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
-//            mAtFloor[i-1] = new AtFloorCanPayloadTranslator(networkAtFloor[i - 1], i, hallway);
-//            canInterface.registerTimeTriggered(networkAtFloor[i - 1]);
-//        }
         mAtFloor = new Utility.AtFloorArray(canInterface);
 
         networkDesiredDwell = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway));

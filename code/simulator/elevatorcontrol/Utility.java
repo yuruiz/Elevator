@@ -4,17 +4,14 @@
  */
 package simulator.elevatorcontrol;
 
-import java.util.HashMap;
 import simulator.elevatormodules.AtFloorCanPayloadTranslator;
 import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
+import simulator.framework.*;
 import simulator.payloads.CANNetwork;
-import simulator.framework.Elevator;
-import simulator.framework.Hallway;
-import simulator.framework.Harness;
-import simulator.framework.ReplicationComputer;
-import simulator.framework.Side;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
+
+import java.util.HashMap;
 
 /**
  * This class provides some example utility classes that might be useful in more
@@ -90,5 +87,78 @@ public class Utility {
             }
             return retval;
         }
+    }
+
+    public static class HallCallArray{
+        private CANNetwork.CanConnection conn;
+        public HashMap<Integer, HallCallCanPayloadTranslator> translatorArray = new HashMap<Integer, HallCallCanPayloadTranslator>();
+        public HallCallArray(CANNetwork.CanConnection conn) {
+            this.conn = conn;
+            for (int i = 1; i <= 8; i++) {
+                switch (i) {
+                    case 1:
+                        CreateTranslator(i, Hallway.FRONT, Direction.UP);
+                        CreateTranslator(i, Hallway.FRONT, Direction.DOWN);
+                    case 2:
+                        CreateTranslator(i, Hallway.BACK, Direction.UP);
+                        CreateTranslator(i, Hallway.BACK, Direction.DOWN);
+                        break;
+                    case 7:
+                        CreateTranslator(i, Hallway.FRONT, Direction.UP);
+                        CreateTranslator(i, Hallway.FRONT, Direction.DOWN);
+                        CreateTranslator(i, Hallway.BACK, Direction.UP);
+                        CreateTranslator(i, Hallway.BACK, Direction.DOWN);
+                        break;
+                    default:
+                        CreateTranslator(i, Hallway.FRONT, Direction.UP);
+                        CreateTranslator(i, Hallway.FRONT, Direction.DOWN);
+                        break;
+                }
+
+            }
+        }
+
+        private void CreateTranslator(int floor, Hallway hallway, Direction direction) {
+            int Index = ReplicationComputer.computeReplicationId(floor, hallway, direction);
+            ReadableCanMailbox m = CanMailbox.getReadableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + Index);
+            HallCallCanPayloadTranslator translator = new HallCallCanPayloadTranslator(m, floor, hallway, direction);
+            this.conn.registerTimeTriggered(m);
+            this.translatorArray.put(Index, translator);
+        }
+    }
+
+    public static class CarCallArray {
+        private CANNetwork.CanConnection conn;
+        public HashMap<Integer, CarCallCanPayloadTranslator> translatorArray = new HashMap<Integer, CarCallCanPayloadTranslator>();
+        public CarCallArray(CANNetwork.CanConnection conn){
+            this.conn = conn;
+
+            for (int i = 1; i <= 8; i++) {
+                switch (i) {
+                    case 1:
+                        CreateTranslator(i, Hallway.FRONT);
+                    case 2:
+                        CreateTranslator(i, Hallway.BACK);
+                        break;
+                    case 7:
+                        CreateTranslator(i, Hallway.FRONT);
+                        CreateTranslator(i, Hallway.BACK);
+                        break;
+                    default:
+                        CreateTranslator(i, Hallway.FRONT);
+                        break;
+                }
+
+            }
+        }
+
+        private void CreateTranslator(int floor, Hallway hallway) {
+            int Index = ReplicationComputer.computeReplicationId(floor, hallway);
+            ReadableCanMailbox m = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + Index);
+            CarCallCanPayloadTranslator translator = new CarCallCanPayloadTranslator(m, floor, hallway);
+            this.conn.registerTimeTriggered(m);
+            this.translatorArray.put(Index, translator);
+        }
+
     }
 }
