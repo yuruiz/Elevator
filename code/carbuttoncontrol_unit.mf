@@ -1,0 +1,46 @@
+;18649 2014 Fall
+;Group 5
+;Yurui Zhou (yuruiz)
+;Siyur Wei (siyuwei)
+;James Sakai (jssakai)
+;Vijay Jayaram (vijayj)
+;carbuttoncontrol_unit.mf
+
+#INCLUDE canid.mf
+#DEFINE MESSAGE_PERIOD 10ms
+
+;initialize
+0ms I 0ms F CarCall 3 FRONT = false
++0ms I 0ms N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = false
++0ms I 0ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 2 DOWN FRONT
+
+;#state 'CBC.S1 STATE_IDLE'
++301ms A F CarLight 3 FRONT : lighted == false
++0ms A N CAR_LIGHT_[3][FRONT]_CAN_ID Boolean : getValue == false
++0ms A N CAR_CALL_[3][FRONT]_CAN_ID Boolean : getValue == false
+
+;#transition 'CBC.T1'
++10ms I 0ms F CarCall 3 FRONT = true
++200ms I 0ms F CarCall 3 FRONT = false
+
+;#state 'CBC.S2 STATE_CAR_CALL'
++1s A F CarLight 3 FRONT : lighted == true
++0ms A N CAR_LIGHT_[3][FRONT]_CAN_ID Boolean : getValue == true
++0ms A N CAR_CALL_[3][FRONT]_CAN_ID Boolean : getValue == true
+
+;#transition Implicit transition to same state
++0ms I 0ms N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = true
+;+0ms I 0ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 DOWN FRONT
+
+;#state 'CBC.S2 STATE_CAR_CALL'
++1s A F CarLight 3 FRONT : lighted == true
++0ms A N CAR_LIGHT_[3][FRONT]_CAN_ID Boolean : getValue == true
++0ms A N CAR_CALL_[3][FRONT]_CAN_ID Boolean : getValue == true
+
+;#transition 'CBC.T2' 
++0ms I 0ms N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 UP FRONT
+
+;#state 'CBC.S1 STATE_IDLE'
++1s A F CarLight 3 FRONT : lighted == false
++0ms A N CAR_LIGHT_[3][FRONT]_CAN_ID Boolean : getValue == false
++0ms A N CAR_CALL_[3][FRONT]_CAN_ID Boolean : getValue == false
