@@ -154,7 +154,9 @@ public class DoorControl extends Controller {
                 dwell = mDesiredDwell.getValue();
 
                 //#transition T.4
-                if (mCarWeight.getValue() || (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() == hallway && (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP))) {
+                if (mCarWeight.getValue() || (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
+                        (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
+                        (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP))) {
 
                     currentState = State.Opening;
                 }
