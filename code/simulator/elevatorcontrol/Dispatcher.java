@@ -57,7 +57,7 @@ public class Dispatcher extends Controller {
         this.Target = 1;
         this.prevTarget = 1;
         this.CurrentState = State.Initial;
-        this.DiesiredDewell = 10000;
+        this.DiesiredDewell = 5;
         this.Target_set = false;
 
         mAtFloor = new Utility.AtFloorArray(canInterface);

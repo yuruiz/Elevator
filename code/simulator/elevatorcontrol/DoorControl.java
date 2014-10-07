@@ -10,8 +10,6 @@ import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.DoorMotorPayload;
 import simulator.payloads.DoorMotorPayload.WriteableDoorMotorPayload;
-import simulator.payloads.DriveSpeedPayload;
-import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
 import simulator.payloads.translators.IntegerCanPayloadTranslator;
 
 /**
@@ -38,8 +36,6 @@ public class DoorControl extends Controller {
     private WriteableDoorMotorPayload localDoorMotor;
 
     /*Input network Interface*/
-//    private ReadableCanMailbox networkAtFloor[];
-//    private AtFloorCanPayloadTranslator mAtFloor[];
     private ReadableCanMailbox networkDesiredDwell;
     private IntegerCanPayloadTranslator mDesiredDwell;
     private ReadableCanMailbox networkDoorClosed;
@@ -51,9 +47,8 @@ public class DoorControl extends Controller {
     private ReadableCanMailbox networkDesiredFloor;
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
     private Utility.AtFloorArray mAtFloor;
-
-    /*Input Physical Interface*/
-    private ReadableDriveSpeedPayload localDriveSpeed;
+    private ReadableCanMailbox networkDriveSpeed;
+    private DriveSpeedCanPayloadTranslator mDriveSpeed;
 
     /*Output Network Interface*/
     private WriteableCanMailbox networkDoorMotor;
@@ -67,7 +62,7 @@ public class DoorControl extends Controller {
         this.period = period;
         this.hallway = hallway;
         this.side = side;
-        this.dwell = 0;
+        this.dwell = 10;
         this.countdown = this.dwell;
 
         mAtFloor = new Utility.AtFloorArray(canInterface);
@@ -96,9 +91,9 @@ public class DoorControl extends Controller {
         mDoorMotor = new DoorMotorCanPayloadTranslator(networkDoorMotor, hallway, side);
         canInterface.sendTimeTriggered(networkDoorMotor, period);
 
-
-        localDriveSpeed = DriveSpeedPayload.getReadablePayload();
-        physicalInterface.registerTimeTriggered(localDriveSpeed);
+        networkDriveSpeed = CanMailbox.getReadableCanMailbox(MessageDictionary.DRIVE_SPEED_CAN_ID);
+        mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
+        canInterface.registerTimeTriggered(networkDriveSpeed);
 
         localDoorMotor = DoorMotorPayload.getWriteablePayload(hallway, side);
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
@@ -159,8 +154,8 @@ public class DoorControl extends Controller {
                 dwell = mDesiredDwell.getValue();
 
                 //#transition T.4
-                if (mCarWeight.getValue() || (atFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() ==
-                        hallway && localDriveSpeed.speed() == 0) || localDriveSpeed.direction() == Direction.STOP) {
+                if (mCarWeight.getValue() || (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() == hallway && (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP))) {
+
                     currentState = State.Opening;
                 }
                 break;
@@ -172,12 +167,4 @@ public class DoorControl extends Controller {
 
     }
 
-    private int atFloor() {
-        for (int i = 0; i < height; i++) {
-            if(this.mAtFloor.isAtFloor(i+1, hallway)){
-                return i;
-            }
-        }
-        return 0;
-    }
 }
