@@ -148,7 +148,6 @@ public class DoorControl extends Controller {
                 }
                 break;
             case Closed:  /*State 3 Closed*/
-//                log("Start Door Closed State");
                 localDoorMotor.set(DoorCommand.STOP);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();

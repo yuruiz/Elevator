@@ -16,6 +16,7 @@ public class Dispatcher extends Controller {
 
     private static enum State{
         Initial,
+        Error,
         Target,
         Open,
         Close
@@ -90,18 +91,20 @@ public class Dispatcher extends Controller {
 
     @Override
     public void timerExpired(Object callbackData) {
-        log("Executing state " + CurrentState + Target);
+        log("Executing state " + CurrentState);
 
+        boolean FrontClosed;
+        boolean BackClosed;
         boolean atCurrentTarget;
         switch (CurrentState) {
             case Initial:
                 this.Target = 1;
-                mDesiredFloor.set(this.Target, Direction.STOP, Hallway.NONE);
+                mDesiredFloor.set(Target, Hallway.BOTH, Direction.STOP);
 
-                boolean FrontClosed = mFrontDoorClosed.getBothClosed();
-                boolean BackClosed = mBackDoorClosed.getBothClosed();
+                FrontClosed = mFrontDoorClosed.getBothClosed();
+                BackClosed = mBackDoorClosed.getBothClosed();
                 if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
-                        mDesiredFloor.getHallway() == Hallway.NONE) {
+                        mDesiredFloor.getHallway() == Hallway.BOTH) {
                     CurrentState = State.Target;
                 }
                 break;
@@ -113,7 +116,7 @@ public class Dispatcher extends Controller {
                     atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
                     prevTarget = Target;
                     Target = Target % 8 + 1;
-                    setTarget(Target, mAtFloor.isAtFloor(prevTarget, Hallway.FRONT), mAtFloor.isAtFloor(prevTarget, Hallway.BACK));
+                    setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
                     Target_set = true;
                 }
 
@@ -121,8 +124,8 @@ public class Dispatcher extends Controller {
                     Target_set = false;
                     CurrentState = State.Close;
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
-
-                    CurrentState = State.Initial;
+                    Target_set = false;
+                    CurrentState = State.Error;
                 }
                 break;
             case Open:
@@ -134,7 +137,7 @@ public class Dispatcher extends Controller {
                     CurrentState = State.Target;
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
 
-                    CurrentState = State.Initial;
+                    CurrentState = State.Error;
                 }
                 break;
             case Close:
@@ -145,7 +148,18 @@ public class Dispatcher extends Controller {
                     CurrentState = State.Open;
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
 
-                    CurrentState = State.Initial;
+                    CurrentState = State.Error;
+                }
+                break;
+            case Error:
+                this.Target = 1;
+                mDesiredFloor.set(this.Target, Direction.STOP, Hallway.NONE);
+
+                FrontClosed = mFrontDoorClosed.getBothClosed();
+                BackClosed = mBackDoorClosed.getBothClosed();
+                if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
+                        mDesiredFloor.getHallway() == Hallway.NONE) {
+                    CurrentState = State.Target;
                 }
                 break;
             default:
@@ -164,6 +178,9 @@ public class Dispatcher extends Controller {
         }
         else if (Back == true) {
             mDesiredFloor.set(Target, Hallway.BACK, Direction.STOP);
+        }
+        else {
+            mDesiredFloor.set(Target, Hallway.NONE, Direction.STOP);
         }
 
 
