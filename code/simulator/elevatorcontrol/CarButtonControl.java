@@ -63,7 +63,7 @@ public class CarButtonControl extends Controller {
     }
     
     //state variable initialized to the initial state FLASH_OFF
-    private State state = State.STATE_IDLE;
+    private State currentState = State.STATE_IDLE;
 
     /**
      * The arguments listed in the .cf configuration file should match the order and
@@ -143,8 +143,8 @@ public class CarButtonControl extends Controller {
 
 	@Override
 	public void timerExpired(Object callbackData) {
-		State newState = state;
-        switch(state) {
+		State newState = currentState;
+        switch(currentState) {
             case STATE_IDLE:
             	localCarLight.set(false);
             	mCarLight.set(false);
@@ -165,11 +165,11 @@ public class CarButtonControl extends Controller {
             	}
                 break;
             default:
-            	throw new RuntimeException("State " + state + " was not recognized.");
+            	throw new RuntimeException("State " + currentState + " was not recognized.");
         }
         
-    	log(state.toString() + " -> " + newState.toString());
-        state = newState;
+    	log(currentState.toString() + " -> " + newState.toString());
+        currentState = newState;
 
         timer.start(period);
 	}
