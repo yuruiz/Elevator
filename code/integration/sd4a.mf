@@ -1,0 +1,55 @@
+;18649 2014 Fall
+;Group 5
+;Yurui Zhou (yuruiz)
+;Siyur Wei (siyuwei)
+;James Sakai (jssakai)
+;Vijay Jayaram (vijayj)
+; sd4a.mf
+
+#INCLUDE canid.mf
+
+#DEFINE MESSAGE_PERIOD 10ms
+
+;initialize to pre-conditions
+0ms  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
+0ms  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][RIGHT]_CAN_ID DoorClosed FRONT RIGHT = true
+0ms  I  MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
+0ms  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 3 STOP FRONT
+0ms  I  MESSAGE_PERIOD F DriveSpeed = STOP 0
+0ms I MESSAGE_PERIOD N DESIRED_DWELL_[FRONT]_CAN_ID Integer = 2
+
+;#arc '4a/1a'
+;+1ms I MESSAGE_PERIOD N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = false
++1ms I MESSAGE_PERIOD N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT = true
+
+; Check Drive set to stop (internal state check)
+;+21ms A F Drive : speed == STOP
+;+0ms A F Drive : direction == STOP
+;+0ms A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+;+0ms A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == STOP
+;+0ms A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+;#arc '4a/2a' (internal state check)
+;+0ms A F DoorMotor FRONT LEFT : command == OPEN
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == OPEN
+;+0ms A F DoorMotor FRONT RIGHT : command == OPEN
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][RIGHT]_CAN_ID DoorMotor FRONT RIGHT : getCommand == OPEN
+;
+; Tell DoorControl that Doors are opened
++100ms I MESSAGE_PERIOD N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT = true
++0ms I MESSAGE_PERIOD N DOOR_OPEN_SENSOR_[FRONT][RIGHT]_CAN_ID DoorOpened FRONT RIGHT = true
+
+;#arc '4a/2c' (internal state check)
+;+41ms A F DoorMotor FRONT LEFT : command == STOP
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
+;+0ms A F DoorMotor FRONT RIGHT : command == STOP
+;+0ms A N DOOR_MOTOR_COMMAND_[FRONT][RIGHT]_CAN_ID DoorMotor FRONT RIGHT : getCommand == STOP;
+
+; post-condition checks
++1s A F DoorMotor FRONT LEFT : command == STOP
++0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
++0ms A F DoorMotor FRONT RIGHT : command == STOP
++0ms A N DOOR_MOTOR_COMMAND_[FRONT][RIGHT]_CAN_ID DoorMotor FRONT RIGHT : getCommand == STOP
++0ms A N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT : getValue == true
++0ms A N DOOR_OPEN_SENSOR_[FRONT][RIGHT]_CAN_ID DoorOpened FRONT RIGHT : getValue == true
++0ms A N AT_FLOOR_[3][FRONT]_CAN_ID AtFloor 3 FRONT : getValue == true

@@ -1,0 +1,100 @@
+Simulator Parameters:
+Command line = -cf unit/hallbuttoncontrol_unit.cf -mf unit/hallbuttoncontrol_unit.mf -rt 1s
+RandomSeed = 1412747799967
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = unit/hallbuttoncontrol_unit.mf
+Controller File = unit/hallbuttoncontrol_unit.cf
+
+
+[HallButtonControl[3][FRONT][UP]] @0.000000000: Created HallButtonControl[3][FRONT][UP] with period = 0.1s
+[Elevator] @0.000000000: Starting Simulation ***
+[HallButtonControl[3][FRONT][UP]] @0.100000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @0.200000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @0.300000000: STATE_IDLE -> STATE_IDLE
+[AssertionMonitor] @0.301000000: ********************************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@2857a293 :: lighted ?== false PASSED
+[AssertionMonitor] @0.301000000: ********************************************************************************************************
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7185d3cc :: getValue ?== false PASSED
+[AssertionMonitor] @0.301000000: *********************************************************************************************
+[AssertionMonitor] @0.301000000: ********************************************************************************************
+[AssertionMonitor] @0.301000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@c6f558a :: getValue ?== false PASSED
+[AssertionMonitor] @0.301000000: ********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @0.400000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @0.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[AssertionMonitor] @1.511000000: *******************************************************************************************************
+[AssertionMonitor] @1.511000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@112f8578 :: lighted ?== true PASSED
+[AssertionMonitor] @1.511000000: *******************************************************************************************************
+[AssertionMonitor] @1.511000000: *******************************************************************************************
+[AssertionMonitor] @1.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@68c8a04 :: getValue ?== true PASSED
+[AssertionMonitor] @1.511000000: *******************************************************************************************
+[AssertionMonitor] @1.511000000: ********************************************************************************************
+[AssertionMonitor] @1.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@21c75cff :: getValue ?== true PASSED
+[AssertionMonitor] @1.511000000: ********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @1.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @1.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[3][FRONT][UP]] @2.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[AssertionMonitor] @2.511000000: *******************************************************************************************************
+[AssertionMonitor] @2.511000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@295bc68c :: lighted ?== true PASSED
+[AssertionMonitor] @2.511000000: *******************************************************************************************************
+[AssertionMonitor] @2.511000000: ********************************************************************************************
+[AssertionMonitor] @2.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@78da5318 :: getValue ?== true PASSED
+[AssertionMonitor] @2.511000000: ********************************************************************************************
+[AssertionMonitor] @2.511000000: ********************************************************************************************
+[AssertionMonitor] @2.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@425138a4 :: getValue ?== true PASSED
+[AssertionMonitor] @2.511000000: ********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @2.600000000: STATE_ACTIVE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @2.700000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @2.800000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @2.900000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.000000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.100000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.200000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.300000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.400000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.500000000: STATE_IDLE -> STATE_IDLE
+[AssertionMonitor] @3.511000000: ********************************************************************************************************
+[AssertionMonitor] @3.511000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@771c9fcc :: lighted ?== false PASSED
+[AssertionMonitor] @3.511000000: ********************************************************************************************************
+[AssertionMonitor] @3.511000000: ********************************************************************************************
+[AssertionMonitor] @3.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@25995ba :: getValue ?== false PASSED
+[AssertionMonitor] @3.511000000: ********************************************************************************************
+[AssertionMonitor] @3.511000000: *********************************************************************************************
+[AssertionMonitor] @3.511000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@4c0d39ac :: getValue ?== false PASSED
+[AssertionMonitor] @3.511000000: *********************************************************************************************
+[HallButtonControl[3][FRONT][UP]] @3.600000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.700000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.800000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @3.900000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.000000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.100000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.200000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.300000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.400000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[3][FRONT][UP]] @4.500000000: STATE_IDLE -> STATE_IDLE
+[Elevator] @4.500000000: Simulation Finished ***
+******************Summary******************
+Passed:  12
+Failed:  0
+Total :  12
+

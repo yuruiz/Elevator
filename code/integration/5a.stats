@@ -1,0 +1,22 @@
+Simulator Parameters:
+Command line = -cf integration/5a.cf -mf integration/5a.mf -rt 1s
+RandomSeed = 1412748676255
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = integration/5a.mf
+Controller File = integration/5a.cf
+
+
+Exception in thread "main" java.lang.IllegalArgumentException: java.io.FileNotFoundException: integration/5a.cf (No such file or directory)
+	at simulator.framework.FileTokenizer.parseFile(FileTokenizer.java:120)
+	at simulator.framework.ControllerBuilder.makeFromFile(ControllerBuilder.java:246)
+	at simulator.framework.Elevator.main(Elevator.java:353)
+Caused by: java.io.FileNotFoundException: integration/5a.cf (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:146)
+	at java.io.FileInputStream.<init>(FileInputStream.java:101)
+	at java.io.FileReader.<init>(FileReader.java:58)
+	at simulator.framework.FileTokenizer.parseFile(FileTokenizer.java:67)
+	... 2 more

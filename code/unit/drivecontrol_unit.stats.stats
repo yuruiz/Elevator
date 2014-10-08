@@ -1,0 +1,22 @@
+Simulator Parameters:
+Command line = -cf unit/drivecontrol_unit.stats.cf -mf unit/drivecontrol_unit.stats.mf -rt 1s
+RandomSeed = 1412747826788
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = unit/drivecontrol_unit.stats.mf
+Controller File = unit/drivecontrol_unit.stats.cf
+
+
+Exception in thread "main" java.lang.IllegalArgumentException: java.io.FileNotFoundException: unit/drivecontrol_unit.stats.cf (No such file or directory)
+	at simulator.framework.FileTokenizer.parseFile(FileTokenizer.java:120)
+	at simulator.framework.ControllerBuilder.makeFromFile(ControllerBuilder.java:246)
+	at simulator.framework.Elevator.main(Elevator.java:353)
+Caused by: java.io.FileNotFoundException: unit/drivecontrol_unit.stats.cf (No such file or directory)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(FileInputStream.java:146)
+	at java.io.FileInputStream.<init>(FileInputStream.java:101)
+	at java.io.FileReader.<init>(FileReader.java:58)
+	at simulator.framework.FileTokenizer.parseFile(FileTokenizer.java:67)
+	... 2 more

@@ -1,0 +1,406 @@
+Simulator Parameters:
+Command line = -cf unit/doorcontrol_unit.cf -mf unit/doorcontrol_unit.mf -rt 1s
+RandomSeed = 1412747863525
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = 1.0s
+Real time rate = null
+Message File = unit/doorcontrol_unit.mf
+Controller File = unit/doorcontrol_unit.cf
+
+
+[Elevator] @0.000000000: Starting Simulation ***
+[DoorControl[FRONT][LEFT]] @0.010000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.010000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.020000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.020000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.030000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.030000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.040000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.040000000: Closed -> Closed
+[AssertionMonitor] @0.041000000: **********************************************************************************************
+[AssertionMonitor] @0.041000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@12330301 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.041000000: **********************************************************************************************
+[AssertionMonitor] @0.041000000: *******************************************************************************************************
+[AssertionMonitor] @0.041000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@45eee3fb :: command ?== STOP PASSED
+[AssertionMonitor] @0.041000000: *******************************************************************************************************
+[DoorControl[FRONT][LEFT]] @0.050000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.050000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.060000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.060000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.070000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.070000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.080000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.080000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.090000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.090000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.100000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.100000000: Closed -> Closed
+[AssertionMonitor] @0.101000000: ///////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.101000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@42906563 :: command ?== OPEN FAILED
+[AssertionMonitor] @0.101000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @0.101000000: //////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.101000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@5a6b54ef :: getCommand ?== OPEN FAILED
+[AssertionMonitor] @0.101000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[DoorControl[FRONT][LEFT]] @0.110000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.110000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.120000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.120000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.130000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.130000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.140000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.140000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.150000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.150000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.160000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.160000000: Closed -> Closed
+[AssertionMonitor] @0.161000000: *******************************************************************************************************
+[AssertionMonitor] @0.161000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@6bf7dab1 :: command ?== STOP PASSED
+[AssertionMonitor] @0.161000000: *******************************************************************************************************
+[AssertionMonitor] @0.161000000: **********************************************************************************************
+[AssertionMonitor] @0.161000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@3a0aaa10 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.161000000: **********************************************************************************************
+[DoorControl[FRONT][LEFT]] @0.170000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.170000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.180000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.180000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.190000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.190000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.200000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.200000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.210000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.210000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.220000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.220000000: Closed -> Closed
+[AssertionMonitor] @0.221000000: **********************************************************************************************
+[AssertionMonitor] @0.221000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@3f9432e0 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.221000000: **********************************************************************************************
+[AssertionMonitor] @0.221000000: ////////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.221000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@7da79447 :: command ?== NUDGE FAILED
+[AssertionMonitor] @0.221000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[DoorControl[FRONT][LEFT]] @0.230000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.230000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.240000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.240000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.250000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.250000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.260000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.260000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.270000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.270000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.280000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.280000000: Closed -> Closed
+[AssertionMonitor] @0.281000000: **********************************************************************************************
+[AssertionMonitor] @0.281000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@363bed68 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.281000000: **********************************************************************************************
+[AssertionMonitor] @0.281000000: *******************************************************************************************************
+[AssertionMonitor] @0.281000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@1e4651bf :: command ?== STOP PASSED
+[AssertionMonitor] @0.281000000: *******************************************************************************************************
+[DoorControl[FRONT][LEFT]] @0.290000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.290000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.300000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.300000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.310000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.310000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.320000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.320000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.330000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.330000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.340000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.340000000: Closed -> Closed
+[AssertionMonitor] @0.342000000: ///////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.342000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@385db088 :: command ?== OPEN FAILED
+[AssertionMonitor] @0.342000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @0.342000000: //////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.342000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@634c0cb0 :: getCommand ?== OPEN FAILED
+[AssertionMonitor] @0.342000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[DoorControl[FRONT][LEFT]] @0.350000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.350000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.360000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.360000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.370000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.370000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.380000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.380000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.390000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.390000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.400000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.400000000: Closed -> Closed
+[AssertionMonitor] @0.402000000: *******************************************************************************************************
+[AssertionMonitor] @0.402000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@5da78424 :: command ?== STOP PASSED
+[AssertionMonitor] @0.402000000: *******************************************************************************************************
+[AssertionMonitor] @0.402000000: **********************************************************************************************
+[AssertionMonitor] @0.402000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@610d3d99 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.402000000: **********************************************************************************************
+[DoorControl[FRONT][LEFT]] @0.410000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.410000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.420000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.420000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.430000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.430000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.440000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.440000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.450000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.450000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.460000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.460000000: Closed -> Closed
+[AssertionMonitor] @0.462000000: **********************************************************************************************
+[AssertionMonitor] @0.462000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@7815bd8f :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.462000000: **********************************************************************************************
+[AssertionMonitor] @0.462000000: ////////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.462000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@6ebf8cf5 :: command ?== NUDGE FAILED
+[AssertionMonitor] @0.462000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[DoorControl[FRONT][LEFT]] @0.470000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.470000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.480000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.480000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.490000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.490000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.500000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.500000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.510000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.510000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.520000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.520000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.530000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.530000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.540000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.540000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.550000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.550000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.560000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.560000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.570000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.570000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.580000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.580000000: Closed -> Closed
+[AssertionMonitor] @0.582000000: **********************************************************************************************
+[AssertionMonitor] @0.582000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@5ba28182 :: getCommand ?== STOP PASSED
+[AssertionMonitor] @0.582000000: **********************************************************************************************
+[AssertionMonitor] @0.582000000: ******************************************************************************************************
+[AssertionMonitor] @0.582000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@40d0d75 :: command ?== STOP PASSED
+[AssertionMonitor] @0.582000000: ******************************************************************************************************
+[DoorControl[FRONT][LEFT]] @0.590000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.590000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.600000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.600000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.610000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.610000000: Closed -> Closed
+[DoorControl[FRONT][LEFT]] @0.620000000: Executing state Closed
+[DoorControl[FRONT][LEFT]] @0.620000000: Closed -> Opening
+[DoorControl[FRONT][LEFT]] @0.630000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.630000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.640000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.640000000: Opening -> Opening
+[AssertionMonitor] @0.642000000: ///////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.642000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@55ac9683 :: command ?== STOP FAILED
+[AssertionMonitor] @0.642000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @0.642000000: //////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.642000000: FAILED simulator.payloads.CanMailbox$ReadableCanMailbox@4e5a5622 :: getCommand ?== STOP FAILED
+[AssertionMonitor] @0.642000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[DoorControl[FRONT][LEFT]] @0.650000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.650000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.660000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.660000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.670000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.670000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.680000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.680000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.690000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.690000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.700000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.700000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.710000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.710000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.720000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.720000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.730000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.730000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.740000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.740000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.750000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.750000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.760000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.760000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.770000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.770000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.780000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.780000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.790000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.790000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.800000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.800000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.810000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.810000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.820000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.820000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.830000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.830000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.840000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.840000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.850000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.850000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.860000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.860000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.870000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.870000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.880000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.880000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.890000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.890000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.900000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.900000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.910000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.910000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.920000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.920000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.930000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.930000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.940000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.940000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.950000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.950000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.960000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.960000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.970000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.970000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.980000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.980000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @0.990000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @0.990000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.000000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.000000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.010000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.010000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.020000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.020000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.030000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.030000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.040000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.040000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.050000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.050000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.060000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.060000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.070000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.070000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.080000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.080000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.090000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.090000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.100000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.100000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.110000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.110000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.120000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.120000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.130000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.130000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.140000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.140000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.150000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.150000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.160000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.160000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.170000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.170000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.180000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.180000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.190000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.190000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.200000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.200000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.210000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.210000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.220000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.220000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.230000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.230000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.240000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.240000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.250000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.250000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.260000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.260000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.270000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.270000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.280000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.280000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.290000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.290000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.300000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.300000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.310000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.310000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.320000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.320000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.330000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.330000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.340000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.340000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.350000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.350000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.360000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.360000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.370000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.370000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.380000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.380000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.390000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.390000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.400000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.400000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.410000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.410000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.420000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.420000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.430000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.430000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.440000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.440000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.450000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.450000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.460000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.460000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.470000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.470000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.480000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.480000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.490000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.490000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.500000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.500000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.510000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.510000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.520000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.520000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.530000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.530000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.540000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.540000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.550000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.550000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.560000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.560000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.570000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.570000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.580000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.580000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.590000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.590000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.600000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.600000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.610000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.610000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.620000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.620000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.630000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.630000000: Opening -> Opening
+[DoorControl[FRONT][LEFT]] @1.640000000: Executing state Opening
+[DoorControl[FRONT][LEFT]] @1.640000000: Opening -> Opening
+[Elevator] @1.641000000: Simulation Finished ***
+******************Summary******************
+Passed:  12
+Failed:  8
+Total :  20
+

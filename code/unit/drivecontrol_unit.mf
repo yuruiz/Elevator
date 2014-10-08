@@ -1,0 +1,89 @@
+;18649 2014 Fall
+;Group 5
+;Yurui Zhou (yuruiz)
+;Siyur Wei (siyuwei)
+;James Sakai (jssakai)
+;Vijay Jayaram (vijayj)
+;driveControlUnit.mf
+
+
+#DEFINE MESSAGE_PERIOD 0.1s
+
+#INCLUDE canid.mf
+
+
+;initialize
+0s  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
+0s  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][RIGHT]_CAN_ID DoorClosed FRONT RIGHT = true
+0s  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[BACK][LEFT]_CAN_ID DoorClosed BACK LEFT = true
+0s  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[BACK][RIGHT]_CAN_ID DoorClosed BACK RIGHT = true
+0s  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 5 FRONT UP
+
+;state 2 move to next floor
+0.5s A F Drive : speed == SLOW
+0.5s A F Drive : direction == UP
+0.5s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == SLOW
+0.5s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == UP
+0.5s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 10
+
+;transition DC.2
+3s  I  MESSAGE_PERIOD N AT_FLOOR_[5][FRONT]_CAN_ID AtFloor 5 FRONT = true
+
+;state 3 level
+3.05s A F Drive : speed == LEVEL
+3.05s A F Drive : direction == UP
+3.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == LEVEL
+3.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == UP
+3.05s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 1
+
+;transition DC.3
+4s  I  MESSAGE_PERIOD N LEVEL_SENSOR_[UP]_CAN_ID Leveling UP = true
+
+;state 4 open door
+4.05s A F Drive : speed == STOP
+4.05s A F Drive : direction == STOP
+4.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+4.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == STOP
+4.05s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+;transition DC.4
+4.5s  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = false
+
+;state 1 wait
+4.55s  A F Drive : direction == UP
+4.55s  A F Drive : speed == STOP
+4.55s  A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == UP
+4.55s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+4.55s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+;transition DC.5
+5.5s  I  MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = true
+
+;state 5 emergency
+5.55s A F Drive : speed == STOP
+5.55s A F Drive : direction == STOP
+5.55s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == STOP
+5.55s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+5.55s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+;transition DC.6
+6s I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
+
+;state 1 wait
+6.05S A F Drive : direction == UP
+6.05s A F Drive : speed == STOP
+6.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == UP
+6.05s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+6.05s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+;transition DC.5
+7.5s  I  MESSAGE_PERIOD N EMERGENCY_BRAKE_CAN_ID Boolean = true
+
+;state 5 emergency
+7.55s A F Drive : speed == STOP
+7.55s A F Drive : direction == STOP
+7.55s A N DRIVE_COMMAND_CAN_ID DriveCommand : getDirection == STOP
+7.55s A N DRIVE_COMMAND_CAN_ID DriveCommand : getSpeed == STOP
+7.55s A N DRIVE_SPEED_CAN_ID DriveSpeed : getSpeed == 0
+
+
