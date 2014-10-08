@@ -1,13 +1,16 @@
 package simulator.elevatorcontrol;
 
-import java.util.ArrayList;
 import jSimPack.SimTime;
+
+import java.util.ArrayList;
+
 import simulator.elevatorcontrol.Utility.AtFloorArray;
 import simulator.elevatorcontrol.Utility.DoorClosedArray;
-import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
+import simulator.elevatormodules.CarWeightCanPayloadTranslator;
 import simulator.elevatormodules.LevelingCanPayloadTranslator;
 import simulator.framework.Controller;
 import simulator.framework.Direction;
+import simulator.framework.Elevator;
 import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
 import simulator.framework.Speed;
@@ -41,10 +44,10 @@ public class DriveControl extends Controller {
 	private BooleanCanPayloadTranslator mEmergencyBrake;
 	private DesiredFloorCanPayloadTranslator mDesiredFloor;
 	private LevelingCanPayloadTranslator mLevel;
-	private CarWeightAlarmCanPayloadTranslator mCarWeightAlarm;
+	private CarWeightCanPayloadTranslator mCarWeight;
 
 	private ReadableCanMailbox emergencyBrake;
-	private ReadableCanMailbox carWeightAlarm;
+	private ReadableCanMailbox carWeight;
 	private ReadableCanMailbox level;
 	private ReadableCanMailbox desiredFloor;
 
@@ -98,10 +101,10 @@ public class DriveControl extends Controller {
 		/*
 		 * Car weight alarm
 		 */
-		carWeightAlarm = CanMailbox
-				.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_ALARM_CAN_ID);
-		mCarWeightAlarm = new CarWeightAlarmCanPayloadTranslator(carWeightAlarm);
-		canInterface.registerTimeTriggered(carWeightAlarm);
+		carWeight = CanMailbox
+				.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_CAN_ID);
+		mCarWeight = new CarWeightCanPayloadTranslator(carWeight);
+		canInterface.registerTimeTriggered(carWeight);
 
 		/*
 		 * mDesiredDirection
@@ -156,7 +159,7 @@ public class DriveControl extends Controller {
 		case WAIT:
 			this.setOutput(Speed.STOP, desiredDirection);
 			// #transition 'DC.5'
-			if (mEmergencyBrake.getValue() || mCarWeightAlarm.getValue()) {
+			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -169,7 +172,7 @@ public class DriveControl extends Controller {
 		case MOVE:
 			this.setOutput(Speed.SLOW, desiredDirection);
 			// #transition 'DC.5'
-			if (mEmergencyBrake.getValue() || mCarWeightAlarm.getValue()) {
+			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -182,10 +185,9 @@ public class DriveControl extends Controller {
 			}
 			break;
 		case LEVEL:
-			
 			this.setOutput(Speed.LEVEL, desiredDirection);
 			// #transition 'DC.5'
-			if (mEmergencyBrake.getValue() || mCarWeightAlarm.getValue()) {
+			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -197,7 +199,7 @@ public class DriveControl extends Controller {
 		case OPEN:
 			this.setOutput(Speed.STOP, Direction.STOP);
 			// #transition 'DC.5'
-			if (mEmergencyBrake.getValue() || mCarWeightAlarm.getValue()) {
+			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -209,7 +211,7 @@ public class DriveControl extends Controller {
 		case EMERGENCY:
 			this.setOutput(Speed.STOP, Direction.STOP);
 			// #transition 'DC.6'
-			if (!mEmergencyBrake.getValue() && !mCarWeightAlarm.getValue()) {
+			if (!this.isEmergencyCondition()) {
 				newState = State.WAIT;
 				break;
 			}
@@ -223,6 +225,15 @@ public class DriveControl extends Controller {
 		timer.start(period);
 
 	};
+	
+	/* 
+	 * Helper that tests guard condition to go into emergency state. Either:
+	 * 	- Car is overweight
+	 *  - mEmergencyBrake has been set to true
+	 */
+	private boolean isEmergencyCondition() {
+		return ((this.mCarWeight.getValue() > Elevator.MaxCarCapacity) || mEmergencyBrake.getValue());
+	}
 
 	private void setOutput(Speed speed, Direction direction) {
 		drivePayload.set(speed, direction);

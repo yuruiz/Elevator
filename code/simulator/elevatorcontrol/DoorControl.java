@@ -1,11 +1,17 @@
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
-import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
+import simulator.elevatormodules.CarWeightCanPayloadTranslator;
 import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
 import simulator.elevatormodules.DoorOpenedCanPayloadTranslator;
 import simulator.elevatormodules.DoorReversalCanPayloadTranslator;
-import simulator.framework.*;
+import simulator.framework.Controller;
+import simulator.framework.Direction;
+import simulator.framework.DoorCommand;
+import simulator.framework.Elevator;
+import simulator.framework.Hallway;
+import simulator.framework.ReplicationComputer;
+import simulator.framework.Side;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
@@ -24,9 +30,6 @@ public class DoorControl extends Controller {
         Nudge
     }
 
-    private static final int height = 8;
-    private static final int MaxCarCapacity = 10000;
-
     private SimTime period;
     private Hallway hallway;
     private Side side;
@@ -44,7 +47,7 @@ public class DoorControl extends Controller {
     private ReadableCanMailbox networkDoorOpened;
     private DoorOpenedCanPayloadTranslator mDoorOpened;
     private ReadableCanMailbox networkCarWeight;
-    private CarWeightAlarmCanPayloadTranslator mCarWeight;
+    private CarWeightCanPayloadTranslator mCarWeight;
     private ReadableCanMailbox networkDesiredFloor;
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
     private Utility.AtFloorArray mAtFloor;
@@ -82,8 +85,8 @@ public class DoorControl extends Controller {
         mDoorOpened = new DoorOpenedCanPayloadTranslator(networkDoorOpened, hallway, side);
         canInterface.registerTimeTriggered(networkDoorOpened);
 
-        networkCarWeight = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_ALARM_CAN_ID);
-        mCarWeight = new CarWeightAlarmCanPayloadTranslator(networkCarWeight);
+        networkCarWeight = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_CAN_ID);
+        mCarWeight = new CarWeightCanPayloadTranslator(networkCarWeight);
         canInterface.registerTimeTriggered(networkCarWeight);
 
         networkDesiredFloor = CanMailbox.getReadableCanMailbox((MessageDictionary.DESIRED_FLOOR_CAN_ID));
@@ -135,7 +138,7 @@ public class DoorControl extends Controller {
                 countdown--;
 
                 //#transition T.2
-                if (countdown < 0 && !mCarWeight.getValue()) {
+                if (countdown < 0 && !this.isOverweight()) {
                     newState = State.Nudge;
                 }
                 break;
@@ -148,8 +151,8 @@ public class DoorControl extends Controller {
                 if (mDoorClosed.getValue()) {
                     newState = State.Closed;
                 }
-                //#transition T.5 (Added door reversal)
-                else if (mCarWeight.getValue() || mDoorReversal.getValue()) {
+                //#transition T.5 (XXX: Add Door reversal to state chart)
+                else if (this.isOverweight() || mDoorReversal.getValue()) {
                     newState = State.Opening;
                 }
                 break;
@@ -158,8 +161,9 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#transition T.4
-                if (mCarWeight.getValue() || (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
+                //#transition T.4 XXX: Make sure this is reflected in the state chart
+                if (this.isOverweight() || 
+                		(mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
                         (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
                         (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP))) {
                     newState = State.Opening;
@@ -173,6 +177,13 @@ public class DoorControl extends Controller {
         currentState = newState;
         timer.start(period);
 
+    }
+    
+    /*
+     * Helper guard condition for car being overweight (weight greater than MaxCarCapacity
+     */
+    private boolean isOverweight() {
+    	return (mCarWeight.getValue() > Elevator.MaxCarCapacity);
     }
 
 }
