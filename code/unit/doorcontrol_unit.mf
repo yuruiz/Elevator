@@ -11,16 +11,16 @@
 
 ;initialize
 0ms  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
-0ms  I  MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
+0ms  I  MESSAGE_PERIOD N CAR_WEIGHT_CAN_ID CarWeight = 0
 0ms  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 0 UP BACK
-0ms  I  MESSAGE_PERIOD F DriveSpeed = UP 0
+0ms  I  MESSAGE_PERIOD N DRIVE_SPEED_CAN_ID DriveSpeed = 0 UP
 
 ;check door Closed
 +41ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
 +0ms A F DoorMotor FRONT LEFT : command == STOP
 
 ;set condition for T.4.1
-+19ms I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = true
++19ms I MESSAGE_PERIOD N CAR_WEIGHT_CAN_ID CarWeight = 15000
 
 ;check Door Opening
 +41ms A F DoorMotor FRONT LEFT : command == OPEN
@@ -36,7 +36,7 @@
 +0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
 
 ;set condition for T.2
-+19ms I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
++19ms I MESSAGE_PERIOD N CAR_WEIGHT_CAN_ID CarWeight = 0
 
 ;check Door Nudge
 +41ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
@@ -51,8 +51,9 @@
 +0ms A F DoorMotor FRONT LEFT : command == STOP
 
 ;set condition for T.4.2
-+20ms  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 1 STOP FRONT
-+0ms  I  MESSAGE_PERIOD F DriveSpeed = STOP 0
++19ms I MESSAGE_PERIOD N AT_FLOOR_[1][FRONT]_CAN_ID AtFloor 1 FRONT = true
++0ms  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 1 STOP FRONT
++0ms  I  MESSAGE_PERIOD N DRIVE_SPEED_CAN_ID DriveSpeed = 1 STOP
 
 ;check Door Opening
 +41ms A F DoorMotor FRONT LEFT : command == OPEN
@@ -68,7 +69,7 @@
 +0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
 
 ;set condition for T.2
-+19ms I MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
++19ms I MESSAGE_PERIOD N CAR_WEIGHT_CAN_ID CarWeight = 0
 
 ;check Door Nudge
 +41ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
@@ -78,9 +79,9 @@
 +19ms I MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID  DoorClosed FRONT LEFT = true
 +0ms I MESSAGE_PERIOD N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT = false
 +0ms  I  MESSAGE_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
-+0ms  I  MESSAGE_PERIOD N CAR_WEIGHT_ALARM_CAN_ID CarWeightAlarm = false
++0ms  I  MESSAGE_PERIOD N CAR_WEIGHT_CAN_ID CarWeight = 0
 +0ms  I  MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 0 UP BACK
-+0ms  I  MESSAGE_PERIOD F DriveSpeed = UP 0
++0ms  I  MESSAGE_PERIOD N DRIVE_SPEED_CAN_ID DriveSpeed = 0 UP
 
 ;check Door Closed
 +101ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
@@ -88,11 +89,11 @@
 
 ;set condition for T.4.3
 +19ms I MESSAGE_PERIOD N AT_FLOOR_[1][FRONT]_CAN_ID AtFloor 1 FRONT = true
-+0ms I MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 1 STOP FRONT
-+0ms  I  MESSAGE_PERIOD F DriveSpeed = UP 0
++0ms I MESSAGE_PERIOD N DESIRED_FLOOR_CAN_ID DesiredFloor = 1 STOP BOTH
++0ms  I  MESSAGE_PERIOD N DRIVE_SPEED_CAN_ID DriveSpeed = 0 UP
 
-;check Door Opened
-+41ms A F DoorMotor FRONT LEFT : command == STOP
-+0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == STOP
+;check Door Opening
++41ms A F DoorMotor FRONT LEFT : command == OPEN
++0ms A N DOOR_MOTOR_COMMAND_[FRONT][LEFT]_CAN_ID DoorMotor FRONT LEFT : getCommand == OPEN
 
 

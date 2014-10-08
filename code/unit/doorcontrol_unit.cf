@@ -4,7 +4,6 @@
 ;Siyur Wei (siyuwei)
 ;James Sakai (jssakai)
 ;Vijay Jayaram (vijayj)
-;doorcontrol_unit.cf
-
+; doorcontrol_test1.mf
 
 DoorControl 10ms FRONT LEFT true
