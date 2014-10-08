@@ -4,6 +4,7 @@ import jSimPack.SimTime;
 import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
 import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
 import simulator.elevatormodules.DoorOpenedCanPayloadTranslator;
+import simulator.elevatormodules.DoorReversalCanPayloadTranslator;
 import simulator.framework.*;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
@@ -38,8 +39,6 @@ public class DoorControl extends Controller {
     private WriteableDoorMotorPayload localDoorMotor;
 
     /*Input network Interface*/
-//    private ReadableCanMailbox networkAtFloor[];
-//    private AtFloorCanPayloadTranslator mAtFloor[];
     private ReadableCanMailbox networkDesiredDwell;
     private IntegerCanPayloadTranslator mDesiredDwell;
     private ReadableCanMailbox networkDoorClosed;
@@ -50,6 +49,8 @@ public class DoorControl extends Controller {
     private CarWeightAlarmCanPayloadTranslator mCarWeight;
     private ReadableCanMailbox networkDesiredFloor;
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
+    private ReadableCanMailbox networkDoorReversal;
+    private DoorReversalCanPayloadTranslator mDoorReversal;
     private Utility.AtFloorArray mAtFloor;
 
     /*Input Physical Interface*/
@@ -70,14 +71,6 @@ public class DoorControl extends Controller {
         this.dwell = 0;
         this.countdown = this.dwell;
 
-//        networkAtFloor = new ReadableCanMailbox[height];
-
-//        mAtFloor = new AtFloorCanPayloadTranslator[height];
-//        for (int i = 1; i <= height; i++) {
-//            networkAtFloor[i - 1] = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(i, hallway));
-//            mAtFloor[i-1] = new AtFloorCanPayloadTranslator(networkAtFloor[i - 1], i, hallway);
-//            canInterface.registerTimeTriggered(networkAtFloor[i - 1]);
-//        }
         mAtFloor = new Utility.AtFloorArray(canInterface);
 
         networkDesiredDwell = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway));
@@ -104,7 +97,9 @@ public class DoorControl extends Controller {
         mDoorMotor = new DoorMotorCanPayloadTranslator(networkDoorMotor, hallway, side);
         canInterface.sendTimeTriggered(networkDoorMotor, period);
 
-
+        networkDoorReversal = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_REVERSAL_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, side));
+        mDoorReversal = new DoorReversalCanPayloadTranslator(networkDoorReversal, hallway, side);
+        
         localDriveSpeed = DriveSpeedPayload.getReadablePayload();
         physicalInterface.registerTimeTriggered(localDriveSpeed);
 
@@ -114,7 +109,6 @@ public class DoorControl extends Controller {
 
         localDoorMotor.set(DoorCommand.STOP);
         mDoorMotor.setCommand(DoorCommand.STOP);
-//        while (!mDoorClosed.getValue()){}
         this.currentState = State.Closed;
 
         timer.start(period);
@@ -122,8 +116,11 @@ public class DoorControl extends Controller {
 
     @Override
     public void timerExpired(Object callbackData) {
-        log("Executing state " + currentState);
-
+        //log("Executing state " + currentState);
+    	State newState = currentState;
+    	if (mDoorReversal.getValue()) {
+    		log("DOOR REVERSAL IS TRUE");
+    	}
         switch (currentState) {
             case Opening:    /*State 1 Opening*/
                 localDoorMotor.set(DoorCommand.OPEN);
@@ -132,7 +129,7 @@ public class DoorControl extends Controller {
                 countdown = dwell;
                 //#transition T.1
                 if (mDoorOpened.getValue()) {
-                    currentState = State.Opened;
+                    newState = State.Opened;
                 }
                 break;
             case Opened:    /*State 2 Opened*/
@@ -143,7 +140,7 @@ public class DoorControl extends Controller {
 
                 //#transition T.2
                 if (countdown < 0 && !mCarWeight.getValue()) {
-                    currentState = State.Nudge;
+                    newState = State.Nudge;
                 }
                 break;
             case Nudge:    /*State 4 Nudge*/
@@ -153,36 +150,39 @@ public class DoorControl extends Controller {
 
                 //#transition T.3
                 if (mDoorClosed.getValue()) {
-                    currentState = State.Closed;
+                    newState = State.Closed;
                 }
-                //#transition T.5
-                else if (mCarWeight.getValue()) {
-                    currentState = State.Opening;
+                //#transition T.5 XXX: ADD DOOR REVERSAL TO THIS TRANSITION
+                else if (mCarWeight.getValue() || mDoorReversal.getValue()) {
+                    newState = State.Opening;
                 }
                 break;
             case Closed:  /*State 3 Closed*/
-//                log("Start Door Closed State");
                 localDoorMotor.set(DoorCommand.STOP);
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#transition T.4
+                //#transition T.4 XXX: Changed OR condition to AND for drivespeed direction being stop
                 if (mCarWeight.getValue() || (atFloor() == mDesiredFloor.getFloor() && mDesiredFloor.getHallway() ==
-                        hallway && localDriveSpeed.speed() == 0) || localDriveSpeed.direction() == Direction.STOP) {
-                    currentState = State.Opening;
+                        hallway && localDriveSpeed.speed() == 0 && localDriveSpeed.direction() == Direction.STOP)) {
+                    newState = State.Opening;
                 }
+                log(atFloor() + " " + mDesiredFloor.getFloor() + " " + mDesiredFloor.getHallway() + localDriveSpeed.speed() + " " + localDriveSpeed.direction());
+
                 break;
             default:
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
-
+    	log(currentState.toString() + " -> " + newState.toString());
+    	currentState = newState;
         timer.start(period);
 
     }
 
     private int atFloor() {
-        for (int i = 0; i < height; i++) {
-            if(this.mAtFloor.isAtFloor(i+1, hallway)){
+    	// XXX: Fixed to go until height and check isAtFloor(i) instead of i+1
+        for (int i = 1; i <= height; i++) {
+            if(this.mAtFloor.isAtFloor(i, hallway)){
                 return i;
             }
         }
