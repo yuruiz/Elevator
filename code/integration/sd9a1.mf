@@ -1,0 +1,70 @@
+;18649 2014 Fall
+;Group 5
+;Yurui Zhou (yuruiz)
+;Siyur Wei (siyuwei)
+;James Sakai (jssakai)
+;Vijay Jayaram (vijayj)
+;sd9a1.mf
+
+#INCLUDE canid.mf
+
+;set for Precondition
+0ms I DRIVE_PERIOD N DRIVE_SPEED_CAN_ID DriveSpeed = 0 STOP
+0ms I AT_FLOOR_PERIOD N AT_FLOOR_[1][FRONT]_CAN_ID AtFloor 1 FRONT = true
+0ms I AT_FLOOR_PERIOD N AT_FLOOR_[1][BACK]_CAN_ID AtFloor 1 BACK = true
+0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
+0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][RIGHT]_CAN_ID DoorClosed FRONT RIGHT = true
+0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][LEFT]_CAN_ID DoorClosed BACK LEFT = true
+0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][RIGHT]_CAN_ID DoorClosed BACK RIGHT = true
+
+;#arc '9A/1'
++121ms A F DoorMotor FRONT LEFT : command == OPEN
++0ms A F DoorMotor FRONT RIGHT : command == OPEN
++0ms A F DoorMotor BACK LEFT : command == OPEN
++0ms A F DoorMotor BACK RIGHT : command == OPEN
+
+;#arc '9A/2a'
++100ms I DOOR_OPENED_SENSOR_PERIOD N DOOR_OPEN_SENSOR_[FRONT][LEFT]_CAN_ID DoorOpened FRONT LEFT = true
++0ms I DOOR_OPENED_SENSOR_PERIOD N DOOR_OPEN_SENSOR_[FRONT][RIGHT]_CAN_ID DoorOpened FRONT RIGHT = true
++0ms I DOOR_OPENED_SENSOR_PERIOD N DOOR_OPEN_SENSOR_[BACK][LEFT]_CAN_ID DoorOpened BACK LEFT = true
++0ms I DOOR_OPENED_SENSOR_PERIOD N DOOR_OPEN_SENSOR_[BACK][RIGHT]_CAN_ID DoorOpened BACK RIGHT = true
++0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = false
++0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][RIGHT]_CAN_ID DoorClosed FRONT RIGHT = false
++0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][LEFT]_CAN_ID DoorClosed BACK LEFT = false
++0ms I DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][RIGHT]_CAN_ID DoorClosed BACK RIGHT = false
+
+;#arc '9A/2b'
++41ms A F DoorMotor FRONT LEFT : command == STOP
++0ms A F DoorMotor FRONT RIGHT : command == STOP
++0ms A F DoorMotor BACK LEFT : command == STOP
++0ms A F DoorMotor BACK RIGHT : command == STOP
+
+;#arc '9A/3A'
++301ms A N DESIRED_FLOOR_CAN_ID DesiredFloor : getFloor == 2
++0ms   A N DESIRED_FLOOR_CAN_ID DesiredFloor : getDirection == STOP
++0ms   A N DESIRED_FLOOR_CAN_ID DesiredFloor : getHallway == NONE
+
+;#arc '9A/3B'
++51ms  A N DESIRED_DWELL_[FRONT]_CAN_ID Integer : getValue == 5
++0ms  A N DESIRED_DWELL_[BACK]_CAN_ID Integer : getValue == 5
+
+;#arc '9A/4'
++121ms A F DoorMotor FRONT LEFT : command == NUDGE
++0ms A F DoorMotor FRONT RIGHT : command == NUDGE
++0ms A F DoorMotor BACK LEFT : command == NUDGE
++0ms A F DoorMotor BACK RIGHT : command == NUDGE
+
+;#arc '9A/5A'
++19ms  I  DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][LEFT]_CAN_ID DoorClosed FRONT LEFT = true
++0ms  I  DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[FRONT][RIGHT]_CAN_ID DoorClosed FRONT RIGHT = true
++0ms  I  DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][LEFT]_CAN_ID DoorClosed BACK LEFT = true
++0ms  I  DOOR_CLOSED_SENSOR_PERIOD N DOOR_CLOSED_SENSOR_[BACK][RIGHT]_CAN_ID DoorClosed BACK RIGHT = true
+
+;#arc '9A/5B'
++121ms A F DoorMotor FRONT LEFT : command == STOP
++0ms A F DoorMotor FRONT RIGHT : command == STOP
++0ms A F DoorMotor BACK LEFT : command == STOP
++0ms A F DoorMotor BACK RIGHT : command == STOP
+
+
+
