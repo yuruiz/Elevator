@@ -103,6 +103,7 @@ public class Dispatcher extends Controller {
 
                 FrontClosed = mFrontDoorClosed.getBothClosed();
                 BackClosed = mBackDoorClosed.getBothClosed();
+                //#transition T.1
                 if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
                         mDesiredFloor.getHallway() == Hallway.BOTH) {
                     CurrentState = State.Target;
@@ -120,9 +121,11 @@ public class Dispatcher extends Controller {
                     Target_set = true;
                 }
 
+                //#transition T.2
                 if (atCurrentTarget == true && mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) {
                     Target_set = false;
                     CurrentState = State.Close;
+                //#transition T.6
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
                     Target_set = false;
                     CurrentState = State.Error;
@@ -132,9 +135,11 @@ public class Dispatcher extends Controller {
                 atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
                 setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
 
+                //#transition T.5
                 if (Target == mAtFloor.getCurrentFloor() && ((mAtFloor.isAtFloor(Target, Hallway.FRONT) && !mFrontDoorClosed.getBothClosed()) || (mAtFloor.isAtFloor(Target, Hallway.BACK) && !mBackDoorClosed.getBothClosed()))) {
 
                     CurrentState = State.Target;
+                //#transition T.4
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
 
                     CurrentState = State.Error;
@@ -144,8 +149,10 @@ public class Dispatcher extends Controller {
                 atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
                 mDesiredFloor.set(this.Target, Direction.STOP, Hallway.NONE);
 
+                //#transition T.3
                 if (atCurrentTarget == true && (mFrontDoorClosed.getBothClosed() || mBackDoorClosed.getBothClosed() && mDesiredFloor.getHallway() == Hallway.NONE)) {
                     CurrentState = State.Open;
+                //#transition T.7
                 } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
 
                     CurrentState = State.Error;
@@ -157,6 +164,7 @@ public class Dispatcher extends Controller {
 
                 FrontClosed = mFrontDoorClosed.getBothClosed();
                 BackClosed = mBackDoorClosed.getBothClosed();
+                //#transition T.8
                 if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
                         mDesiredFloor.getHallway() == Hallway.NONE) {
                     CurrentState = State.Target;
