@@ -137,6 +137,8 @@ public class Utility {
                 switch (i) {
                     case 1:
                         CreateTranslator(i, Hallway.FRONT);
+                        CreateTranslator(i, Hallway.BACK);
+                        break;
                     case 2:
                         CreateTranslator(i, Hallway.BACK);
                         break;
