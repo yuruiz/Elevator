@@ -99,6 +99,9 @@ public class Utility {
                     case 1:
                         CreateTranslator(i, Hallway.FRONT, Direction.UP);
                         CreateTranslator(i, Hallway.FRONT, Direction.DOWN);
+                        CreateTranslator(i, Hallway.BACK, Direction.UP);
+                        CreateTranslator(i, Hallway.BACK, Direction.DOWN);
+                        break;
                     case 2:
                         CreateTranslator(i, Hallway.BACK, Direction.UP);
                         CreateTranslator(i, Hallway.BACK, Direction.DOWN);
