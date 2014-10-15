@@ -85,6 +85,8 @@ public class Dispatcher extends Controller {
 
         mBackDesiredDwell.set(this.DiesiredDewell);
         mFrontDesiredDwell.set(this.DiesiredDewell);
+
+        mDesiredFloor.set(1, Hallway.BOTH, Direction.STOP);
         timer.start(period);
 
     }
