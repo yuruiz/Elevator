@@ -58,7 +58,7 @@ public class Dispatcher extends Controller {
         this.Target = 1;
         this.prevTarget = 1;
         this.CurrentState = State.Initial;
-        this.DiesiredDewell = 5;
+        this.DiesiredDewell = 1000;
         this.Target_set = false;
 
         mAtFloor = new Utility.AtFloorArray(canInterface);
@@ -116,7 +116,7 @@ public class Dispatcher extends Controller {
                 else{
                     atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
                     prevTarget = Target;
-                    Target = Target % 8 + 1;
+                    Target = Target % 7 + 1;
                     setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
                     Target_set = true;
                 }
