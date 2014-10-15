@@ -29,6 +29,7 @@ public class Dispatcher extends Controller {
     private State CurrentState;
     private int Target;
     private int prevTarget;
+    private int height;
     private int DiesiredDewell;
     private boolean Target_set;
 
@@ -51,7 +52,7 @@ public class Dispatcher extends Controller {
 
 
 
-    public Dispatcher(SimTime period, boolean verbose) {
+    public Dispatcher(int height, SimTime period, boolean verbose) {
         super("Dispatcher", verbose);
 
         this.period = period;
@@ -60,6 +61,7 @@ public class Dispatcher extends Controller {
         this.CurrentState = State.Initial;
         this.DiesiredDewell = 1000;
         this.Target_set = false;
+        this.height = height;
 
         mAtFloor = new Utility.AtFloorArray(canInterface);
         mFrontDoorClosed = new Utility.DoorClosedArray(Hallway.FRONT,canInterface);
@@ -118,7 +120,7 @@ public class Dispatcher extends Controller {
                 else{
                     atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
                     prevTarget = Target;
-                    Target = Target % 7 + 1;
+                    Target = Target % height + 1;
                     setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
                     Target_set = true;
                 }
