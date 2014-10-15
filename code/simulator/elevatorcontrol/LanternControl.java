@@ -83,7 +83,7 @@ public class LanternControl extends Controller {
      * the method signatures in ControllerBuilder.makeAll().
      */
 
-    public LanternControl(SimTime period, Direction direction, boolean verbose) {
+    public LanternControl(Direction direction, SimTime period, boolean verbose) {
 
         super("LanternControl" + ReplicationComputer.makeReplicationString(direction), verbose);
 

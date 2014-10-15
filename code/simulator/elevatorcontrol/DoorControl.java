@@ -62,7 +62,7 @@ public class DoorControl extends Controller {
 
     State currentState;
 
-    public DoorControl(SimTime period, Hallway hallway, Side side, boolean verbose) {
+    public DoorControl(Hallway hallway, Side side, SimTime period, boolean verbose) {
         super("DoorControl" + ReplicationComputer.makeReplicationString(hallway, side), verbose);
 
         this.period = period;
