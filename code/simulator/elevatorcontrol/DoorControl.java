@@ -5,13 +5,7 @@ import simulator.elevatormodules.CarWeightCanPayloadTranslator;
 import simulator.elevatormodules.DoorClosedCanPayloadTranslator;
 import simulator.elevatormodules.DoorOpenedCanPayloadTranslator;
 import simulator.elevatormodules.DoorReversalCanPayloadTranslator;
-import simulator.framework.Controller;
-import simulator.framework.Direction;
-import simulator.framework.DoorCommand;
-import simulator.framework.Elevator;
-import simulator.framework.Hallway;
-import simulator.framework.ReplicationComputer;
-import simulator.framework.Side;
+import simulator.framework.*;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
@@ -53,8 +47,8 @@ public class DoorControl extends Controller {
     private Utility.AtFloorArray mAtFloor;
     private ReadableCanMailbox networkDriveSpeed;
     private DriveSpeedCanPayloadTranslator mDriveSpeed;
-	private ReadableCanMailbox networkDoorReversal;
-	private DoorReversalCanPayloadTranslator mDoorReversal;
+    private ReadableCanMailbox networkDoorReversal;
+    private DoorReversalCanPayloadTranslator mDoorReversal;
 
     /*Output Network Interface*/
     private WriteableCanMailbox networkDoorMotor;
@@ -100,11 +94,11 @@ public class DoorControl extends Controller {
         networkDriveSpeed = CanMailbox.getReadableCanMailbox(MessageDictionary.DRIVE_SPEED_CAN_ID);
         mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
         canInterface.registerTimeTriggered(networkDriveSpeed);
-           
+
         networkDoorReversal = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_REVERSAL_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, side));
         mDoorReversal = new DoorReversalCanPayloadTranslator(networkDoorReversal, hallway, side);
         canInterface.registerTimeTriggered(networkDoorReversal);
-        
+
         localDoorMotor = DoorMotorPayload.getWriteablePayload(hallway, side);
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
 
@@ -162,8 +156,9 @@ public class DoorControl extends Controller {
                 dwell = mDesiredDwell.getValue();
 
                 //#transition T.4 XXX: Make sure this is reflected in the state chart
-                if (this.isOverweight() || 
-                		(mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
+                if ((this.isOverweight() && mAtFloor.getCurrentFloor() != -1 &&
+                        mAtFloor.isAtFloor(mAtFloor.getCurrentFloor(), hallway)) ||
+                        (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
                         (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
                         (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP))) {
                     newState = State.Opening;
@@ -172,18 +167,18 @@ public class DoorControl extends Controller {
             default:
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
-        
-    	log(currentState.toString() + " -> " + newState.toString());
+
+        log(currentState.toString() + " -> " + newState.toString());
         currentState = newState;
         timer.start(period);
 
     }
-    
+
     /*
      * Helper guard condition for car being overweight (weight greater than MaxCarCapacity
      */
     private boolean isOverweight() {
-    	return (mCarWeight.getValue() > Elevator.MaxCarCapacity);
+        return (mCarWeight.getValue() > Elevator.MaxCarCapacity);
     }
 
 }
