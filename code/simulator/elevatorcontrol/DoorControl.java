@@ -145,7 +145,7 @@ public class DoorControl extends Controller {
                 if (mDoorClosed.getValue()) {
                     newState = State.Closed;
                 }
-                //#transition T.5 (XXX: Add Door reversal to state chart)
+                //#transition T.5
                 else if (this.isOverweight() || mDoorReversal.getValue()) {
                     newState = State.Opening;
                 }
@@ -155,7 +155,7 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#transition T.4 XXX: Make sure this is reflected in the state chart
+                //#transition T.4
                 if ((this.isOverweight() && mAtFloor.getCurrentFloor() != -1 &&
                         mAtFloor.isAtFloor(mAtFloor.getCurrentFloor(), hallway)) ||
                         (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&
