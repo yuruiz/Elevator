@@ -72,7 +72,7 @@ public class CarButtonControl extends Controller {
      * For your elevator controllers, you should make sure that the constructor matches
      * the method signatures in ControllerBuilder.makeAll().
      */
-    public CarButtonControl(SimTime period, int floor, Hallway hallway, boolean verbose) {
+    public CarButtonControl(int floor, Hallway hallway, SimTime period, boolean verbose) {
         //call to the Controller superclass constructor is required
         super("CarButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway), verbose);
         

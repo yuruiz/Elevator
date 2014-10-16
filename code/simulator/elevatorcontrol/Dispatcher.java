@@ -59,7 +59,7 @@ public class Dispatcher extends Controller {
         this.Target = 1;
         this.prevTarget = 1;
         this.CurrentState = State.Initial;
-        this.DiesiredDewell = 1000;
+        this.DiesiredDewell = 800;
         this.Target_set = false;
         this.height = height;
 

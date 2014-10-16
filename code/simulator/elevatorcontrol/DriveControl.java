@@ -43,16 +43,17 @@ public class DriveControl extends Controller {
 	 */
 	private BooleanCanPayloadTranslator mEmergencyBrake;
 	private DesiredFloorCanPayloadTranslator mDesiredFloor;
-	private LevelingCanPayloadTranslator mLevel;
+	private LevelingCanPayloadTranslator mLevelUp, mLevelDown;
 	private CarWeightCanPayloadTranslator mCarWeight;
 
 	private ReadableCanMailbox emergencyBrake;
 	private ReadableCanMailbox carWeight;
-	private ReadableCanMailbox level;
+	private ReadableCanMailbox levelUp, levelDown;
 	private ReadableCanMailbox desiredFloor;
 
-	private DoorClosedArray doorClosed;
+	private DoorClosedArray doorClosedFront, doorClosedBack;
 	private AtFloorArray atFloor;
+	private int currentFloor = 1;
 
 	/*
 	 * Out put interfaces
@@ -83,7 +84,9 @@ public class DriveControl extends Controller {
 
 		new ArrayList<ReadableCanMailbox>();
 
-		doorClosed = new DoorClosedArray(Hallway.FRONT, canInterface);
+		doorClosedFront = new DoorClosedArray(Hallway.FRONT, canInterface);
+		doorClosedBack = new DoorClosedArray(Hallway.BACK, canInterface);
+
 		atFloor = new AtFloorArray(canInterface);
 
 		/*
@@ -117,12 +120,18 @@ public class DriveControl extends Controller {
 		/*
 		 * mLevel
 		 */
-		level = CanMailbox
+		levelUp = CanMailbox
 				.getReadableCanMailbox(MessageDictionary.LEVELING_BASE_CAN_ID
 						+ ReplicationComputer
 								.computeReplicationId(Direction.UP));
-		mLevel = new LevelingCanPayloadTranslator(level, Direction.UP);
-		canInterface.registerTimeTriggered(level);
+		mLevelUp = new LevelingCanPayloadTranslator(levelUp, Direction.UP);
+		levelDown = CanMailbox
+				.getReadableCanMailbox(MessageDictionary.LEVELING_BASE_CAN_ID
+						+ ReplicationComputer
+								.computeReplicationId(Direction.DOWN));
+		mLevelDown = new LevelingCanPayloadTranslator(levelDown, Direction.DOWN);
+		canInterface.registerTimeTriggered(levelUp);
+		canInterface.registerTimeTriggered(levelDown);
 
 		/*
 		 * Outputs
@@ -152,7 +161,12 @@ public class DriveControl extends Controller {
 	public void timerExpired(Object callbackData) {
 
 		desiredDirection = mDesiredFloor.getDirection();
-		boolean allClosed = doorClosed.getBothClosed();
+
+		boolean allClosed = doorClosedFront.getBothClosed()
+				&& doorClosedBack.getBothClosed();
+
+		//System.out.println("currentFloor: " + atFloor.getCurrentFloor()
+		//		+ " state: " + currentState);
 
 		State newState = currentState;
 		switch (currentState) {
@@ -165,11 +179,21 @@ public class DriveControl extends Controller {
 			}
 
 			// #transition 'DC.1'
-			if (allClosed && mDesiredFloor.getDirection() != Direction.STOP) {
+			if (allClosed && currentFloor != mDesiredFloor.getFloor()) {
 				newState = State.MOVE;
 			}
 			break;
 		case MOVE:
+
+			if (currentFloor < mDesiredFloor.getFloor()) {
+				desiredDirection = Direction.UP;
+			} else {
+				if (currentFloor > mDesiredFloor.getFloor())
+					desiredDirection = Direction.DOWN;
+				else
+					desiredDirection = Direction.STOP;
+			}
+
 			this.setOutput(Speed.SLOW, desiredDirection);
 			// #transition 'DC.5'
 			if (this.isEmergencyCondition()) {
@@ -177,23 +201,43 @@ public class DriveControl extends Controller {
 				break;
 			}
 			// #transition 'DC.2'
+			//System.out.println("floor: " + mDesiredFloor.getFloor()
+					// + "Hallway: " + mDesiredFloor.getHallway()
+					// + mDesiredFloor.getDirection());
 
-			if (atFloor.isAtFloor(mDesiredFloor.getFloor(),
-					mDesiredFloor.getHallway())) {
-				newState = State.LEVEL;
-				mDesiredFloor.getFloor();
+			if (mDesiredFloor.getHallway() == Hallway.NONE) {
+				break;
+			}
+
+			if (mDesiredFloor.getHallway() == Hallway.BOTH) {
+				if (atFloor.isAtFloor(mDesiredFloor.getFloor(), Hallway.FRONT)) {
+					newState = State.LEVEL;
+				}
+			} else {
+				if (atFloor.isAtFloor(mDesiredFloor.getFloor(),
+						mDesiredFloor.getHallway())) {
+					newState = State.LEVEL;
+				}
 			}
 			break;
 		case LEVEL:
-			this.setOutput(Speed.LEVEL, desiredDirection);
+			Direction d;
+			if (currentFloor < mDesiredFloor.getFloor()) {
+				d = Direction.UP;
+			} else {
+				d = Direction.DOWN;
+			}
+			this.setOutput(Speed.LEVEL, d);
 			// #transition 'DC.5'
 			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
 			// #transition 'DC.3'
-			if (mLevel.getValue()) {
+			if ((mLevelUp.getValue() && d == Direction.UP)
+					|| (mLevelDown.getValue() && d == Direction.DOWN)) {
 				newState = State.OPEN;
+				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
 		case OPEN:
@@ -225,22 +269,25 @@ public class DriveControl extends Controller {
 		timer.start(period);
 
 	};
-	
-	/* 
-	 * Helper that tests guard condition to go into emergency state. Either:
-	 * 	- Car is overweight
-	 *  - mEmergencyBrake has been set to true
+
+	/*
+	 * Helper that tests guard condition to go into emergency state. Either: -
+	 * Car is overweight - mEmergencyBrake has been set to true
 	 */
 	private boolean isEmergencyCondition() {
-		return ((this.mCarWeight.getValue() > Elevator.MaxCarCapacity) || mEmergencyBrake.getValue());
+		return ((this.mCarWeight.getValue() > Elevator.MaxCarCapacity) || mEmergencyBrake
+				.getValue());
 	}
 
 	private void setOutput(Speed speed, Direction direction) {
+		// System.out.println("desired: " + mDesiredFloor.getFloor()
+		// 		+ mDesiredFloor.getDirection());
+
 		drivePayload.set(speed, direction);
 		mDrive.set(speed, direction);
 		switch (speed) {
 		case SLOW:
-			mDriveSpeed.set(10, direction);
+			mDriveSpeed.set(1, direction);
 			break;
 		case STOP:
 			mDriveSpeed.set(0, direction);

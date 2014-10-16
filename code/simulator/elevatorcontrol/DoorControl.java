@@ -111,7 +111,7 @@ public class DoorControl extends Controller {
 
     @Override
     public void timerExpired(Object callbackData) {
-        log("Executing state " + currentState);
+        //System.out.println("currentFloor" + mAtFloor.getCurrentFloor());
         State newState = currentState;
 
         switch (currentState) {
