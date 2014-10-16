@@ -1,3 +1,12 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+*/
+
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
@@ -165,9 +174,6 @@ public class DriveControl extends Controller {
 		boolean allClosed = doorClosedFront.getBothClosed()
 				&& doorClosedBack.getBothClosed();
 
-		//System.out.println("currentFloor: " + atFloor.getCurrentFloor()
-		//		+ " state: " + currentState);
-
 		State newState = currentState;
 		switch (currentState) {
 		case WAIT:
@@ -176,6 +182,10 @@ public class DriveControl extends Controller {
 			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
+			}
+
+			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
+				newState = State.LEVEL;
 			}
 
 			// #transition 'DC.1'
@@ -201,10 +211,6 @@ public class DriveControl extends Controller {
 				break;
 			}
 			// #transition 'DC.2'
-			//System.out.println("floor: " + mDesiredFloor.getFloor()
-					// + "Hallway: " + mDesiredFloor.getHallway()
-					// + mDesiredFloor.getDirection());
-
 			if (mDesiredFloor.getHallway() == Hallway.NONE) {
 				break;
 			}
@@ -234,8 +240,7 @@ public class DriveControl extends Controller {
 				break;
 			}
 			// #transition 'DC.3'
-			if ((mLevelUp.getValue() && d == Direction.UP)
-					|| (mLevelDown.getValue() && d == Direction.DOWN)) {
+			if (mLevelUp.getValue() && mLevelDown.getValue()) {
 				newState = State.OPEN;
 				currentFloor = atFloor.getCurrentFloor();
 			}
@@ -280,8 +285,6 @@ public class DriveControl extends Controller {
 	}
 
 	private void setOutput(Speed speed, Direction direction) {
-		// System.out.println("desired: " + mDesiredFloor.getFloor()
-		// 		+ mDesiredFloor.getDirection());
 
 		drivePayload.set(speed, direction);
 		mDrive.set(speed, direction);

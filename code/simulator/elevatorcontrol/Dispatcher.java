@@ -1,3 +1,13 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+*/
+
+
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
@@ -59,7 +69,7 @@ public class Dispatcher extends Controller {
         this.Target = 1;
         this.prevTarget = 1;
         this.CurrentState = State.Initial;
-        this.DiesiredDewell = 800;
+        this.DiesiredDewell = 1000;
         this.Target_set = false;
         this.height = height;
 
