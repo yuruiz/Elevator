@@ -111,7 +111,7 @@ public class DoorControl extends Controller {
 
     @Override
     public void timerExpired(Object callbackData) {
-        //System.out.println("currentFloor" + mAtFloor.getCurrentFloor());
+        
         State newState = currentState;
 
         switch (currentState) {
@@ -168,7 +168,7 @@ public class DoorControl extends Controller {
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
 
-        log(currentState.toString() + " -> " + newState.toString());
+        // log(currentState.toString() + " -> " + newState.toString());
         currentState = newState;
         timer.start(period);
 

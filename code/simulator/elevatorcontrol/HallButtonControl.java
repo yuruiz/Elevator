@@ -1,3 +1,12 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+*/
+
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;

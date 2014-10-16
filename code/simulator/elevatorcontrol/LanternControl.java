@@ -1,3 +1,12 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+*/
+
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
@@ -16,20 +25,18 @@ import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
 /* Author: James Sakai (jssakai) */
 public class LanternControl extends Controller {
-
-    /**
-     * ************************************************************************
+	
+    /***************************************************************************
      * Declarations
-     * ************************************************************************
-     */
+     **************************************************************************/
 
     /* 
-     *  OOUTPUT INTERFACE
+     *  OUTPUT INTERFACE
      */
 
     // Output Interface :: local physical state 
     private WriteableCarLanternPayload localCarLantern;
-
+    
     // Networked Output Interface
     private WriteableCanMailbox networkCarLantern;
     private BooleanCanPayloadTranslator mCarLantern;
@@ -47,7 +54,7 @@ public class LanternControl extends Controller {
     // Networked Input Interface :: translator for the AtFloor message -- 
     //   this translator is specific to this message and is provided in the 
     //   elevatormodules package
-    private AtFloorArray mAtFloor;
+    private AtFloorArray mAtFloor; 
 
     // Networked Input Interface :: translator for the DesiredFloor message -- 
     //   this translator is specific to this message and is provided in the 
@@ -56,10 +63,8 @@ public class LanternControl extends Controller {
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
 
     //these variables keep track of which instance this is.
-    //private final Hallway hallway;
     private final Direction direction;
     private Direction desiredDirection;
-    //private final int floor;
 
     //store the period for the controller
     private SimTime period;
@@ -68,12 +73,11 @@ public class LanternControl extends Controller {
     private enum State {
         STATE_NO_DIRECTION,
         STATE_DIRECTION_SET,
-        STATE_LANTERN_ON,
-        STATE_Lantern_NOT_ON
+        STATE_LANTERN_ON
     }
 
     // initialized state
-    private State currentState = State.STATE_NO_DIRECTION;
+	private State currentState = State.STATE_NO_DIRECTION;
   
     /*
      * The arguments listed in the .cf configuration file should match the order and
@@ -85,33 +89,33 @@ public class LanternControl extends Controller {
 
     public LanternControl(Direction direction, SimTime period, boolean verbose) {
 
-        super("LanternControl" + ReplicationComputer.makeReplicationString(direction), verbose);
-
-        //store the constructor arguments in internal state
-        this.period = period;
-        //this.hallway = hallway;
-        this.direction = direction;
-        //this.floor = floor;
+		super("LanternControl" + ReplicationComputer.makeReplicationString(direction), verbose);
+    	
+		//store the constructor arguments in internal state
+    	this.period = period;
+    	//this.hallway = hallway;
+    	this.direction = direction;
+    	//this.floor = floor;
 
     	/* 
          * The log() method is inherited from the Controller class.  It takes an
          * array of objects which will be converted to strings and concatenated
          * only if the log message is actually written.  
          */
-        log("Created " + getReplicationName() + " with period = ", period);
+    	log("Created " + getReplicationName() + " with period = ", period);
 
         /* 
          * Create READABLE PAYLOADS AND TRANSLATORS for all messages in INPUT INTERFACE
          * 		- mAtFloor[f,b,d], mDesiredFloor, mDoorClosed[b,r] 
          */
-
+       
         // mAtFloor
         mAtFloor = new AtFloorArray(canInterface);
 
         // mDesiredFloor
         networkDesiredFloor = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_FLOOR_CAN_ID);
         mDesiredFloor = new DesiredFloorCanPayloadTranslator(networkDesiredFloor);
-
+        
         // mDoorClosedLeft, mDoorClosedRight
         mDoorClosedFrontHallway = new DoorClosedArray(Hallway.FRONT, canInterface);
         mDoorClosedBackHallway = new DoorClosedArray(Hallway.BACK, canInterface);
@@ -140,68 +144,55 @@ public class LanternControl extends Controller {
     }
 
     @Override
-    public void timerExpired(Object callbackData) {
+	public void timerExpired(Object callbackData) {
         log("current state is " + currentState);
-
-        switch (currentState) {
-            case STATE_NO_DIRECTION:
-                localCarLantern.set(false);
-                desiredDirection = Direction.STOP;
-                mCarLantern.set(false);
+		
+        switch(currentState) {
+        	case STATE_NO_DIRECTION:
+        		localCarLantern.set(false);
+        		desiredDirection = Direction.STOP;
+        		mCarLantern.set(false);
                 //#Transition TL.T.1
-                if ((mDesiredFloor.getDirection() != desiredDirection) && (desiredDirection == Direction.STOP)) {
-                    currentState = State.STATE_DIRECTION_SET;
-                }
+        		if ((mDesiredFloor.getDirection() != desiredDirection) && (desiredDirection == Direction.STOP)) {
+        			currentState = State.STATE_DIRECTION_SET;
+        		}
 
-                break;
+        		break;
 
-            case STATE_DIRECTION_SET:
-                localCarLantern.set(false);
-                mCarLantern.set(false);
-                desiredDirection = mDesiredFloor.getDirection();
+        	case STATE_DIRECTION_SET:
+        		localCarLantern.set(false);
+        		desiredDirection = mDesiredFloor.getDirection();
+        		mCarLantern.set(false);
 
-                //#Transition TL.T.2
-                if (mAtFloor.isAtFloor(mDesiredFloor.getFloor(), mDesiredFloor.getHallway()) &&
-                        (mDoorClosedBackHallway.getBothClosed() == false || mDoorClosedFrontHallway.getBothClosed() == false)) {
-                    if ((desiredDirection == direction)) {
-                        currentState = State.STATE_LANTERN_ON;
-                    } else {
-                        currentState = State.STATE_Lantern_NOT_ON;
-                    }
+        		//#Transition TL.T.2
+        		if (mAtFloor.isAtFloor(mDesiredFloor.getFloor(), mDesiredFloor.getHallway()) && (desiredDirection != Direction.STOP)) {
+        			currentState = State.STATE_LANTERN_ON;
+        		}
 
-                }
+        		break;
 
-                break;
+        	case STATE_LANTERN_ON:
+        		localCarLantern.set(true);
+        		desiredDirection = mDesiredFloor.getDirection();
+        		mCarLantern.set(true);
+        		
+        		// #Transition TL.T.3
+        		if ((desiredDirection != Direction.STOP) && (mDoorClosedFrontHallway.getBothClosed() &&
+        				mDoorClosedBackHallway.getBothClosed())) {
+        			currentState = State.STATE_NO_DIRECTION;
+        		}
 
-            case STATE_LANTERN_ON:
-                localCarLantern.set(true);
-                mCarLantern.set(true);
+        		break;
 
-                // #Transition TL.T.3
-                if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
-                    currentState = State.STATE_NO_DIRECTION;
-                }
-
-                break;
-            case STATE_Lantern_NOT_ON:
-                localCarLantern.set(false);
-                mCarLantern.set(false);
-
-                if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
-                    currentState = State.STATE_NO_DIRECTION;
-                }
-            default:
-                throw new RuntimeException("State " + currentState + " was not recognized.");
+        	default:
+        		throw new RuntimeException("State " + currentState + " was not recognized.");
         }
 
-        //log(state.toString() + " -> " + newState.toString());
-        //state = newState;
-
         timer.start(period);
-    }
+	}
 
-    private String getReplicationName() {
-        return "LanternControl" + ReplicationComputer.makeReplicationString(direction);
-    }
+	private String getReplicationName() {
+		return "LanternControl" + ReplicationComputer.makeReplicationString(direction);
+	}
 
 }
