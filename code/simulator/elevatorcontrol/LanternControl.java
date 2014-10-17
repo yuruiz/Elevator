@@ -148,7 +148,7 @@ public class LanternControl extends Controller {
                 localCarLantern.set(false);
                 desiredDirection = Direction.STOP;
                 mCarLantern.set(false);
-                //#Transition TL.T.1
+                //#transition TL.T.1
                 if ((mDesiredFloor.getDirection() != desiredDirection) && (desiredDirection == Direction.STOP)) {
                     currentState = State.STATE_DIRECTION_SET;
                 }
@@ -160,12 +160,12 @@ public class LanternControl extends Controller {
                 mCarLantern.set(false);
                 desiredDirection = mDesiredFloor.getDirection();
 
-                //#Transition TL.T.2
+                //#transition TL.T.2
                 if (mAtFloor.isAtFloor(mDesiredFloor.getFloor(), mDesiredFloor.getHallway()) &&
                         (mDoorClosedBackHallway.getBothClosed() == false || mDoorClosedFrontHallway.getBothClosed() == false)) {
                     if ((desiredDirection == direction)) {
                         currentState = State.STATE_LANTERN_ON;
-                        //#Transition TL.T.4
+                        //#transition TL.T.4
                     } else {
                         currentState = State.STATE_Lantern_NOT_ON;
                     }
@@ -178,7 +178,7 @@ public class LanternControl extends Controller {
                 localCarLantern.set(true);
                 mCarLantern.set(true);
 
-                // #Transition TL.T.3
+                // #transition TL.T.3
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
                     currentState = State.STATE_NO_DIRECTION;
                 }
