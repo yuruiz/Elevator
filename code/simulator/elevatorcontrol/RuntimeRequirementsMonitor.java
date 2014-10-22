@@ -21,7 +21,7 @@ import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
  * @author vijay
  *
  */
-public class Proj11RuntimeMonitor extends RuntimeMonitor {
+public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     DoorStateMachine doorState = new DoorStateMachine(new AtFloorArray(canInterface));
     DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(canInterface));
     boolean wasWastedOpening = false;
