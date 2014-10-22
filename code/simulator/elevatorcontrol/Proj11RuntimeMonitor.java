@@ -21,12 +21,14 @@ import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
  * @author vijay
  *
  */
-public class RuntimeRequirementsMonitor extends RuntimeMonitor {
+public class Proj11RuntimeMonitor extends RuntimeMonitor {
     DoorStateMachine doorState = new DoorStateMachine(new AtFloorArray(canInterface));
     DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(canInterface));
     boolean wasWastedOpening = false;
     boolean wasWastedStop = false;
+    int totalOpeningCount = 0;
 	int wastedOpeningCount = 0;
+	int totalStopCount = 0;
 	int wastedStopCount = 0;
 	
 	@Override
@@ -37,9 +39,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	protected String[] summarize() {
-        String[] arr = new String[3];
-        arr[0] = "Wasted door openings count = " + wastedOpeningCount;
-        arr[1] = "Wasted drive stop count = " + wastedStopCount;
+        String[] arr = new String[2];
+        arr[0] = wastedStopCount + " unnecessary stops out of " + totalStopCount + " total.";
+        arr[1] = wastedOpeningCount + " unnecessary openings out of " + totalOpeningCount + " total.";
         return arr;
 	}
 	
@@ -86,6 +88,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         	this.wastedOpeningCount += 1;
         }
         wasWastedOpening = false;
+        totalOpeningCount += 1;
     }
     
     /**
@@ -105,6 +108,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         	this.wastedStopCount += 1;
         }
         wasWastedStop = false;
+        totalStopCount += 1;
     }
     
     /**
