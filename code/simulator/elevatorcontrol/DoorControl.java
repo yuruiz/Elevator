@@ -1,3 +1,11 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+*/
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
@@ -145,7 +153,7 @@ public class DoorControl extends Controller {
                 if (mDoorClosed.getValue()) {
                     newState = State.Closed;
                 }
-                //#transition T.5
+                //#transition T.5 (XXX: Add Door reversal to state chart)
                 else if (this.isOverweight() || mDoorReversal.getValue()) {
                     newState = State.Opening;
                 }
@@ -155,7 +163,7 @@ public class DoorControl extends Controller {
                 mDoorMotor.setCommand(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
 
-                //#transition T.4
+                //#transition T.4 XXX: Make sure this is reflected in the state chart
                 if ((this.isOverweight() && mAtFloor.getCurrentFloor() != -1 &&
                         mAtFloor.isAtFloor(mAtFloor.getCurrentFloor(), hallway)) ||
                         (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor() &&

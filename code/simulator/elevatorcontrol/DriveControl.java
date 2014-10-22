@@ -184,6 +184,7 @@ public class DriveControl extends Controller {
 				break;
 			}
 
+			// #transition 'DC.7'
 			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
 				newState = State.LEVEL;
 			}
@@ -234,11 +235,6 @@ public class DriveControl extends Controller {
 				d = Direction.DOWN;
 			}
 			this.setOutput(Speed.LEVEL, d);
-			// #transition 'DC.5'
-			if (this.isEmergencyCondition()) {
-				newState = State.EMERGENCY;
-				break;
-			}
 			// #transition 'DC.3'
 			if (mLevelUp.getValue() && mLevelDown.getValue()) {
 				newState = State.OPEN;
@@ -263,6 +259,10 @@ public class DriveControl extends Controller {
 			if (!this.isEmergencyCondition()) {
 				newState = State.WAIT;
 				break;
+			}
+			// #transition `DC.5`
+			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
+				newState = State.LEVEL;
 			}
 			break;
 		default:

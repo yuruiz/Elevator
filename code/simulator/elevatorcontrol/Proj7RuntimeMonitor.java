@@ -1,14 +1,4 @@
 /*
-18-649 (Fall 2014)
-Group 5:
-Vijay Jayaram
-James Sakai*
-Siyu Wei
-Yurui Zhou
-*/
-
-
-/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
