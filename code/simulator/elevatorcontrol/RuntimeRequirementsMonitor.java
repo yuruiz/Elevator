@@ -24,8 +24,8 @@ import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
 public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     DoorStateMachine doorState = new DoorStateMachine(new AtFloorArray(canInterface));
     DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(canInterface));
-    boolean wasWastedOpening = false;
-    boolean wasWastedStop = false;
+    boolean hadPendingCall = false;
+    boolean hadPendingDoorCall = false;
     int totalOpeningCount = 0;
 	int wastedOpeningCount = 0;
 	int totalStopCount = 0;
@@ -70,6 +70,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         driveState.receive(msg);
     }
 
+
     /**************************************************************************
      * high level event methods
      *
@@ -81,34 +82,15 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      * Called once when the doors close completely
      * @param hallway which door the event pertains to
      */
-    private void doorClosed(Hallway hallway) {
+    private void doorClosed(Hallway hallway, int currentFloor) {
         //System.out.println(hallway.toString() + " Door Closed");
         // Once all doors are closed, check to see if opening was wasted
-        if (wasWastedOpening) {
+        if (!hadPendingDoorCall) {
+        	warning("Violation of R-T7: Door opened at floor " + currentFloor + " and hallway " + hallway + " where there were no pending calls.");
         	this.wastedOpeningCount += 1;
         }
-        wasWastedOpening = false;
+        hadPendingDoorCall = false;
         totalOpeningCount += 1;
-    }
-    
-    /**
-     * Called once when the drive is stopped at a floor with no call at that floor
-     */
-    private void noCallDriveStopped(int floor) {
-    	//System.out.println("Drive stopped at floor " + f + " without a call.");
-    	wasWastedStop = true;
-    }
-    
-    /**
-     * Called once when the drive is moving
-     */
-    private void driveMoving() {
-        // Once all doors are closed, check to see if opening was wasted
-        if (wasWastedStop) {
-        	this.wastedStopCount += 1;
-        }
-        wasWastedStop = false;
-        totalStopCount += 1;
     }
     
     /**
@@ -117,9 +99,46 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      * @param hallway which door the event pertains to
      */
     private void noCallDoorOpened(int floor, Hallway hallway) {
-    	wasWastedOpening = true;
+    	hadPendingDoorCall = false;
     }
-	
+    
+    /**
+     * Called once when the doors open with a call to the floor
+     * @param floor which door the event pertains to
+     * @param hallway which door the event pertains to
+     */
+    private void callDoorOpened(int floor, Hallway hallway) {
+    	hadPendingDoorCall = true;
+    }
+    
+    /**
+     * Called once when the drive is moving
+     */
+    private void driveMoving(int currentFloor) {
+        // Once drive starts moving again, check if stop was wasted
+        if (!hadPendingCall) {
+        	warning("Violation of R-T6: Drive stopped at floor " + currentFloor + " with no pending calls.");
+        	this.wastedStopCount += 1;
+        }
+        hadPendingCall = false;
+        totalStopCount += 1;
+    }
+    
+    /**
+     * Called once when the drive is stopped at a floor with no call at that floor
+     */
+    private void noCallDriveStopped(int floor) {
+    	//System.out.println("Drive stopped at floor " + f + " without a call.");
+    	hadPendingCall = false;
+    }
+    
+    /**
+     * Called once when the drive is stopped at a floor with a call at that floor
+     */
+    private void callDriveStopped(int floor) {
+    	hadPendingCall = true;
+    }
+ 
     private static enum DoorState {
         CLOSED,
         CALL_OPEN,
@@ -164,25 +183,26 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
             	}
             	return;
             }
-            
-            if (!allDoorsClosed(h) && !wasCalled(currentFloor, h)) {
-            	// Doors opening without a call at this floor/hallway
-                newState = DoorState.NO_CALL_OPEN;
-            } else if (!allDoorsClosed(h) && wasCalled(currentFloor, h)) {
-            	// Doors opening with a call at this floor/hallway
-                newState = DoorState.CALL_OPEN;
-            } else if (allDoorsClosed(h) && allDoorMotorsStopped(h)) {
-            	// Doors are closed
-                newState = DoorState.CLOSED;
+
+            if (allDoorsClosed(h) && allDoorMotorsStopped(h)) {
+            	newState = DoorState.CLOSED;
+            } else if (!allDoorsClosed(h) && !hadPendingDoorCall) {
+            	// Doors opened, check if need to set hadPendingDoorCall
+            	if (wasCalled(currentFloor, h)) {
+            		newState = DoorState.CALL_OPEN;
+            	} else {
+            		newState = DoorState.NO_CALL_OPEN;
+            	}
             }
             
             if (newState != previousState) {
                 switch (newState) {
                     case CLOSED:
-                        doorClosed(h);
+                        doorClosed(h, currentFloor);
                         break;
                     case CALL_OPEN:
                     	//System.out.println("Door opened in response to call");
+                    	callDoorOpened(currentFloor, h);
                         break;
                     case NO_CALL_OPEN:
                         noCallDoorOpened(currentFloor, h);
@@ -206,9 +226,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         // Returns whether there a car or hall call to this floor/hallway combination
         public boolean wasCalled(int f, Hallway h){
-        	return carCalls[f][h.ordinal()].isPressed() || 
-        			hallCalls[f][h.ordinal()][Direction.UP.ordinal()].pressed() || 
-        			hallCalls[f][h.ordinal()][Direction.DOWN.ordinal()].pressed();
+        	return carCalls[f-1][h.ordinal()].isPressed() || 
+        			hallCalls[f-1][h.ordinal()][Direction.UP.ordinal()].pressed() || 
+        			hallCalls[f-1][h.ordinal()][Direction.DOWN.ordinal()].pressed();
         }
     }
 
@@ -250,24 +270,24 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
             	return;
             }
             
-            if (driveStopped() && !wasCalled(currentFloor)) {
-            	// Drive stopped without a call at this floor
-                newState = DriveState.NO_CALL_STOP;
-            } else if (driveStopped() && wasCalled(currentFloor)) {
-            	// Drive stopped with a call at this floor
-                newState = DriveState.CALL_STOP;
-            } else if (!driveStopped()) {
-            	// Drive is moving
-                newState = DriveState.MOVING;
+            if (!driveStopped()) {
+            	newState = DriveState.MOVING;
+            } else if (driveStopped() && !hadPendingCall) {
+            	// Drive is stopped, check whether there was a call here or not
+            	if (wasCalled(currentFloor)) {
+            		newState = DriveState.CALL_STOP;
+            	} else {
+            		newState = DriveState.NO_CALL_STOP;
+            	}
             }
             
             if (newState != this.currentState) {
                 switch (newState) {
                     case MOVING:
-                        driveMoving();
+                        driveMoving(currentFloor);
                         break;
                     case CALL_STOP:
-                    	//System.out.println("Drive stopped in response to call");
+                    	callDriveStopped(currentFloor);
                         break;
                     case NO_CALL_STOP:
                         noCallDriveStopped(currentFloor);
@@ -291,9 +311,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         // Returns whether there a car or hall call to this floor/hallway combination
         public boolean wasCalled(int f, Hallway h){
-        	return carCalls[f][h.ordinal()].isPressed() || 
-        			hallCalls[f][h.ordinal()][Direction.UP.ordinal()].pressed() || 
-        			hallCalls[f][h.ordinal()][Direction.DOWN.ordinal()].pressed();
+        	return carCalls[f-1][h.ordinal()].isPressed() || 
+        			hallCalls[f-1][h.ordinal()][Direction.UP.ordinal()].pressed() || 
+        			hallCalls[f-1][h.ordinal()][Direction.DOWN.ordinal()].pressed();
         }
     }
 
