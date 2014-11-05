@@ -11,46 +11,70 @@ Yurui Zhou
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
+
+import java.util.Arrays;
+
+import simulator.elevatorcontrol.Utility.CallRequest;
+import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
+import simulator.elevatormodules.DriveObject;
 import simulator.framework.Controller;
 import simulator.framework.Direction;
+import simulator.framework.Elevator;
 import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.translators.IntegerCanPayloadTranslator;
+import simulator.elevatorcontrol.Utility.AtFloorArray;
+import simulator.elevatorcontrol.Utility.CarCallArray;
+import simulator.elevatorcontrol.Utility.DoorClosedArray;
+import simulator.elevatorcontrol.Utility.HallCallArray;
 
 /**
  * Created by yuruiz on 10/5/14.
  */
 public class Dispatcher extends Controller {
 
-    private static enum State{
-        Initial,
-        Error,
-        Target,
-        Open,
-        Close
+    private static enum State {
+    	Initial,
+        UpUp,
+        UpStop,
+        UpDown,
+        StopUp,
+        StopStop,
+        StopDown,
+        DownUp,
+        DownStop,
+        DownDown,
+        Emergency
     }
 
-
-
-
     private SimTime period;
-    private State CurrentState;
+    private State currentState;
+    private int CurrentFloor;
+    private Direction CurrentDirection;
+    private Direction DesiredDirection;
     private int Target;
-    private int prevTarget;
-    private int height;
-    private int DiesiredDewell;
-    private boolean Target_set;
+    private int DesiredDwell;
+    private int previousFloorSeen;
+    // Flags for whether the car can commit to stopping at a particular floor, indexing by floor number
+    // Updated at each time instance
+    private boolean[] canCommit = new boolean[Elevator.numFloors + 1];
+    private final int mmDistBetweenFloors = (int) Elevator.DISTANCE_BETWEEN_FLOORS * 1000;
+    private final double acceleration = 1.0;
 
     /*Network Input*/
-    private Utility.AtFloorArray mAtFloor;
-    private Utility.DoorClosedArray mFrontDoorClosed;
-    private Utility.DoorClosedArray mBackDoorClosed;
-    private Utility.HallCallArray mHallCallArray;
-    private Utility.CarCallArray mCarCallArray;
+    private AtFloorArray mAtFloor;
+    private DoorClosedArray mFrontDoorClosed;
+    private DoorClosedArray mBackDoorClosed;
+    private HallCallArray mHallCallArray;
+    private CarCallArray mCarCallArray;
     private CanMailbox.ReadableCanMailbox networkCarWeight;
     private CarWeightAlarmCanPayloadTranslator mCarWeight;
+    private CarLevelPositionCanPayloadTranslator mCarLevelPosition;
+    private CanMailbox.ReadableCanMailbox networkCarLevelPosition;
+    private CanMailbox.ReadableCanMailbox networkDriveSpeed;
+    private DriveSpeedCanPayloadTranslator mDriveSpeed;
 
     /*Network Output*/
     private CanMailbox.WriteableCanMailbox networkDesiredFloor;
@@ -60,6 +84,7 @@ public class Dispatcher extends Controller {
     private CanMailbox.WriteableCanMailbox networkBackDesiredDwell;
     private IntegerCanPayloadTranslator mBackDesiredDwell;
 
+    
 
 
     public Dispatcher(int height, SimTime period, boolean verbose) {
@@ -67,22 +92,28 @@ public class Dispatcher extends Controller {
 
         this.period = period;
         this.Target = 1;
-        this.prevTarget = 1;
-        this.CurrentState = State.Initial;
-        this.DiesiredDewell = 1000;
-        this.Target_set = false;
-        this.height = height;
+        this.currentState = State.Initial;
+        this.DesiredDwell = 1000;
+        this.previousFloorSeen = 1;
 
-        mAtFloor = new Utility.AtFloorArray(canInterface);
-        mFrontDoorClosed = new Utility.DoorClosedArray(Hallway.FRONT,canInterface);
-        mBackDoorClosed = new Utility.DoorClosedArray(Hallway.BACK, canInterface);
-        mHallCallArray = new Utility.HallCallArray(canInterface);
-        mCarCallArray = new Utility.CarCallArray(canInterface);
-
+        mAtFloor = new AtFloorArray(canInterface);
+        mFrontDoorClosed = new DoorClosedArray(Hallway.FRONT,canInterface);
+        mBackDoorClosed = new DoorClosedArray(Hallway.BACK, canInterface);
+        mHallCallArray = new HallCallArray(canInterface);
+        mCarCallArray = new CarCallArray(canInterface);
+        
         networkCarWeight = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_WEIGHT_ALARM_CAN_ID);
         mCarWeight = new CarWeightAlarmCanPayloadTranslator(networkCarWeight);
         canInterface.registerTimeTriggered(networkCarWeight);
 
+        networkCarLevelPosition = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_LEVEL_POSITION_CAN_ID);
+        mCarLevelPosition = new CarLevelPositionCanPayloadTranslator(networkCarLevelPosition);
+        canInterface.registerTimeTriggered(networkCarLevelPosition);
+        
+        networkDriveSpeed = CanMailbox.getReadableCanMailbox(MessageDictionary.DRIVE_SPEED_CAN_ID);
+        mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
+        canInterface.registerTimeTriggered(networkDriveSpeed);
+        
         networkDesiredFloor = CanMailbox.getWriteableCanMailbox(MessageDictionary.DESIRED_FLOOR_CAN_ID);
         mDesiredFloor = new DesiredFloorCanPayloadTranslator(networkDesiredFloor);
         canInterface.sendTimeTriggered(networkDesiredFloor, period);
@@ -95,116 +126,362 @@ public class Dispatcher extends Controller {
         mBackDesiredDwell = new IntegerCanPayloadTranslator(networkBackDesiredDwell);
         canInterface.sendTimeTriggered(networkBackDesiredDwell, period);
 
-        mBackDesiredDwell.set(this.DiesiredDewell);
-        mFrontDesiredDwell.set(this.DiesiredDewell);
+        mBackDesiredDwell.set(this.DesiredDwell);
+        mFrontDesiredDwell.set(this.DesiredDwell);
 
         mDesiredFloor.set(1, Hallway.BOTH, Direction.STOP);
         timer.start(period);
-
     }
 
     @Override
     public void timerExpired(Object callbackData) {
-        log("Executing state " + CurrentState);
-
+        log("Executing state " + currentState);
+        State nextState = currentState;
         boolean FrontClosed;
         boolean BackClosed;
         boolean atCurrentTarget;
-        switch (CurrentState) {
-            case Initial:
-                this.Target = 1;
-                mDesiredFloor.set(Target, Hallway.BOTH, Direction.STOP);
-
-                FrontClosed = mFrontDoorClosed.getBothClosed();
-                BackClosed = mBackDoorClosed.getBothClosed();
-                //#transition T.1
-                if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
-                        mDesiredFloor.getHallway() == Hallway.BOTH) {
-                    CurrentState = State.Target;
-                }
-                break;
-            case Target:
-                if (Target_set == true) {
-                    atCurrentTarget = (mAtFloor.isAtFloor(prevTarget, Hallway.FRONT) || mAtFloor.isAtFloor(prevTarget, Hallway.BACK));
-                }
-                else{
-                    atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
-                    prevTarget = Target;
-                    Target = Target % height + 1;
-                    setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
-                    Target_set = true;
-                }
-
-                //#transition T.2
-                if (atCurrentTarget == true && mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) {
-                    Target_set = false;
-                    CurrentState = State.Close;
-                //#transition T.6
-                } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
-                    Target_set = false;
-                    CurrentState = State.Error;
-                }
-                break;
-            case Open:
-                atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
-                setTarget(Target, mAtFloor.isAtFloor(Target, Hallway.FRONT), mAtFloor.isAtFloor(Target, Hallway.BACK));
-
-                //#transition T.5
-                if (Target == mAtFloor.getCurrentFloor() && ((mAtFloor.isAtFloor(Target, Hallway.FRONT) && !mFrontDoorClosed.getBothClosed()) || (mAtFloor.isAtFloor(Target, Hallway.BACK) && !mBackDoorClosed.getBothClosed()))) {
-
-                    CurrentState = State.Target;
-                //#transition T.4
-                } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
-
-                    CurrentState = State.Error;
-                }
-                break;
-            case Close:
-                atCurrentTarget = (mAtFloor.isAtFloor(Target, Hallway.FRONT) || mAtFloor.isAtFloor(Target, Hallway.BACK));
-                mDesiredFloor.set(this.Target, Direction.STOP, Hallway.NONE);
-
-                //#transition T.3
-                if (atCurrentTarget == true && (mFrontDoorClosed.getBothClosed() || mBackDoorClosed.getBothClosed() && mDesiredFloor.getHallway() == Hallway.NONE)) {
-                    CurrentState = State.Open;
-                //#transition T.7
-                } else if ((!mFrontDoorClosed.getBothClosed() || !mBackDoorClosed.getBothClosed()) && atCurrentTarget == false) {
-
-                    CurrentState = State.Error;
-                }
-                break;
-            case Error:
-                this.Target = 1;
-                mDesiredFloor.set(this.Target, Direction.STOP, Hallway.NONE);
-
-                FrontClosed = mFrontDoorClosed.getBothClosed();
-                BackClosed = mBackDoorClosed.getBothClosed();
-                //#transition T.8
-                if (((FrontClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.FRONT)) || (BackClosed == false && mAtFloor.isAtFloor(this.Target, Hallway.BACK))) && this.Target == 1 &&
-                        mDesiredFloor.getHallway() == Hallway.NONE) {
-                    CurrentState = State.Target;
-                }
-                break;
-            default:
-                throw new RuntimeException("State " + CurrentState + " was not recognized.");
+        CurrentFloor = mAtFloor.getCurrentFloor();
+        if (CurrentFloor != -1) {
+            this.previousFloorSeen = CurrentFloor;
         }
-
+        
+        updateCommitPoints();
+        
+        /* Avoid duplicate declarations of variables here */
+        CallRequest closestCarCallAbove = mCarCallArray.closestCallAbove(previousFloorSeen, this.canCommit);
+        CallRequest closestHallCallAbove = mHallCallArray.closestCallAbove(previousFloorSeen, this.canCommit);
+        CallRequest closestCarCallBelow = mCarCallArray.closestCallBelow(previousFloorSeen, this.canCommit);
+        CallRequest closestHallCallBelow = mHallCallArray.closestCallBelow(previousFloorSeen, this.canCommit);
+        Hallway desiredHallway = Hallway.NONE;
+        CallRequest targetRequest;
+        
+        switch (currentState) {
+        	case Initial:
+        		/* Go down to lobby and have no desired floor afterward */
+        		CurrentDirection = (CurrentFloor == 1) ? Direction.STOP : Direction.DOWN;
+        		DesiredDirection = Direction.STOP;
+        		mDesiredFloor.set(Target, DesiredDirection, Hallway.NONE);
+        		//#transition DPT.13
+        		if (CurrentDirection == Direction.STOP) {
+        			nextState = State.StopStop;
+        		} else {
+        			log("CurrentDirection is " + CurrentDirection);
+        		}
+        		break;
+        	case StopStop:
+        		//DONE
+        		CurrentDirection = Direction.STOP;
+        		Target = CurrentFloor;
+        		DesiredDirection = Direction.STOP;
+        		mDesiredFloor.set(Target, DesiredDirection, Hallway.NONE);
+        		//#transition DPT.6
+        		if (closestCarCallAbove.isValid() || closestHallCallAbove.isValid() || 
+        				mHallCallArray.isCalled(CurrentFloor, Direction.UP).isValid()) {
+        			nextState = State.StopUp;
+        		//#transition DPT.7
+        		} else if (closestCarCallBelow.isValid() || closestHallCallBelow.isValid() ||
+        				mHallCallArray.isCalled(CurrentFloor, Direction.DOWN).isValid()) {
+        			nextState = State.StopDown;
+        		}
+        		break;
+			case StopDown:
+				//DONE
+				CurrentDirection = Direction.STOP;
+				DesiredDirection = Direction.DOWN;
+				targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, DesiredDirection);
+				if (targetRequest.isValid()) {
+					Target = targetRequest.floor;
+					desiredHallway = targetRequest.hallway;
+				} else {
+					throw new RuntimeException("Got to state StopDown without any down calls.");
+				}
+				
+				//#transition DPT.8
+				if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() &&
+						mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+					nextState = State.DownStop;
+				}
+					
+				mDesiredFloor.set(Target,  DesiredDirection, desiredHallway);
+				break;
+			case StopUp:
+				//DONE
+				CurrentDirection = Direction.STOP;
+				DesiredDirection = Direction.UP;
+				targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, DesiredDirection);
+				if (targetRequest.isValid()) {
+					Target = targetRequest.floor;
+					desiredHallway = targetRequest.hallway;
+				} else {
+					throw new RuntimeException("Got to state StopUp without any up calls.");
+				}
+				
+				//#transition DPT.2
+				if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() &&
+						mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+					nextState = State.UpStop;
+				}
+					
+				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+				break;
+        	case UpStop:
+        		//DONE
+        		CurrentDirection = Direction.UP;
+        		DesiredDirection = Direction.STOP;
+				targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, CurrentDirection);
+				if (targetRequest.isValid()) {
+					Target = targetRequest.floor;
+					desiredHallway = targetRequest.hallway;
+				} else {
+					throw new RuntimeException("Got to state UpStop without any up calls.");
+				}
+				
+        		// Check for calls above Target
+        		CallRequest nextCarCallAbove = mCarCallArray.closestCallAbove(Target, canCommit);
+        		CallRequest nextHallCallAbove = mHallCallArray.closestCallAbove(Target, canCommit);
+        		
+        		//#transition DPT.3
+        		if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) 
+        				|| (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
+        			nextState = State.UpUp;
+        		} 
+        		//#transition DPT.4
+        		else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
+        			nextState = State.UpDown;
+        		}
+        		mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+        		break;
+			case DownStop:
+				//DONE
+				CurrentDirection = Direction.DOWN;
+				DesiredDirection = Direction.STOP;
+				targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, CurrentDirection);
+				if (targetRequest.isValid()) {
+					Target = targetRequest.floor;
+					desiredHallway = targetRequest.hallway;
+				} else {
+					throw new RuntimeException("Got to state DownStop without any down calls.");
+				}
+				
+        		// Check for calls below Target
+        		CallRequest nextCarCallBelow = mCarCallArray.closestCallBelow(Target, canCommit);
+        		CallRequest nextHallCallBelow = mHallCallArray.closestCallBelow(Target, canCommit);
+        		
+        		//#transition DPT.9
+        		if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) 
+        				|| (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
+        			nextState = State.DownDown;
+        		} 
+        		//#transition DPT.10
+        		else if (mHallCallArray.isCalled(Target, Direction.UP).isValid()){
+        			nextState = State.DownUp;
+        		}
+        		mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+        		break;	
+			case UpUp:
+				//DONE
+				CurrentDirection = Direction.UP;
+				DesiredDirection = Direction.UP;
+				
+				CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP, canCommit);
+				if (upUpHallCall.isValid() && closestCarCallAbove.isValid()) {
+					if (upUpHallCall.floor < closestCarCallAbove.floor) {
+						Target = upUpHallCall.floor;
+						desiredHallway = upUpHallCall.hallway;
+					} else {
+						Target = closestCarCallAbove.floor;
+						desiredHallway = closestCarCallAbove.hallway;
+					}
+				}
+				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+				//#transition DPT.1
+				if (!mFrontDoorClosed.getBothClosed() && mAtFloor.getCurrentFloor() != -1) {
+					nextState = State.StopUp;
+				}
+				break;
+			case DownDown:
+				//DONE
+				CurrentDirection = Direction.DOWN;
+				DesiredDirection = Direction.DOWN;
+				CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+				if (downDownHallCall.isValid() && closestCarCallBelow.isValid()) {
+					if (downDownHallCall.floor > closestCarCallBelow.floor) {
+						Target = downDownHallCall.floor;
+						desiredHallway = downDownHallCall.hallway;
+					} else {
+						Target = closestCarCallAbove.floor;
+						desiredHallway = closestCarCallAbove.hallway;
+					}
+				}
+				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+				//#transition DPT.1
+				if (!mFrontDoorClosed.getBothClosed() && mAtFloor.getCurrentFloor() != -1) {
+					nextState = State.StopUp;
+				}
+				break;
+			case UpDown:
+				CurrentDirection = Direction.UP;
+				DesiredDirection = Direction.DOWN;
+				targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, CurrentDirection);
+				if (targetRequest.isValid()) {
+					Target = targetRequest.floor;
+					desiredHallway = targetRequest.hallway;
+				} else {
+					throw new RuntimeException("Got to state UpDown without any up calls.");
+				}
+				
+				CallRequest upDownHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+				if (upDownHallCall.isValid() && closestCarCallAbove.isValid()) {
+					if (upDownHallCall.floor < closestCarCallAbove.floor) {
+						Target = upDownHallCall.floor;
+						desiredHallway = upDownHallCall.hallway;
+					} else {
+						Target = closestCarCallAbove.floor;
+						desiredHallway = closestCarCallAbove.hallway;
+					}
+				}
+				
+				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+				
+				//#transition DPT.1
+				if (!mFrontDoorClosed.getBothClosed() && mAtFloor.getCurrentFloor() != -1) {
+					nextState = State.StopUp;
+				}
+        		// If there's a hall call above the current point, change to up/up
+        		CallRequest nextCarCallUp = mCarCallArray.closestCallAbove(Target, canCommit);
+        		CallRequest nextHallCallUp = mHallCallArray.closestCallAbove(Target, canCommit);
+        		//#transition DPT.5
+        		if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) 
+        				|| (nextHallCallUp.isValid() || nextCarCallUp.isValid())) {
+        			nextState = State.UpUp;
+        		} 
+				break;
+			case DownUp:
+				CurrentDirection = Direction.DOWN;
+				DesiredDirection = Direction.UP;
+				
+				CallRequest downUpHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+				if (downUpHallCall.isValid() && closestCarCallAbove.isValid()) {
+					if (downUpHallCall.floor < closestCarCallAbove.floor) {
+						Target = downUpHallCall.floor;
+						desiredHallway = downUpHallCall.hallway;
+					} else {
+						Target = closestCarCallAbove.floor;
+						desiredHallway = closestCarCallAbove.hallway;
+					}
+				}
+				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
+				//#transition DPT.1
+				if (!mFrontDoorClosed.getBothClosed() && mAtFloor.getCurrentFloor() != -1) {
+					nextState = State.StopUp;
+				}
+        		CallRequest nextCarCallDown = mCarCallArray.closestCallBelow(Target, canCommit);
+        		CallRequest nextHallCallDown = mHallCallArray.closestCallBelow(Target, canCommit);
+        		//#transition DPT.11
+				if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) 
+	        				|| (nextCarCallDown.isValid() || nextHallCallDown.isValid())) {
+	        			nextState = State.DownDown;
+	        	}
+				break;
+			case Emergency:
+				log("Reached the emergency state in dispatcher. Stopping.");
+				break;
+			default:
+				log("State is invalid in dispatcher.");
+				break;
+        }
+        
+        if (currentState != nextState) {
+        	log("Transition from " + currentState + " --> " + nextState);
+        }
+        this.currentState = nextState;
+        //#transition DPT.12
+        if (CurrentFloor == -1 && !(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed())) {
+        	log("Transition from " + currentState + " --> " + nextState);
+        	currentState = State.Emergency;
+        }
         timer.start(period);
     }
+    
+    private CallRequest computeTarget(CallRequest closestCarCall,
+			CallRequest closestHallCall, Direction dir) {
+    	
+    		int floor;
+    		Hallway hallway;
+			if (!(closestCarCall.isValid() || closestHallCall.isValid())) {
+				return new CallRequest();
+			} else if (!closestCarCall.isValid()) {
+				// There is only a hall call below the current floor
+				floor = closestHallCall.floor;
+				hallway = closestHallCall.hallway;
+			} else if (!closestHallCall.isValid()) {
+				// There is only a car call below the current floor
+				floor = closestCarCall.floor;
+				hallway = closestCarCall.hallway;
+			} else {
+				// There is both a hall and car call below the current floor, compute the closest one
+				switch (dir) {
+					case UP:
+						if (closestCarCall.floor < closestHallCall.floor) {
+							floor = closestHallCall.floor;
+							hallway = closestHallCall.hallway;
+						} else {
+							floor = closestCarCall.floor;
+							hallway = closestCarCall.hallway;
+						}
+						break;
+					case DOWN:
+						if (closestCarCall.floor > closestHallCall.floor) {
+							floor = closestHallCall.floor;
+							hallway = closestHallCall.hallway;
+						} else {
+							floor = closestCarCall.floor;
+							hallway = closestCarCall.hallway;
+						}
+						break;
+					default:
+						return new CallRequest();
+					}
+			}
+			return new CallRequest(floor, Direction.STOP, hallway);
+	}
 
-    private void setTarget(int target, boolean Front, boolean Back) {
-        if (Front == true && Back == true) {
-            mDesiredFloor.set(Target, Hallway.BOTH, Direction.STOP);
-        }
-        else if (Front == true) {
-            mDesiredFloor.set(Target, Hallway.FRONT, Direction.STOP);
-        }
-        else if (Back == true) {
-            mDesiredFloor.set(Target, Hallway.BACK, Direction.STOP);
-        }
-        else {
-            mDesiredFloor.set(Target, Hallway.NONE, Direction.STOP);
-        }
+	void updateCommitPoints() {
+    	/* Update this.commitPoints array here */
+    	int currSpeed = mDriveSpeed.getSpeed();
+    	Direction currDir = mDriveSpeed.getDirection();
+    	int currPos = mCarLevelPosition.getPosition();
+    	
+    	//|x| = vi^2/(2*a)
+    	double stoppingDistance = (currSpeed * currSpeed)/(2 * this.acceleration);
+    	double stoppingPoint;
+    	int nearestFloor;
+    	
+    	switch (currDir) {
+	    	case STOP:
+	    		/* If stopped at a floor, it is possible to reach any floor */
+	    		Arrays.fill(this.canCommit, true);
+	    		break;
+	    	case UP:
+	    		/* Moving up: All floors above stopping point can be reached */
+	    		stoppingPoint = currPos + stoppingDistance;
+	    		nearestFloor = (int) Math.ceil(stoppingPoint/this.mmDistBetweenFloors) + 1;
+	    		Arrays.fill(this.canCommit, false);
+	    		
+	    		for (int i = nearestFloor; i <= Elevator.numFloors; i++) {
+	    			this.canCommit[i] = true;
+	    		}
+	    		
+	    		break;
+	    	case DOWN:
+	    		/* Moving down: All floors below stopping point can be reached */
+	    		stoppingPoint = currPos - stoppingDistance;
+	    		nearestFloor = (int) Math.floor(stoppingPoint/this.mmDistBetweenFloors) + 1;
 
-
+	    		for (int i = nearestFloor; i >= 1; i--) {
+	    			this.canCommit[i] = true;
+	    		}
+	    		break;
+    	}
     }
 }

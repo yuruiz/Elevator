@@ -187,6 +187,7 @@ public class DriveControl extends Controller {
 			// #transition 'DC.7'
 			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
 				newState = State.LEVEL;
+				break;
 			}
 
 			// #transition 'DC.1'

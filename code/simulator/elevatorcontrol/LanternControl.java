@@ -1,3 +1,13 @@
+/*
+18-649 (Fall 2014)
+Group 5:
+Vijay Jayaram
+James Sakai*
+Siyu Wei
+Yurui Zhou
+LanternControl
+*/
+
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
@@ -192,6 +202,7 @@ public class LanternControl extends Controller {
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
                     currentState = State.STATE_NO_DIRECTION;
                 }
+                break;
             default:
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
