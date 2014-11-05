@@ -61,7 +61,6 @@ public class Dispatcher extends Controller {
     // Updated at each time instance
     private boolean[] canCommit = new boolean[Elevator.numFloors + 1];
     private final int mmDistBetweenFloors = (int) Elevator.DISTANCE_BETWEEN_FLOORS * 1000;
-    private final double acceleration = 1.0;
 
     /*Network Input*/
     private AtFloorArray mAtFloor;
@@ -137,9 +136,7 @@ public class Dispatcher extends Controller {
     public void timerExpired(Object callbackData) {
         log("Executing state " + currentState);
         State nextState = currentState;
-        boolean FrontClosed;
-        boolean BackClosed;
-        boolean atCurrentTarget;
+
         CurrentFloor = mAtFloor.getCurrentFloor();
         if (CurrentFloor != -1) {
             this.previousFloorSeen = CurrentFloor;
@@ -453,7 +450,7 @@ public class Dispatcher extends Controller {
     	int currPos = mCarLevelPosition.getPosition();
     	
     	//|x| = vi^2/(2*a)
-    	double stoppingDistance = (currSpeed * currSpeed)/(2 * this.acceleration);
+    	double stoppingDistance = (currSpeed * currSpeed)/(2 * DriveObject.Acceleration);
     	double stoppingPoint;
     	int nearestFloor;
     	
