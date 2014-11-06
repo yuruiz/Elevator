@@ -199,12 +199,16 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         DoorState state[] = new DoorState[2];
         AtFloorArray atFloorArray;
-        boolean isNudging = false;
-        boolean isReversaling = false;
+        boolean[] isNudging = new boolean[2];
+        boolean[] isReversaling =new boolean[2];
 
         public DoorStateMachine(AtFloorArray atFloors) {
             state[Hallway.FRONT.ordinal()] = DoorState.CLOSED;
             state[Hallway.BACK.ordinal()] = DoorState.CLOSED;
+            isNudging[Hallway.FRONT.ordinal()] = false;
+            isNudging[Hallway.BACK.ordinal()] = false;
+            isReversaling[Hallway.FRONT.ordinal()] = false;
+            isReversaling[Hallway.BACK.ordinal()] = false;
             this.atFloorArray = atFloors;
         }
 
@@ -221,12 +225,12 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
             Hallway h = msg.getHallway();
             if(doorReversals[h.ordinal()][Side.LEFT.ordinal()].isReversing() || doorReversals[h.ordinal()][Side.RIGHT
                     .ordinal()].isReversing()){
-                if(!isReversaling) {
+                if(!isReversaling[h.ordinal()]) {
                     callDoorReversal(h);
-                    isReversaling = true;
+                    isReversaling[h.ordinal()] = true;
                 }
             }else{
-                isReversaling = false;
+                isReversaling[h.ordinal()] = false;
             }
         }
 
@@ -277,12 +281,12 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         public void updateNudge(Hallway hallway) {
             if (doorNudge(hallway)) {
-                if(!isNudging) {
+                if(!isNudging[hallway.ordinal()]) {
                     callDoorNudge(hallway);
-                    isNudging = true;
+                    isNudging[hallway.ordinal()] = true;
                 }
             }else{
-                isNudging = false;
+                isNudging[hallway.ordinal()] = false;
             }
         }
 
