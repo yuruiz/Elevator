@@ -450,16 +450,22 @@ public class Dispatcher extends Controller {
 						if (closestCarCall.floor < closestHallCall.floor) {
 							floor = closestHallCall.floor;
 							hallway = closestHallCall.hallway;
-						} else {
-							floor = closestCarCall.floor;
-							hallway = closestCarCall.hallway;
-						}
+						} else if (closestCarCall.floor == closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
+                        } else {
+                            floor = closestCarCall.floor;
+                            hallway = closestCarCall.hallway;
+                        }
 						break;
 					case DOWN:
 						if (closestCarCall.floor > closestHallCall.floor) {
 							floor = closestHallCall.floor;
 							hallway = closestHallCall.hallway;
-						} else {
+						} else if (closestCarCall.floor == closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
+                        } else {
 							floor = closestCarCall.floor;
 							hallway = closestCarCall.hallway;
 						}

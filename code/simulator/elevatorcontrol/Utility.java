@@ -338,18 +338,18 @@ public class Utility {
     		this.valid = false;
     	}
     	
-//    	private static Hallway union(Hallway a, Hallway b) {
-//    		if (a == hallway.NONE) {
-//    			return b;
-//    		} else if (b == Hallway.NONE) {
-//    			return a;
-//    		} else if (a == b) {
-//    			return a;
-//    		} else {
-//    			return Hallway.BOTH;
-//    		}
-//    	}
-//    	
+    	public static Hallway union(Hallway a, Hallway b) {
+    		if (a == Hallway.NONE) {
+    			return b;
+    		} else if (b == Hallway.NONE) {
+    			return a;
+    		} else if (a == b) {
+    			return a;
+    		} else {
+    			return Hallway.BOTH;
+    		}
+    	}
+
 //    	public static CallRequest union(CallRequest a, CallRequest b) {
 //    		if (!a.isValid()) {
 //    			return b;
