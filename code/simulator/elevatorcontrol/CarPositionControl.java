@@ -10,16 +10,14 @@ Yurui Zhou
 
 package simulator.elevatorcontrol;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import jSimPack.SimTime;
 import simulator.elevatorcontrol.Utility.AtFloorArray;
+import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
+import simulator.elevatormodules.DriveObject;
 import simulator.framework.Controller;
-import simulator.framework.Direction;
-import simulator.framework.Hallway;
-import simulator.framework.ReplicationComputer;
+import simulator.framework.Elevator;
 import simulator.payloads.CanMailbox;
+import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.CarPositionIndicatorPayload;
 import simulator.payloads.CarPositionIndicatorPayload.WriteableCarPositionIndicatorPayload;
@@ -27,116 +25,90 @@ import simulator.payloads.translators.IntegerCanPayloadTranslator;
 
 public class CarPositionControl extends Controller {
 
-	private static final String NAME = "CarPositionControl";
-	private static final int FLOOR = 8;
-	private int currentFloor; // the first floor
+	private int CurrentFloor;
 	private SimTime period;
 	private State state;
+	private double mmDistBetweenFloors = Elevator.DISTANCE_BETWEEN_FLOORS * 1000;
 
 	// input
-	private AtFloorArray atFloor;
+	private AtFloorArray mAtFloor;
+	private ReadableCanMailbox networkCarLevelPosition;
+	private CarLevelPositionCanPayloadTranslator mCarLevelPosition;
+	private ReadableCanMailbox networkDriveSpeed;
+	private DriveSpeedCanPayloadTranslator mDriveSpeed;
 
-	private static class Door {
-
-		private Door(int floor, Hallway hallway) {
-			this.floor = floor;
-			this.hallway = hallway;
-		}
-
-		private int floor;
-		private Hallway hallway;
-	}
-
-	private List<Door> doorList;
 
 	// output
-	private WriteableCanMailbox carPositionIndicator;
+	private WriteableCanMailbox networkCarPositionIndicator;
 	private IntegerCanPayloadTranslator mCarPositionIndicator;
-
-	private WriteableCarPositionIndicatorPayload carPositionPayload;
-
+	private WriteableCarPositionIndicatorPayload localCarPositionIndicator;
 	private enum State {
 		ARRIVE, MOVING
 	}
 
 	public CarPositionControl(SimTime period, boolean verbose) {
-		super(NAME, verbose);
+		super("CarPositionControl", verbose);
 		this.period = period;
-		this.initialize();
-	}
-
-	private void initialize() {
-
 		state = State.ARRIVE;
-		currentFloor = 1; // the first floor
-		carPositionIndicator = CanMailbox
-				.getWriteableCanMailbox(MessageDictionary.CAR_POSITION_CAN_ID);
-		canInterface.sendTimeTriggered(carPositionIndicator, period);
+		CurrentFloor = 1; // the first floor
 		
+		/* Input */
+		mAtFloor = new AtFloorArray(canInterface);
+		networkCarLevelPosition = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_LEVEL_POSITION_CAN_ID);
+		mCarLevelPosition = new CarLevelPositionCanPayloadTranslator(networkCarLevelPosition);
+		networkDriveSpeed = CanMailbox.getReadableCanMailbox(MessageDictionary.DRIVE_SPEED_CAN_ID);
+		mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
+		
+		/* Output */
+		networkCarPositionIndicator = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_POSITION_CAN_ID);
+		mCarPositionIndicator = new IntegerCanPayloadTranslator(networkCarPositionIndicator);
+		canInterface.sendTimeTriggered(networkCarPositionIndicator, period);
+		
+		localCarPositionIndicator = CarPositionIndicatorPayload.getWriteablePayload();
+		physicalInterface.sendTimeTriggered(localCarPositionIndicator, period);
 
-		mCarPositionIndicator = new IntegerCanPayloadTranslator(
-				carPositionIndicator);
-
-		carPositionPayload = CarPositionIndicatorPayload.getWriteablePayload();
-		physicalInterface.sendTimeTriggered(carPositionPayload, period);
-
-		doorList = new ArrayList<Door>();
-		for (int i = 1; i <= FLOOR; i++) {
-			if (i == 2) {
-				continue;
-			}
-			doorList.add(new Door(i, Hallway.FRONT));
-		}
-
-		doorList.add(new Door(1, Hallway.BACK));
-		doorList.add(new Door(2, Hallway.BACK));
-		doorList.add(new Door(7, Hallway.BACK));
-
-		atFloor = new AtFloorArray(canInterface);
-
-		timer.start(period);
+		timer.start(period);	
 	}
+
 
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		State newState = state;
-
+		State nextState = state;
+		int currPos = mCarLevelPosition.getPosition();
+		
 		switch (state) {
-		case MOVING:
-
-			carPositionPayload.set(currentFloor);
-			mCarPositionIndicator.set(currentFloor);
-
-			for (Door door : doorList) {
-				// #transition CPC T.1
-				if (atFloor.isAtFloor(door.floor, door.hallway)) {
-					newState = State.ARRIVE;
+			case MOVING:
+				localCarPositionIndicator.set(CurrentFloor);
+				mCarPositionIndicator.setValue(CurrentFloor);
+				switch (mDriveSpeed.getDirection()) {
+					case DOWN:
+						// Moving down, get the nearest floor above
+						CurrentFloor = (int) Math.ceil(currPos/this.mmDistBetweenFloors) + 1;
+						break;
+					case UP:
+						// Moving up, get the nearest floor below
+						CurrentFloor = (int) Math.floor(currPos/this.mmDistBetweenFloors) + 1;
+						break;
+					case STOP:
+						//#transition CPC T.1
+						nextState = State.ARRIVE;
+						break;
+					}
+				break;
+			case ARRIVE:
+				localCarPositionIndicator.set(CurrentFloor);
+				mCarPositionIndicator.set(CurrentFloor);
+				// #transition CPC T.2
+				if (mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+					nextState = State.MOVING;
 				}
-
-			}
-			break;
-		case ARRIVE:
-			boolean notAtFloor = true;
-
-			for (Door door : doorList) {
-				if (atFloor.isAtFloor(door.floor, door.hallway)) {
-					currentFloor = door.floor;
-					log("floor: " + door.floor);
-					notAtFloor = false;
-				}
-			}
-			carPositionPayload.set(currentFloor);
-			mCarPositionIndicator.set(currentFloor);
-
-			// #transition CPC T.2
-			if (notAtFloor) {
-				newState = State.MOVING;
-			}
-
-			break;
+				break;
 		}
-		state = newState;
+		if (state != nextState) {
+			log("Transition: " + state + " -> " + nextState);
+		}
+		state = nextState;
 		timer.start(period);
 	}
 }
