@@ -19,6 +19,7 @@ import simulator.framework.Side;
 import simulator.framework.Speed;
 import simulator.payloads.DoorClosedPayload.ReadableDoorClosedPayload;
 import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
+import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
 import simulator.payloads.DrivePayload.ReadableDrivePayload;
 import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
 
@@ -30,16 +31,24 @@ import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
  *  - RT-7: The Car shall only open Doors at Hallways for which there are pending calls.
  * @author vijay
  *
+ * As of Proj10 the summarize() method reports violations of:
+ *
+ * - R-T10: For each stop at a floor, at least one door reversal shall have occured before the doors are commanded to nudge.
+ *
+ * @author yuruiz
  */
 public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     DoorStateMachine doorState = new DoorStateMachine(new AtFloorArray(canInterface));
     DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(canInterface));
     boolean hadPendingCall = false;
     boolean hadPendingDoorCall = false;
+    boolean[] hadReversal = new boolean[2];
     int totalOpeningCount = 0;
 	int wastedOpeningCount = 0;
 	int totalStopCount = 0;
 	int wastedStopCount = 0;
+    int wastedNudgeCount = 0;
+    int totalNudgeCount = 0;
 	
 	@Override
 	public void timerExpired(Object callbackData) {
@@ -49,9 +58,10 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	protected String[] summarize() {
-        String[] arr = new String[2];
+        String[] arr = new String[3];
         arr[0] = wastedStopCount + " unnecessary stops out of " + totalStopCount + " total.";
         arr[1] = wastedOpeningCount + " unnecessary openings out of " + totalOpeningCount + " total.";
+        arr[3] = wastedNudgeCount + "unnecessary nudge out of " + totalNudgeCount + " total";
         return arr;
 	}
 	
@@ -78,6 +88,11 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     @Override
     public void receive(ReadableDriveSpeedPayload msg) {
         driveState.receive(msg);
+    }
+
+    @Override
+    public void receive(ReadableDoorReversalPayload msg) {
+
     }
 
 
@@ -110,6 +125,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      */
     private void noCallDoorOpened(int floor, Hallway hallway) {
     	hadPendingDoorCall = false;
+        hadReversal[hallway.ordinal()] = false;
     }
     
     /**
@@ -119,6 +135,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      */
     private void callDoorOpened(int floor, Hallway hallway) {
     	hadPendingDoorCall = true;
+        hadReversal[hallway.ordinal()] = false;
     }
     
     /**
@@ -148,6 +165,23 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     private void callDriveStopped(int floor) {
     	hadPendingCall = true;
     }
+
+    /*
+    * Called once when the door is start nudge
+    * */
+    private void callDoorNudge(Hallway hallway){
+        totalNudgeCount++;
+        if (!hadReversal[hallway.ordinal()]) {
+            warning("Violation of R-T10: Door nudge at " + hallway + " with no reversal triggered.");
+            wastedNudgeCount++;
+        }
+
+        hadReversal[hallway.ordinal()] = false;
+    }
+
+    private void callDoorReversal(Hallway hallway) {
+        hadReversal[hallway.ordinal()] = true;
+    }
  
     private static enum DoorState {
         CLOSED,
@@ -165,10 +199,16 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         DoorState state[] = new DoorState[2];
         AtFloorArray atFloorArray;
+        boolean[] isNudging = new boolean[2];
+        boolean[] isReversaling =new boolean[2];
 
         public DoorStateMachine(AtFloorArray atFloors) {
             state[Hallway.FRONT.ordinal()] = DoorState.CLOSED;
             state[Hallway.BACK.ordinal()] = DoorState.CLOSED;
+            isNudging[Hallway.FRONT.ordinal()] = false;
+            isNudging[Hallway.BACK.ordinal()] = false;
+            isReversaling[Hallway.FRONT.ordinal()] = false;
+            isReversaling[Hallway.BACK.ordinal()] = false;
             this.atFloorArray = atFloors;
         }
 
@@ -178,6 +218,20 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
         public void receive(ReadableDoorMotorPayload msg) {
             updateState(msg.getHallway());
+            updateNudge(msg.getHallway());
+        }
+
+        public void receive(ReadableDoorReversalPayload msg) {
+            Hallway h = msg.getHallway();
+            if(doorReversals[h.ordinal()][Side.LEFT.ordinal()].isReversing() || doorReversals[h.ordinal()][Side.RIGHT
+                    .ordinal()].isReversing()){
+                if(!isReversaling[h.ordinal()]) {
+                    callDoorReversal(h);
+                    isReversaling[h.ordinal()] = true;
+                }
+            }else{
+                isReversaling[h.ordinal()] = false;
+            }
         }
 
         private void updateState(Hallway h) {
@@ -217,11 +271,23 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
                     case NO_CALL_OPEN:
                         noCallDoorOpened(currentFloor, h);
                         break;
+
                 }
             }
 
             //set the newState
             state[h.ordinal()] = newState;
+        }
+
+        public void updateNudge(Hallway hallway) {
+            if (doorNudge(hallway)) {
+                if(!isNudging[hallway.ordinal()]) {
+                    callDoorNudge(hallway);
+                    isNudging[hallway.ordinal()] = true;
+                }
+            }else{
+                isNudging[hallway.ordinal()] = false;
+            }
         }
 
         //door utility methods
@@ -239,6 +305,10 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         	return carCalls[f-1][h.ordinal()].isPressed() || 
         			hallCalls[f-1][h.ordinal()][Direction.UP.ordinal()].pressed() || 
         			hallCalls[f-1][h.ordinal()][Direction.DOWN.ordinal()].pressed();
+        }
+
+        public boolean doorNudge(Hallway hallway) {
+            return doorMotors[hallway.ordinal()][Side.LEFT.ordinal()].command() == DoorCommand.NUDGE && doorMotors[hallway.ordinal()][Side.RIGHT.ordinal()].command() == DoorCommand.NUDGE;
         }
     }
 
