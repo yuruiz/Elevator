@@ -122,6 +122,26 @@ public class Utility {
             }
         }
         
+        public CallRequest maxGoingDown(int curFloor, boolean[] canCommit) {
+        	CallRequest c;
+        	for (int i = Elevator.numFloors; i > curFloor; i--) {
+        		if ((c = isCalled(i, Direction.DOWN)).isValid() && canCommit[i]) {
+        			return c;
+        		}
+        	}
+        	return new CallRequest();
+        }
+        
+        public CallRequest minGoingUp(int curFloor, boolean[] canCommit) {
+        	CallRequest c;
+        	for (int i = 1; i < curFloor; i++) {
+        		if ((c = isCalled(i, Direction.UP)).isValid() && canCommit[i]) {
+        			return c;
+        		}
+        	}
+        	return new CallRequest();
+        }
+        
         public CallRequest closestCallAboveInDirection(int curFloor, Direction direction, boolean[] canCommit) {
         	// Called by current floor up, return true
         	CallRequest c;
@@ -170,7 +190,7 @@ public class Utility {
         	return new CallRequest();
         }
         
-        private CallRequest isCalled(int floor) {
+        public CallRequest isCalled(int floor) {
         	CallRequest downCalled = isCalled(floor, Direction.DOWN);
         	CallRequest upCalled = isCalled(floor, Direction.UP);
         	
@@ -266,7 +286,7 @@ public class Utility {
 			return new CallRequest();
 		}
         
-        private CallRequest isCalled(int floor) {
+        public CallRequest isCalled(int floor) {
         	boolean backCalled = isCalled(floor, Hallway.BACK);
         	boolean frontCalled = isCalled(floor, Hallway.FRONT);
         	
@@ -318,8 +338,38 @@ public class Utility {
     		this.valid = false;
     	}
     	
+//    	private static Hallway union(Hallway a, Hallway b) {
+//    		if (a == hallway.NONE) {
+//    			return b;
+//    		} else if (b == Hallway.NONE) {
+//    			return a;
+//    		} else if (a == b) {
+//    			return a;
+//    		} else {
+//    			return Hallway.BOTH;
+//    		}
+//    	}
+//    	
+//    	public static CallRequest union(CallRequest a, CallRequest b) {
+//    		if (!a.isValid()) {
+//    			return b;
+//    		} else if (!b.isValid()) {
+//    			return a;
+//    		} else { // both are valid calls, check if directions are the same
+//    			if (a.direction == b.direction) {
+//    				return new CallRequest(a.floor, a.direction, union(a.hallway, b.hallway));
+//    			}
+//    		}
+//    			return new CallRequest(a.floor, a.direction, union(a.hallway, b.hallway));
+//    	}
+//    	
     	public boolean isValid() {
     		return this.valid;
+    	}
+    	
+    	@Override
+    	public String toString() {
+    		return "Floor: " + floor + " Hallway: " + hallway + " Direction: " + direction;
     	}
     }
 }
