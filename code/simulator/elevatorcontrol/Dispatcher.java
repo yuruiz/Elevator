@@ -11,24 +11,15 @@ Yurui Zhou
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
-
-import java.util.Arrays;
-
-import simulator.elevatorcontrol.Utility.CallRequest;
+import simulator.elevatorcontrol.Utility.*;
 import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.CarWeightAlarmCanPayloadTranslator;
 import simulator.elevatormodules.DriveObject;
-import simulator.framework.Controller;
-import simulator.framework.Direction;
-import simulator.framework.Elevator;
-import simulator.framework.Hallway;
-import simulator.framework.ReplicationComputer;
+import simulator.framework.*;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.translators.IntegerCanPayloadTranslator;
-import simulator.elevatorcontrol.Utility.AtFloorArray;
-import simulator.elevatorcontrol.Utility.CarCallArray;
-import simulator.elevatorcontrol.Utility.DoorClosedArray;
-import simulator.elevatorcontrol.Utility.HallCallArray;
+
+import java.util.Arrays;
 
 /**
  * Created by yuruiz on 10/5/14.
@@ -445,7 +436,7 @@ public class Dispatcher extends Controller {
 
 	void updateCommitPoints() {
     	/* Update this.commitPoints array here */
-    	int currSpeed = mDriveSpeed.getSpeed();
+    	double currSpeed = mDriveSpeed.getSpeed();
     	Direction currDir = mDriveSpeed.getDirection();
     	int currPos = mCarLevelPosition.getPosition();
     	
