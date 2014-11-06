@@ -5,7 +5,7 @@ Vijay Jayaram
 James Sakai*
 Siyu Wei
 Yurui Zhou
-*/
+ */
 
 package simulator.elevatorcontrol;
 
@@ -28,6 +28,8 @@ import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.DrivePayload;
 import simulator.payloads.DrivePayload.WriteableDrivePayload;
+import simulator.payloads.DriveSpeedPayload;
+import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
 import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
 /**
@@ -54,6 +56,7 @@ public class DriveControl extends Controller {
 	private DesiredFloorCanPayloadTranslator mDesiredFloor;
 	private LevelingCanPayloadTranslator mLevelUp, mLevelDown;
 	private CarWeightCanPayloadTranslator mCarWeight;
+	private ReadableDriveSpeedPayload driveSpeedPayload;
 
 	private ReadableCanMailbox emergencyBrake;
 	private ReadableCanMailbox carWeight;
@@ -97,6 +100,10 @@ public class DriveControl extends Controller {
 		doorClosedBack = new DoorClosedArray(Hallway.BACK, canInterface);
 
 		atFloor = new AtFloorArray(canInterface);
+
+		// driveSpeed pay load
+		driveSpeedPayload = DriveSpeedPayload.getReadablePayload();
+		physicalInterface.registerTimeTriggered(driveSpeedPayload);
 
 		/*
 		 * Get all the mAtFloor messages
@@ -185,7 +192,7 @@ public class DriveControl extends Controller {
 			}
 
 			// #transition 'DC.7'
-			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
+			if (!mLevelUp.getValue() || !mLevelDown.getValue()) {
 				newState = State.LEVEL;
 			}
 
@@ -261,7 +268,7 @@ public class DriveControl extends Controller {
 				break;
 			}
 			// #transition `DC.5`
-			if(!mLevelUp.getValue() || !mLevelDown.getValue()){
+			if (!mLevelUp.getValue() || !mLevelDown.getValue()) {
 				newState = State.LEVEL;
 			}
 			break;
@@ -288,19 +295,11 @@ public class DriveControl extends Controller {
 
 		drivePayload.set(speed, direction);
 		mDrive.set(speed, direction);
-		switch (speed) {
-		case SLOW:
-			mDriveSpeed.set(1, direction);
-			break;
-		case STOP:
-			mDriveSpeed.set(0, direction);
-			break;
-		case LEVEL:
-			mDriveSpeed.set(1, direction);
-			break;
-		default:
-			break;
-		}
+		mDriveSpeed.set(driveSpeedPayload.speed(),
+				driveSpeedPayload.direction());
+		// System.out.println(mDriveSpeed.getSpeed() + "    " +
+		// driveSpeedPayload.speed());
+
 	}
 
 }

@@ -5,10 +5,12 @@ Vijay Jayaram
 James Sakai*
 Siyu Wei
 Yurui Zhou
-*/
+ */
 
 package simulator.elevatorcontrol;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.BitSet;
 
 import simulator.elevatorcontrol.MessageDictionary;
@@ -36,19 +38,39 @@ public class DriveSpeedCanPayloadTranslator extends CanPayloadTranslator {
 	 * @param speed
 	 * @param dir
 	 */
-	public void set(int speed, Direction dir) {
+	public void set(double speed, Direction dir) {
 		setSpeed(speed);
 		setDirection(dir);
 	}
 
-	public void setSpeed(int speed) {
+	public void setSpeed(double speed) {
 		BitSet b = getMessagePayload();
-		addIntToBitset(b, speed, 0, 32);
+		float f = (float) speed;
+		byte[] bytes = ByteBuffer.allocate(4).putFloat(f).array();
+		b.clear(0, 32);
+		b.or(BitSet.valueOf(bytes));
 		setMessagePayload(b, getByteSize());
 	}
 
-	public int getSpeed() {
-		int val = getIntFromBitset(getMessagePayload(), 0, 32);
+	public double getSpeed() {
+		BitSet b = getMessagePayload();
+		BitSet temp = b.get(0, 32);
+		byte[] bytes = new byte[4];
+		byte[] nums = temp.toByteArray();
+		int i = 0;
+
+		// Fill the buffer with ending 0s
+		while (i < 4) {
+			if (i < nums.length) {
+				bytes[i] = nums[i];
+			} else {
+				bytes[i] = 0;
+			}
+			i++;
+		}
+
+		float f = ByteBuffer.wrap(bytes).getFloat();
+		double val = (double) f;
 		if (val >= 0) {
 			return val;
 		}
