@@ -42,7 +42,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(canInterface));
     boolean hadPendingCall = false;
     boolean hadPendingDoorCall = false;
-    boolean hadReversal = false;
+    boolean[] hadReversal = new boolean[2];
     int totalOpeningCount = 0;
 	int wastedOpeningCount = 0;
 	int totalStopCount = 0;
@@ -115,7 +115,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         	this.wastedOpeningCount += 1;
         }
         hadPendingDoorCall = false;
-        hadReversal = false;
         totalOpeningCount += 1;
     }
     
@@ -126,7 +125,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      */
     private void noCallDoorOpened(int floor, Hallway hallway) {
     	hadPendingDoorCall = false;
-        hadReversal = false;
+        hadReversal[hallway.ordinal()] = false;
     }
     
     /**
@@ -136,7 +135,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
      */
     private void callDoorOpened(int floor, Hallway hallway) {
     	hadPendingDoorCall = true;
-        hadReversal = false;
+        hadReversal[hallway.ordinal()] = false;
     }
     
     /**
@@ -172,16 +171,16 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
     * */
     private void callDoorNudge(Hallway hallway){
         totalNudgeCount++;
-        if (!hadReversal) {
+        if (!hadReversal[hallway.ordinal()]) {
             warning("Violation of R-T10: Door nudge at " + hallway + " with no reversal triggered.");
             wastedNudgeCount++;
         }
 
-        hadReversal = false;
+        hadReversal[hallway.ordinal()] = false;
     }
 
     private void callDoorReversal(Hallway hallway) {
-        hadReversal = true;
+        hadReversal[hallway.ordinal()] = true;
     }
  
     private static enum DoorState {
