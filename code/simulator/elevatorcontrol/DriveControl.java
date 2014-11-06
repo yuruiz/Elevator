@@ -15,7 +15,9 @@ import java.util.ArrayList;
 
 import simulator.elevatorcontrol.Utility.AtFloorArray;
 import simulator.elevatorcontrol.Utility.DoorClosedArray;
+import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.CarWeightCanPayloadTranslator;
+import simulator.elevatormodules.DriveObject;
 import simulator.elevatormodules.LevelingCanPayloadTranslator;
 import simulator.framework.Controller;
 import simulator.framework.Direction;
@@ -24,8 +26,10 @@ import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
 import simulator.framework.Speed;
 import simulator.payloads.CanMailbox;
+import simulator.payloads.CarPositionPayload;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
+import simulator.payloads.CarPositionPayload.ReadableCarPositionPayload;
 import simulator.payloads.DrivePayload;
 import simulator.payloads.DrivePayload.WriteableDrivePayload;
 import simulator.payloads.DriveSpeedPayload;
@@ -47,7 +51,7 @@ public class DriveControl extends Controller {
 	private Direction desiredDirection;
 	private SimTime period;
 
-	private State currentState = State.WAIT;
+	private State currentState = State.STOP;
 
 	/*
 	 * Input interfaces
@@ -57,11 +61,13 @@ public class DriveControl extends Controller {
 	private LevelingCanPayloadTranslator mLevelUp, mLevelDown;
 	private CarWeightCanPayloadTranslator mCarWeight;
 	private ReadableDriveSpeedPayload driveSpeedPayload;
+	private CarLevelPositionCanPayloadTranslator mCarLevelPosition;
 
 	private ReadableCanMailbox emergencyBrake;
 	private ReadableCanMailbox carWeight;
 	private ReadableCanMailbox levelUp, levelDown;
 	private ReadableCanMailbox desiredFloor;
+	private ReadableCanMailbox carLevelPosition;
 
 	private DoorClosedArray doorClosedFront, doorClosedBack;
 	private AtFloorArray atFloor;
@@ -80,7 +86,7 @@ public class DriveControl extends Controller {
 	private WriteableDrivePayload drivePayload;
 
 	private enum State {
-		WAIT, MOVE, LEVEL, OPEN, EMERGENCY
+		STOP, FAST, SLOW, LEVEL_UP, LEVEL_DOWN, EMERGENCY
 	}
 
 	public DriveControl(SimTime period, boolean verbose) {
@@ -104,6 +110,10 @@ public class DriveControl extends Controller {
 		// driveSpeed pay load
 		driveSpeedPayload = DriveSpeedPayload.getReadablePayload();
 		physicalInterface.registerTimeTriggered(driveSpeedPayload);
+
+		/*
+		 * car position pay load
+		 */
 
 		/*
 		 * Get all the mAtFloor messages
@@ -132,6 +142,15 @@ public class DriveControl extends Controller {
 				.getReadableCanMailbox(MessageDictionary.DESIRED_FLOOR_CAN_ID);
 		mDesiredFloor = new DesiredFloorCanPayloadTranslator(desiredFloor);
 		canInterface.registerTimeTriggered(desiredFloor);
+
+		/*
+		 * mCarLevelPosition
+		 */
+		carLevelPosition = CanMailbox
+				.getReadableCanMailbox(MessageDictionary.CAR_LEVEL_POSITION_CAN_ID);
+		mCarLevelPosition = new CarLevelPositionCanPayloadTranslator(
+				carLevelPosition);
+		canInterface.registerTimeTriggered(carLevelPosition);
 
 		/*
 		 * mLevel
@@ -176,105 +195,97 @@ public class DriveControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		desiredDirection = mDesiredFloor.getDirection();
+		if (currentFloor < mDesiredFloor.getFloor()) {
+			desiredDirection = Direction.UP;
+		} else {
+			if (currentFloor > mDesiredFloor.getFloor())
+				desiredDirection = Direction.DOWN;
+			else
+				desiredDirection = Direction.STOP;
+		}
 
 		boolean allClosed = doorClosedFront.getBothClosed()
 				&& doorClosedBack.getBothClosed();
 
 		State newState = currentState;
 		switch (currentState) {
-		case WAIT:
-			this.setOutput(Speed.STOP, desiredDirection);
-			// #transition 'DC.5'
-			if (this.isEmergencyCondition()) {
-				newState = State.EMERGENCY;
+		case STOP:
+			this.setOutput(Speed.STOP, Direction.STOP);
+
+			// #transition 'DC.T.1'
+			if (!mLevelUp.getValue()) {
+				newState = State.LEVEL_UP;
 				break;
 			}
 
-			// #transition 'DC.7'
-			if (!mLevelUp.getValue() || !mLevelDown.getValue()) {
-				newState = State.LEVEL;
+			// #transition 'DC.T.3'
+			if (!mLevelDown.getValue()) {
+				newState = State.LEVEL_DOWN;
 				break;
 			}
-
-			// #transition 'DC.1'
+			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
+			// #transition 'DC.T.5'
 			if (allClosed && currentFloor != mDesiredFloor.getFloor()) {
-				newState = State.MOVE;
+				log("level up to slow");
+				newState = State.SLOW;
 			}
 			break;
-		case MOVE:
-
-			if (currentFloor < mDesiredFloor.getFloor()) {
-				desiredDirection = Direction.UP;
-			} else {
-				if (currentFloor > mDesiredFloor.getFloor())
-					desiredDirection = Direction.DOWN;
-				else
-					desiredDirection = Direction.STOP;
-			}
-
+		case SLOW:
 			this.setOutput(Speed.SLOW, desiredDirection);
-			// #transition 'DC.5'
+			// #transition 'DC.T.10'
 			if (this.isEmergencyCondition()) {
 				newState = State.EMERGENCY;
 				break;
 			}
-			// #transition 'DC.2'
-			if (mDesiredFloor.getHallway() == Hallway.NONE) {
+
+			if (atFloor.getCurrentFloor() == mDesiredFloor.getFloor()
+					&& driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
+				// #transition `DC.T.6`
+				if (!mLevelUp.getValue()) {
+					newState = State.LEVEL_UP;
+				}
+				// #transition `DC.T.7`
+				else {
+					log("slow to level down");
+					newState = State.LEVEL_DOWN;
+				}
 				break;
 			}
-
-			if (mDesiredFloor.getHallway() == Hallway.BOTH) {
-				if (atFloor.isAtFloor(mDesiredFloor.getFloor(), Hallway.FRONT)) {
-					newState = State.LEVEL;
-				}
-			} else {
-				if (atFloor.isAtFloor(mDesiredFloor.getFloor(),
-						mDesiredFloor.getHallway())) {
-					newState = State.LEVEL;
-				}
+			// #transition `DC.T.8`
+			if (!this.commitPointReached()
+					&& (int) (driveSpeedPayload.speed() * 100) >= (int) (DriveObject.SlowSpeed * 100)) {
+				log("go fast");
+				newState = State.FAST;
 			}
 			break;
-		case LEVEL:
-			Direction d;
-			if (currentFloor < mDesiredFloor.getFloor()) {
-				d = Direction.UP;
-			} else {
-				d = Direction.DOWN;
-			}
-			this.setOutput(Speed.LEVEL, d);
-			// #transition 'DC.3'
-			if (mLevelUp.getValue() && mLevelDown.getValue()) {
-				newState = State.OPEN;
+		case LEVEL_UP:
+			this.setOutput(Speed.LEVEL, Direction.UP);
+			// #transition 'DC.T.2'
+			if (mLevelUp.getValue()) {
+				log("level up to stop");
+				newState = State.STOP;
 				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
-		case OPEN:
-			this.setOutput(Speed.STOP, Direction.STOP);
-			// #transition 'DC.5'
-			if (this.isEmergencyCondition()) {
-				newState = State.EMERGENCY;
-				break;
+		case LEVEL_DOWN:
+			this.setOutput(Speed.LEVEL, Direction.DOWN);
+			// #transition `DC.T.4`
+			if (mLevelDown.getValue()) {
+				log("level down to stop");
+				newState = State.STOP;
+				currentFloor = atFloor.getCurrentFloor();
 			}
-			// #transition 'DC.4'
-			if (!allClosed) {
-				newState = State.WAIT;
+			break;
+		case FAST:
+			this.setOutput(Speed.FAST, desiredDirection);
+			log(this.commitPointReached());
+			// #transition `DC.T.9`
+			if (this.commitPointReached() || this.isEmergencyCondition()) {
+				newState = State.SLOW;
 			}
 			break;
 		case EMERGENCY:
 			this.setOutput(Speed.STOP, Direction.STOP);
-			// #transition 'DC.6'
-			if (!this.isEmergencyCondition()) {
-				newState = State.WAIT;
-				break;
-			}
-			// #transition `DC.5`
-			if (!mLevelUp.getValue() || !mLevelDown.getValue()) {
-				newState = State.LEVEL;
-			}
-			break;
-		default:
-
 			break;
 		}
 
@@ -292,14 +303,30 @@ public class DriveControl extends Controller {
 				.getValue());
 	}
 
+	/*
+	 * 
+	 */
+	private boolean commitPointReached() {
+		int currPos = mCarLevelPosition.getPosition();
+		int desiredPosition = (mDesiredFloor.getFloor() - 1) * 5 * 1000;
+		double speed = driveSpeedPayload.speed() * 1000d;
+		double stopDist = Math.pow(speed, 2)
+				/ (2 * DriveObject.Acceleration * 1000);
+		if (currPos + stopDist >= desiredPosition) {
+			return true;
+		}
+
+		return false;
+	}
+
 	private void setOutput(Speed speed, Direction direction) {
 
 		drivePayload.set(speed, direction);
 		mDrive.set(speed, direction);
+		// log(driveSpeedPayload.speed());
+		// log(mDriveSpeed.getSpeed());
 		mDriveSpeed.set(driveSpeedPayload.speed(),
 				driveSpeedPayload.direction());
-		// System.out.println(mDriveSpeed.getSpeed() + "    " +
-		// driveSpeedPayload.speed());
 
 	}
 
