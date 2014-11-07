@@ -61,7 +61,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
         String[] arr = new String[3];
         arr[0] = wastedStopCount + " unnecessary stops out of " + totalStopCount + " total.";
         arr[1] = wastedOpeningCount + " unnecessary openings out of " + totalOpeningCount + " total.";
-        arr[3] = wastedNudgeCount + "unnecessary nudge out of " + totalNudgeCount + " total";
+        arr[2] = wastedNudgeCount + " unnecessary nudge out of " + totalNudgeCount + " total";
         return arr;
 	}
 	
@@ -251,12 +251,12 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
             if (allDoorsClosed(h) && allDoorMotorsStopped(h)) {
             	newState = DoorState.CLOSED;
             } else if (!allDoorsClosed(h) && !hadPendingDoorCall) {
-            	// Doors opened, check if need to set hadPendingDoorCall
-            	if (wasCalled(currentFloor, h)) {
-            		newState = DoorState.CALL_OPEN;
-            	} else {
-            		newState = DoorState.NO_CALL_OPEN;
-            	}
+                // Doors opened, check if need to set hadPendingDoorCall
+                if (wasCalled(currentFloor, h)) {
+                    newState = DoorState.CALL_OPEN;
+                } else {
+                    newState = DoorState.NO_CALL_OPEN;
+                }
             }
             
             if (newState != previousState) {
