@@ -263,7 +263,28 @@ public class Utility {
 
             }
         }
-        
+
+        public CallRequest highestCallBetween(int curFloor, int target, boolean[] canCommit) {
+            CallRequest c;
+            for (int i = curFloor - 1; i > target; i--) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
+
+        public CallRequest lowestCallBetween(int curFloor, int target, boolean[] canCommit) {
+            CallRequest c;
+            for (int i = curFloor + 1; i < target; i++) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
+
+
 		public CallRequest closestCallBelow(int curFloor, boolean[] canCommit) {
 			//XXX: Potentially include curFloor (for case of someone making a car call while at the current floor?)
 	       	CallRequest c;

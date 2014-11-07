@@ -50,7 +50,7 @@ public class Elevator {
     };
     public static final int numFloors = landings.length;
     private static final SimTime PROGRESS_INTERVAL = new SimTime(1, SimTime.SimTimeUnit.MINUTE);
-    private static double fastElevatorSpeed = 1.0; //m/s
+    private static double fastElevatorSpeed = 5.0; //m/s
     private static boolean ignoreLeveling = false; 
 
     /**
