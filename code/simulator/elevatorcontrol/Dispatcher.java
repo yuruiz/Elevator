@@ -359,7 +359,7 @@ public class Dispatcher extends Controller {
                     desiredHallway = minDownHallCallAboveTarget.hallway;
 				}
 				
-        		//#transition DPT.11
+        		//#transition DPT.5
 				if (carCallBeforeTarget.isValid()) {
                     // There is a CarCall before existing target, switch to DownDown
                     nextState = State.UpUp;
