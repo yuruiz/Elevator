@@ -22,7 +22,6 @@ import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.CarLanternPayload;
 import simulator.payloads.CarLanternPayload.WriteableCarLanternPayload;
-import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
 /* Author: James Sakai (jssakai) */
 public class LanternControl extends Controller {
@@ -42,7 +41,6 @@ public class LanternControl extends Controller {
 
     // Networked Output Interface
     private WriteableCanMailbox networkCarLantern;
-    private BooleanCanPayloadTranslator mCarLantern;
 
     /*
      *  INPUT INTERFACE
@@ -137,10 +135,6 @@ public class LanternControl extends Controller {
         // CarLantern
         localCarLantern = CarLanternPayload.getWriteablePayload(direction);
 
-        // mCarLantern
-        networkCarLantern = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_LANTERN_BASE_CAN_ID + ReplicationComputer.computeReplicationId(direction));
-        mCarLantern = new BooleanCanPayloadTranslator(networkCarLantern);
-
         // Broadcast output messages periodically :: TIME-TRIGGERED
         physicalInterface.sendTimeTriggered(localCarLantern, period);
         canInterface.sendTimeTriggered(networkCarLantern, period);
@@ -157,7 +151,6 @@ public class LanternControl extends Controller {
             case STATE_NO_DIRECTION:
                 localCarLantern.set(false);
                 desiredDirection = Direction.STOP;
-                mCarLantern.set(false);
                 //#transition TL.T.1
                 if ((mDesiredFloor.getDirection() != desiredDirection) && (desiredDirection == Direction.STOP)) {
                     currentState = State.STATE_DIRECTION_SET;
@@ -167,7 +160,6 @@ public class LanternControl extends Controller {
 
             case STATE_DIRECTION_SET:
                 localCarLantern.set(false);
-                mCarLantern.set(false);
                 desiredDirection = mDesiredFloor.getDirection();
 
                 //#transition TL.T.2
@@ -186,7 +178,6 @@ public class LanternControl extends Controller {
 
             case STATE_LANTERN_ON:
                 localCarLantern.set(true);
-                mCarLantern.set(true);
 
                 // #transition TL.T.3
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
@@ -197,7 +188,6 @@ public class LanternControl extends Controller {
 
             case STATE_Lantern_NOT_ON:
                 localCarLantern.set(false);
-                mCarLantern.set(false);
 
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
                     currentState = State.STATE_NO_DIRECTION;

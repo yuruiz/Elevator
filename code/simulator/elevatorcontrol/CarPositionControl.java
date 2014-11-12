@@ -18,10 +18,8 @@ import simulator.framework.Controller;
 import simulator.framework.Elevator;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
-import simulator.payloads.CanMailbox.WriteableCanMailbox;
 import simulator.payloads.CarPositionIndicatorPayload;
 import simulator.payloads.CarPositionIndicatorPayload.WriteableCarPositionIndicatorPayload;
-import simulator.payloads.translators.IntegerCanPayloadTranslator;
 
 public class CarPositionControl extends Controller {
 
@@ -39,8 +37,6 @@ public class CarPositionControl extends Controller {
 
 
 	// output
-	private WriteableCanMailbox networkCarPositionIndicator;
-	private IntegerCanPayloadTranslator mCarPositionIndicator;
 	private WriteableCarPositionIndicatorPayload localCarPositionIndicator;
 	private enum State {
 		ARRIVE, MOVING
@@ -60,9 +56,6 @@ public class CarPositionControl extends Controller {
 		mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
 		
 		/* Output */
-		networkCarPositionIndicator = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_POSITION_CAN_ID);
-		mCarPositionIndicator = new IntegerCanPayloadTranslator(networkCarPositionIndicator);
-		canInterface.sendTimeTriggered(networkCarPositionIndicator, period);
 		
 		localCarPositionIndicator = CarPositionIndicatorPayload.getWriteablePayload();
 		physicalInterface.sendTimeTriggered(localCarPositionIndicator, period);
@@ -80,7 +73,6 @@ public class CarPositionControl extends Controller {
 		switch (state) {
 			case MOVING:
 				localCarPositionIndicator.set(CurrentFloor);
-				mCarPositionIndicator.setValue(CurrentFloor);
 				switch (mDriveSpeed.getDirection()) {
 					case DOWN:
 						// Moving down, get the nearest floor above
@@ -98,7 +90,6 @@ public class CarPositionControl extends Controller {
 				break;
 			case ARRIVE:
 				localCarPositionIndicator.set(CurrentFloor);
-				mCarPositionIndicator.set(CurrentFloor);
 				// #transition CPC T.2
 				if (mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
 					nextState = State.MOVING;

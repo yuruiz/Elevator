@@ -37,9 +37,7 @@ public class CarButtonControl extends Controller {
     
     //network interface
     private WriteableCanMailbox networkCarLightOut;
-    // translator for the car light message -- this is a generic translator
-    private BooleanCanPayloadTranslator mCarLight;
-    
+
     // network interface
     private WriteableCanMailbox networkCarCall;
     private BooleanCanPayloadTranslator mCarCall;
@@ -132,11 +130,7 @@ public class CarButtonControl extends Controller {
         
         // HallLight
         localCarLight = CarLightPayload.getWriteablePayload(floor, hallway);
-        
-        // mCarLight
-        networkCarLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
-        mCarLight = new BooleanCanPayloadTranslator(networkCarLightOut);
-        
+
         // mCarCall
         networkCarCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mCarCall = new BooleanCanPayloadTranslator(networkCarCall);
@@ -156,7 +150,6 @@ public class CarButtonControl extends Controller {
         switch(currentState) {
             case STATE_IDLE:
             	localCarLight.set(false);
-            	mCarLight.set(false);
             	mCarCall.set(false);
             	//#transition CBC.1
             	if (localCarCall.pressed()) {
@@ -165,7 +158,6 @@ public class CarButtonControl extends Controller {
                 break;
             case STATE_CAR_CALLED:
             	localCarLight.set(true);
-            	mCarLight.set(true);
             	mCarCall.set(true);
             	//#transition CBC.2
             	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&

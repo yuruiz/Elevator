@@ -38,8 +38,6 @@ public class HallButtonControl extends Controller {
     
     //network interface
     private WriteableCanMailbox networkHallLightOut;
-    // translator for the hall light message -- this is a generic translator
-    private BooleanCanPayloadTranslator mHallLight;
     
     // network interface
     private WriteableCanMailbox networkHallCall;
@@ -135,11 +133,7 @@ public class HallButtonControl extends Controller {
         
         // HallLight
         localHallLight = HallLightPayload.getWriteablePayload(floor, hallway, direction);
-        
-        // mHallLight
-        networkHallLightOut = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_LIGHT_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
-        mHallLight = new BooleanCanPayloadTranslator(networkHallLightOut);
-        
+
         // mHallCall
         networkHallCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
         mHallCall = new BooleanCanPayloadTranslator(networkHallCall);
@@ -159,7 +153,6 @@ public class HallButtonControl extends Controller {
         switch(currentState) {
             case STATE_IDLE:
             	localHallLight.set(false);
-            	mHallLight.set(false);
             	mHallCall.set(false);
             	//#transition HBC.1
             	if (localHallCall.pressed()) {
@@ -169,7 +162,6 @@ public class HallButtonControl extends Controller {
             case STATE_ACTIVE:
             	/* Someone made a hall call */
             	localHallLight.set(true);
-            	mHallLight.set(true);
             	mHallCall.set(true);
             	//#transition HBC.2
             	//XXX: Change: Removed && !localHallCall.pressed() (Should turn off as soon as floor is reached)
