@@ -140,7 +140,6 @@ public class HallButtonControl extends Controller {
         
         // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localHallLight, period);
-        canInterface.sendTimeTriggered(networkHallLightOut, period);
         canInterface.sendTimeTriggered(networkHallCall, period);
 
         // Start the periodic timer

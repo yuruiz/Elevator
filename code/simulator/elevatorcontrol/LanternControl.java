@@ -137,7 +137,6 @@ public class LanternControl extends Controller {
 
         // Broadcast output messages periodically :: TIME-TRIGGERED
         physicalInterface.sendTimeTriggered(localCarLantern, period);
-        canInterface.sendTimeTriggered(networkCarLantern, period);
 
         // Start the periodic timer
         timer.start(period);

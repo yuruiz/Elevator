@@ -137,7 +137,6 @@ public class CarButtonControl extends Controller {
         
         // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localCarLight, period);
-        canInterface.sendTimeTriggered(networkCarLightOut, period);
         canInterface.sendTimeTriggered(networkCarCall, period);
 
         // Start the periodic timer
