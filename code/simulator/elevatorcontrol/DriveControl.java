@@ -111,13 +111,6 @@ public class DriveControl extends Controller {
 		driveSpeedPayload = DriveSpeedPayload.getReadablePayload();
 		physicalInterface.registerTimeTriggered(driveSpeedPayload);
 
-		/*
-		 * car position pay load
-		 */
-
-		/*
-		 * Get all the mAtFloor messages
-		 */
 
 		/*
 		 * Emergency brake message
