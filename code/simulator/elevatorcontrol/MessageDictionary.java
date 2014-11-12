@@ -33,9 +33,13 @@ public class MessageDictionary {
     public final static int DRIVE_COMMAND_CAN_ID =              0x0990b500;
     public final static int DESIRED_DWELL_BASE_CAN_ID =         0x0b84b600;
     public final static int DESIRED_FLOOR_CAN_ID =              0x0be8b600;
+    public final static int CAR_POSITION_CAN_ID =               0x0F0DB700;
     public final static int DOOR_MOTOR_COMMAND_BASE_CAN_ID =    0x09f4b800;
     public final static int HALL_CALL_BASE_CAN_ID =             0x0cb0b900;
+    public final static int HALL_LIGHT_BASE_CAN_ID =            0x0F10B900;
     public final static int CAR_CALL_BASE_CAN_ID =              0x0d14ba00;
+    public final static int CAR_LIGHT_BASE_CAN_ID =             0x0F12BA00;
+    public final static int CAR_LANTERN_BASE_CAN_ID =           0x0F13BB00;
 
     //module message IDs
     public final static int AT_FLOOR_BASE_CAN_ID =              0x0abc2800;
