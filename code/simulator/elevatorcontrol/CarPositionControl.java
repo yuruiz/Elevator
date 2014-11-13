@@ -54,6 +54,9 @@ public class CarPositionControl extends Controller {
 		mCarLevelPosition = new CarLevelPositionCanPayloadTranslator(networkCarLevelPosition);
 		networkDriveSpeed = CanMailbox.getReadableCanMailbox(MessageDictionary.DRIVE_SPEED_CAN_ID);
 		mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
+
+        canInterface.registerTimeTriggered(networkDriveSpeed);
+        canInterface.registerTimeTriggered(networkCarLevelPosition);
 		
 		/* Output */
 		
@@ -69,6 +72,7 @@ public class CarPositionControl extends Controller {
 
 		State nextState = state;
 		int currPos = mCarLevelPosition.getPosition();
+        log("State " + state);
 		
 		switch (state) {
 			case MOVING:
@@ -91,7 +95,7 @@ public class CarPositionControl extends Controller {
 			case ARRIVE:
 				localCarPositionIndicator.set(CurrentFloor);
 				// #transition CPC T.2
-				if (mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+                if (mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
 					nextState = State.MOVING;
 				}
 				break;
