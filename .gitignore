@@ -1,1 +1,13 @@
 *.class
+*.stats
+*.html
+.idea
+*.iml
+*.pass
+*.mf
+*.cf
+.DS_Store
+/doc
+/out
+/code/unit_test
+/code/integration_test
