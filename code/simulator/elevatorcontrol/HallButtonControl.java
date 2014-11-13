@@ -23,7 +23,6 @@ import simulator.payloads.HallCallPayload;
 import simulator.payloads.HallCallPayload.ReadableHallCallPayload;
 import simulator.payloads.HallLightPayload;
 import simulator.payloads.HallLightPayload.WriteableHallLightPayload;
-import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
 /* Author: Vijay Jayaram (vijayj) */
 public class HallButtonControl extends Controller {
