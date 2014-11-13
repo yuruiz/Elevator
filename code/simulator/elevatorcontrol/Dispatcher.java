@@ -46,6 +46,7 @@ public class Dispatcher extends Controller {
     private Direction CurrentDirection;
     private Direction DesiredDirection;
     private int Target;
+    private int CountDown;
     private int DesiredDwell;
     private int previousFloorSeen;
     // Flags for whether the car can commit to stopping at a particular floor, indexing by floor number
@@ -128,7 +129,7 @@ public class Dispatcher extends Controller {
         log("Executing state " + currentState);
         State nextState = currentState;
 
-        CurrentFloor = getApproxCurrentFloor();
+        CurrentFloor = mAtFloor.getCurrentFloor(); // TODO: Make this work: getApproxCurrentFloor();
         if (CurrentFloor != -1) {
             this.previousFloorSeen = CurrentFloor;
         }
@@ -166,6 +167,7 @@ public class Dispatcher extends Controller {
         		CurrentDirection = Direction.STOP;
         		Target = CurrentFloor;
         		DesiredDirection = Direction.STOP;
+        		CountDown = DesiredDwell;
         		
         		CallRequest curFloorCarCall = mCarCallArray.isCalled(CurrentFloor);
         		desiredHallway = (curFloorCarCall.isValid()) ? curFloorCarCall.hallway : Hallway.NONE;
@@ -185,6 +187,7 @@ public class Dispatcher extends Controller {
 				//DONE
 				CurrentDirection = Direction.STOP;
 				DesiredDirection = Direction.DOWN;
+				CountDown -= 1;
 				targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, DesiredDirection);
 				if (targetRequest.isValid()) {
 					Target = targetRequest.floor;
@@ -203,14 +206,18 @@ public class Dispatcher extends Controller {
 				if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() &&
 						mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
 					nextState = State.DownStop;
+				//#transition DPT.14
+				} else if (CountDown <= 0 && !(closestHallCallAbove.isValid() || closestCarCallAbove.isValid())) {
+					nextState = State.StopStop;
 				}
-					
+				
 				mDesiredFloor.set(Target,  DesiredDirection, desiredHallway);
 				break;
 			case StopUp:
 				//DONE
 				CurrentDirection = Direction.STOP;
 				DesiredDirection = Direction.UP;
+				CountDown -= 1;
 				targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, DesiredDirection);
 				if (targetRequest.isValid()) {
 					Target = targetRequest.floor;
@@ -229,6 +236,9 @@ public class Dispatcher extends Controller {
 				if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() &&
 						mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
 					nextState = State.UpStop;
+				//#transition DPT.14
+				} else if (CountDown <= 0 && !(closestHallCallAbove.isValid() || closestCarCallAbove.isValid())) {
+					nextState = State.StopStop;
 				}
 					
 				mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
@@ -237,6 +247,7 @@ public class Dispatcher extends Controller {
         		//DONE
         		CurrentDirection = Direction.UP;
         		DesiredDirection = Direction.STOP;
+        		CountDown = DesiredDwell;
 				targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, CurrentDirection);
 				if (targetRequest.isValid()) {
 					Target = targetRequest.floor;
@@ -269,6 +280,8 @@ public class Dispatcher extends Controller {
 				//DONE
 				CurrentDirection = Direction.DOWN;
 				DesiredDirection = Direction.STOP;
+        		CountDown = DesiredDwell;
+
 				targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, CurrentDirection);
 				if (targetRequest.isValid()) {
 					Target = targetRequest.floor;
@@ -301,7 +314,8 @@ public class Dispatcher extends Controller {
 				//DONE
 				CurrentDirection = Direction.UP;
 				DesiredDirection = Direction.UP;
-				
+        		CountDown = DesiredDwell;
+
 				CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP, canCommit);
 				targetRequest = computeTarget(upUpHallCall, closestCarCallAbove, Direction.UP);
 				if (targetRequest.isValid()) {
@@ -326,6 +340,8 @@ public class Dispatcher extends Controller {
 				//DONE
 				CurrentDirection = Direction.DOWN;
 				DesiredDirection = Direction.DOWN;
+        		CountDown = DesiredDwell;
+
 				CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
 				
 				targetRequest = computeTarget(downDownHallCall, closestCarCallBelow, Direction.DOWN);
@@ -350,6 +366,7 @@ public class Dispatcher extends Controller {
 			case UpDown:
 				CurrentDirection = Direction.UP;
 				DesiredDirection = Direction.DOWN;
+        		CountDown = DesiredDwell;
 
                 // Find the minimum hall call below the target
                 CallRequest minDownHallCallAboveTarget = mHallCallArray.maxGoingDown(Target-1, canCommit);
@@ -379,6 +396,7 @@ public class Dispatcher extends Controller {
 			case DownUp:
 				CurrentDirection = Direction.DOWN;
 				DesiredDirection = Direction.UP;
+        		CountDown = DesiredDwell;
 
                 // Find the minimum hall call below the target
                 CallRequest minUpHallCallBelowTarget = mHallCallArray.minGoingUp(Target+1, canCommit);
