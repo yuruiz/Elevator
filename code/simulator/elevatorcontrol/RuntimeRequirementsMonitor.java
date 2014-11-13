@@ -11,6 +11,7 @@ RuntimeRequirementsMonitor
 package simulator.elevatorcontrol;
 
 import simulator.elevatorcontrol.Utility.AtFloorArray;
+import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.DriveObject;
 import simulator.framework.Direction;
 import simulator.framework.DoorCommand;
@@ -18,8 +19,8 @@ import simulator.framework.Hallway;
 import simulator.framework.RuntimeMonitor;
 import simulator.framework.Side;
 import simulator.framework.Speed;
-import simulator.payloads.CarLevelPositionPayload.ReadableCarLevelPositionPayload;
-import simulator.payloads.CarPositionPayload.ReadableCarPositionPayload;
+import simulator.payloads.CanMailbox;
+import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.DoorClosedPayload.ReadableDoorClosedPayload;
 import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
 import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
@@ -55,6 +56,16 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(
 			canInterface));
 	SpeedStateMachine speedState = new SpeedStateMachine();
+	CarLevelPositionCanPayloadTranslator mCarPosition;
+	private ReadableCanMailbox carPosition;
+
+	public RuntimeRequirementsMonitor() {
+		super();
+		carPosition = CanMailbox
+				.getReadableCanMailbox(MessageDictionary.CAR_LEVEL_POSITION_CAN_ID);
+		canInterface.registerTimeTriggered(carPosition);
+		mCarPosition = new CarLevelPositionCanPayloadTranslator(carPosition);
+	}
 
 	boolean hadPendingCall = false;
 	boolean hadPendingDoorCall = false;
@@ -106,14 +117,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		speedState.drive = msg.speed();
 		speedState.update();
 	}
-	
-	@Override
-	public void receive(ReadableCarLevelPositionPayload msg){
-		System.out.println("shit");
-		speedState.position = msg.position();
-		speedState.update();
-	}
-
 
 	@Override
 	public void receive(ReadableDriveSpeedPayload msg) {
@@ -122,8 +125,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		speedState.update();
 
 	}
-	
-	
 
 	@Override
 	public void receive(ReadableDoorReversalPayload msg) {
@@ -156,7 +157,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		totalOpeningCount += 1;
 	}
 
-	private void speedSlowViolate() {
+	private void speedViolate() {
 		unnecessarySlow++;
 		warning("Violation of R-T9: Drive.speed is commanded as SLOW while it can be commanded as fast");
 	}
@@ -402,7 +403,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 		private void updateState() {
 			DriveState newState = this.currentState;
-			
+
 			int currentFloor = atFloorArray.getCurrentFloor();
 			if (currentFloor == MessageDictionary.NONE) {
 				return;
@@ -465,7 +466,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private class SpeedStateMachine {
 		private SpeedState currState = SpeedState.SLOW;
 		private double speed = -1;
-		private int position = -1;
+		private int position = 0;
 		private int desiredFloor = -1;
 		private Speed drive;
 
@@ -488,20 +489,24 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		 * least once
 		 */
 		private boolean initialized() {
-			return this.speed >= 0 && this.position >= 0
-					&& this.desiredFloor >= 0;
+			return this.speed >= 0 && this.desiredFloor >= 0;
 		}
 
 		private void update() {
 			desiredFloor = mDesiredFloor.getFloor();
+			position = mCarPosition.getPosition();
+			
+			
 			if (!initialized()) {
 				return;
 			}
+			
 			SpeedState newState = currState;
 			switch (currState) {
 			case SLOW:
 				if (this.fastAvailable() && drive != Speed.FAST) {
 					newState = SpeedState.SLOW_F;
+					speedViolate();
 				}
 				break;
 			case SLOW_F:
@@ -519,6 +524,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					if (!this.fastAvailable()) {
 						newState = SpeedState.SLOW;
 					} else {
+						speedViolate();
 						newState = SpeedState.SLOW_F;
 					}
 				}

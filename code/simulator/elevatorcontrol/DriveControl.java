@@ -56,7 +56,7 @@ public class DriveControl extends Controller {
 	/*
 	 * Input interfaces
 	 */
-	private EmergencyBreakCanPayloadTranslator mEmergencyBrake;
+	private BooleanCanPayloadTranslator mEmergencyBrake;
 	private DesiredFloorCanPayloadTranslator mDesiredFloor;
 	private LevelingCanPayloadTranslator mLevelUp, mLevelDown;
 	private CarWeightCanPayloadTranslator mCarWeight;
@@ -124,7 +124,7 @@ public class DriveControl extends Controller {
 		 */
 		emergencyBrake = CanMailbox
 				.getReadableCanMailbox(MessageDictionary.EMERGENCY_BRAKE_CAN_ID);
-		mEmergencyBrake = new EmergencyBreakCanPayloadTranslator(emergencyBrake);
+		mEmergencyBrake = new BooleanCanPayloadTranslator(emergencyBrake);
 		canInterface.registerTimeTriggered(emergencyBrake);
 
 		/*
@@ -234,7 +234,6 @@ public class DriveControl extends Controller {
 			this.setOutput(Speed.SLOW, desiredDirection);
 			// #transition 'DC.T.10'
 			if (this.isEmergencyCondition()) {
-				log("Slow to Emergency");
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -300,7 +299,8 @@ public class DriveControl extends Controller {
 	 * Car is overweight - mEmergencyBrake has been set to true
 	 */
 	private boolean isEmergencyCondition() {
-		return mEmergencyBrake.getValue();
+		return ((this.mCarWeight.getValue() > Elevator.MaxCarCapacity) || mEmergencyBrake
+				.getValue());
 	}
 
 	/*
