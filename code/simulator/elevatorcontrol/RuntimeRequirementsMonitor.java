@@ -19,6 +19,7 @@ import simulator.framework.RuntimeMonitor;
 import simulator.framework.Side;
 import simulator.framework.Speed;
 import simulator.payloads.CarLevelPositionPayload.ReadableCarLevelPositionPayload;
+import simulator.payloads.CarPositionPayload.ReadableCarPositionPayload;
 import simulator.payloads.DoorClosedPayload.ReadableDoorClosedPayload;
 import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
 import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
@@ -108,6 +109,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	
 	@Override
 	public void receive(ReadableCarLevelPositionPayload msg){
+		System.out.println("shit");
 		speedState.position = msg.position();
 		speedState.update();
 	}
