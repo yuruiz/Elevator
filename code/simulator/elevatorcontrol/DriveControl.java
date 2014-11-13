@@ -47,7 +47,7 @@ public class DriveControl extends Controller {
 	/*
 	 * Input interfaces
 	 */
-	private BooleanCanPayloadTranslator mEmergencyBrake;
+	private EmergencyBreakCanPayloadTranslator mEmergencyBrake;
 	private DesiredFloorCanPayloadTranslator mDesiredFloor;
 	private LevelingCanPayloadTranslator mLevelUp, mLevelDown;
 	private CarWeightCanPayloadTranslator mCarWeight;
@@ -108,7 +108,7 @@ public class DriveControl extends Controller {
 		 */
 		emergencyBrake = CanMailbox
 				.getReadableCanMailbox(MessageDictionary.EMERGENCY_BRAKE_CAN_ID);
-		mEmergencyBrake = new BooleanCanPayloadTranslator(emergencyBrake);
+		mEmergencyBrake = new EmergencyBreakCanPayloadTranslator(emergencyBrake);
 		canInterface.registerTimeTriggered(emergencyBrake);
 
 		/*
