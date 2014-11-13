@@ -10,22 +10,31 @@ Yurui Zhou
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
+
+import java.util.ArrayList;
+
 import simulator.elevatorcontrol.Utility.AtFloorArray;
 import simulator.elevatorcontrol.Utility.DoorClosedArray;
 import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.CarWeightCanPayloadTranslator;
 import simulator.elevatormodules.DriveObject;
 import simulator.elevatormodules.LevelingCanPayloadTranslator;
-import simulator.framework.*;
+import simulator.framework.Controller;
+import simulator.framework.Direction;
+import simulator.framework.Elevator;
+import simulator.framework.Hallway;
+import simulator.framework.ReplicationComputer;
+import simulator.framework.Speed;
 import simulator.payloads.CanMailbox;
+import simulator.payloads.CarPositionPayload;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
+import simulator.payloads.CarPositionPayload.ReadableCarPositionPayload;
 import simulator.payloads.DrivePayload;
 import simulator.payloads.DrivePayload.WriteableDrivePayload;
 import simulator.payloads.DriveSpeedPayload;
 import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
-
-import java.util.ArrayList;
+import simulator.payloads.translators.BooleanCanPayloadTranslator;
 
 /**
  * The class that represents the DriveControl object
@@ -102,6 +111,13 @@ public class DriveControl extends Controller {
 		driveSpeedPayload = DriveSpeedPayload.getReadablePayload();
 		physicalInterface.registerTimeTriggered(driveSpeedPayload);
 
+		/*
+		 * car position pay load
+		 */
+
+		/*
+		 * Get all the mAtFloor messages
+		 */
 
 		/*
 		 * Emergency brake message
@@ -193,7 +209,7 @@ public class DriveControl extends Controller {
 
 		State newState = currentState;
 		switch (currentState) {
-		case STOP:
+		case STOP: // #State 1 STOP
 			this.setOutput(Speed.STOP, Direction.STOP);
 
 			// #transition 'DC.T.1'
@@ -214,10 +230,11 @@ public class DriveControl extends Controller {
 				newState = State.SLOW;
 			}
 			break;
-		case SLOW:
+		case SLOW: // #State 4 SLOW
 			this.setOutput(Speed.SLOW, desiredDirection);
 			// #transition 'DC.T.10'
 			if (this.isEmergencyCondition()) {
+				log("Slow to Emergency");
 				newState = State.EMERGENCY;
 				break;
 			}
@@ -242,7 +259,7 @@ public class DriveControl extends Controller {
 				newState = State.FAST;
 			}
 			break;
-		case LEVEL_UP:
+		case LEVEL_UP: // #State 2 LEVEL UP
 			this.setOutput(Speed.LEVEL, Direction.UP);
 			// #transition 'DC.T.2'
 			if (mLevelUp.getValue()) {
@@ -251,7 +268,7 @@ public class DriveControl extends Controller {
 				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
-		case LEVEL_DOWN:
+		case LEVEL_DOWN: // #State 3 LEVEL DOWN
 			this.setOutput(Speed.LEVEL, Direction.DOWN);
 			// #transition `DC.T.4`
 			if (mLevelDown.getValue()) {
@@ -260,7 +277,7 @@ public class DriveControl extends Controller {
 				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
-		case FAST:
+		case FAST: // #State 5 FAST
 			this.setOutput(Speed.FAST, desiredDirection);
 			log(this.commitPointReached());
 			// #transition `DC.T.9`
@@ -268,7 +285,7 @@ public class DriveControl extends Controller {
 				newState = State.SLOW;
 			}
 			break;
-		case EMERGENCY:
+		case EMERGENCY: // #State 6 EMERGENCY
 			this.setOutput(Speed.STOP, Direction.STOP);
 			break;
 		}
@@ -283,8 +300,7 @@ public class DriveControl extends Controller {
 	 * Car is overweight - mEmergencyBrake has been set to true
 	 */
 	private boolean isEmergencyCondition() {
-		return ((this.mCarWeight.getValue() > Elevator.MaxCarCapacity) || mEmergencyBrake
-				.getValue());
+		return mEmergencyBrake.getValue();
 	}
 
 	/*
