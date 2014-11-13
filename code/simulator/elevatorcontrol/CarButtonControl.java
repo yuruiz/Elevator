@@ -39,7 +39,7 @@ public class CarButtonControl extends Controller {
 
     // network interface
     private WriteableCanMailbox networkCarCall;
-    private BooleanCanPayloadTranslator mCarCall;
+    private CarCallCanPayloadTranslator mCarCall;
 
     //received door closed message
     private ReadableCanMailbox networkDoorClosedLeft;
@@ -132,7 +132,7 @@ public class CarButtonControl extends Controller {
 
         // mCarCall
         networkCarCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
-        mCarCall = new BooleanCanPayloadTranslator(networkCarCall);
+        mCarCall = new CarCallCanPayloadTranslator(networkCarCall);
         
         // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localCarLight, period);

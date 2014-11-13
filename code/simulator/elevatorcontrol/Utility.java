@@ -91,7 +91,7 @@ public class Utility {
 
     public static class HallCallArray{
         private CANNetwork.CanConnection conn;
-        public HashMap<Integer, BooleanCanPayloadTranslator> translatorArray = new HashMap<Integer, BooleanCanPayloadTranslator>();
+        public HashMap<Integer, HallCallCanPayloadTranslator> translatorArray = new HashMap<Integer, HallCallCanPayloadTranslator>();
         public HallCallArray(CANNetwork.CanConnection conn) {
             this.conn = conn;
             for (int i = 1; i <= 8; i++) {
@@ -219,7 +219,7 @@ public class Utility {
         
         private boolean isCalled(int floor, Direction direction, Hallway hallway) {
             int Index = ReplicationComputer.computeReplicationId(floor, hallway, direction);
-            BooleanCanPayloadTranslator translator = translatorArray.get(Index);
+            HallCallCanPayloadTranslator translator = translatorArray.get(Index);
 
             if (translator == null) {
                 return false;
@@ -230,7 +230,7 @@ public class Utility {
         private void CreateTranslator(int floor, Hallway hallway, Direction direction) {
             int Index = ReplicationComputer.computeReplicationId(floor, hallway, direction);
             ReadableCanMailbox m = CanMailbox.getReadableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + Index);
-            BooleanCanPayloadTranslator translator = new BooleanCanPayloadTranslator(m);
+            HallCallCanPayloadTranslator translator = new HallCallCanPayloadTranslator(m);
             this.conn.registerTimeTriggered(m);
             this.translatorArray.put(Index, translator);
         }
@@ -238,7 +238,7 @@ public class Utility {
 
     public static class CarCallArray {
         private CANNetwork.CanConnection conn;
-        public HashMap<Integer, BooleanCanPayloadTranslator> translatorArray = new HashMap<Integer, BooleanCanPayloadTranslator>();
+        public HashMap<Integer, CarCallCanPayloadTranslator> translatorArray = new HashMap<Integer, CarCallCanPayloadTranslator>();
         public CarCallArray(CANNetwork.CanConnection conn){
             this.conn = conn;
 
@@ -323,7 +323,7 @@ public class Utility {
         
         private boolean isCalled(int floor, Hallway hallway) {
             int Index = ReplicationComputer.computeReplicationId(floor, hallway);
-            BooleanCanPayloadTranslator translator = translatorArray.get(Index);
+            CarCallCanPayloadTranslator translator = translatorArray.get(Index);
 
             if (translator == null) {
                 return false;
@@ -335,7 +335,7 @@ public class Utility {
         private void CreateTranslator(int floor, Hallway hallway) {
             int Index = ReplicationComputer.computeReplicationId(floor, hallway);
             ReadableCanMailbox m = CanMailbox.getReadableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + Index);
-            BooleanCanPayloadTranslator translator = new BooleanCanPayloadTranslator(m);
+            CarCallCanPayloadTranslator translator = new CarCallCanPayloadTranslator(m);
             this.conn.registerTimeTriggered(m);
             this.translatorArray.put(Index, translator);
         }

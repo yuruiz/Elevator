@@ -40,7 +40,7 @@ public class HallButtonControl extends Controller {
     
     // network interface
     private WriteableCanMailbox networkHallCall;
-    private BooleanCanPayloadTranslator mHallCall;
+    private HallCallCanPayloadTranslator mHallCall;
 
     //received door closed message
     private ReadableCanMailbox networkDoorClosedLeft;
@@ -135,7 +135,7 @@ public class HallButtonControl extends Controller {
 
         // mHallCall
         networkHallCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.HALL_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway, direction));
-        mHallCall = new BooleanCanPayloadTranslator(networkHallCall);
+        mHallCall = new HallCallCanPayloadTranslator(networkHallCall);
         
         // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localHallLight, period);
