@@ -10,31 +10,23 @@ Yurui Zhou
 package simulator.elevatorcontrol;
 
 import jSimPack.SimTime;
-
-import java.util.ArrayList;
-
 import simulator.elevatorcontrol.Utility.AtFloorArray;
 import simulator.elevatorcontrol.Utility.DoorClosedArray;
 import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.CarWeightCanPayloadTranslator;
 import simulator.elevatormodules.DriveObject;
 import simulator.elevatormodules.LevelingCanPayloadTranslator;
-import simulator.framework.Controller;
-import simulator.framework.Direction;
-import simulator.framework.Elevator;
-import simulator.framework.Hallway;
-import simulator.framework.ReplicationComputer;
-import simulator.framework.Speed;
+import simulator.framework.*;
 import simulator.payloads.CanMailbox;
-import simulator.payloads.CarPositionPayload;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
-import simulator.payloads.CarPositionPayload.ReadableCarPositionPayload;
 import simulator.payloads.DrivePayload;
 import simulator.payloads.DrivePayload.WriteableDrivePayload;
 import simulator.payloads.DriveSpeedPayload;
 import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
 import simulator.payloads.translators.BooleanCanPayloadTranslator;
+
+import java.util.ArrayList;
 
 /**
  * The class that represents the DriveControl object
@@ -195,8 +187,8 @@ public class DriveControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		System.out.println("D:" + mDesiredFloor.getFloor());
-		System.out.println(currentFloor);
+//		System.out.println("D:" + mDesiredFloor.getFloor());
+//		System.out.println(currentFloor);
 
 		/*
 		 * If the elevator is ready to set new direction
