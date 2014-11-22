@@ -278,9 +278,7 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (mFrontDoorClosed.getBothClosed()
-						&& mBackDoorClosed.getBothClosed()
-						&& CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopStop;
 				}
 				break;
@@ -317,9 +315,7 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (mFrontDoorClosed.getBothClosed()
-						&& mBackDoorClosed.getBothClosed()
-						&& CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopStop;
 				}
 				break;
@@ -359,9 +355,7 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (mFrontDoorClosed.getBothClosed()
-						&& mBackDoorClosed.getBothClosed()
-						&& CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopUp;
 				}
 				break;
@@ -390,9 +384,7 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (mFrontDoorClosed.getBothClosed()
-						&& mBackDoorClosed.getBothClosed()
-						&& CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopDown;
 				}
 				break;
@@ -433,8 +425,7 @@ public class Dispatcher extends Controller {
 					.isValid()) {
 				nextState = State.UpStop;
 				// #transition DPT.1
-			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
-					.getBothClosed()) && CurrentFloor != -1) {
+			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 				nextState = State.StopDown;
 			}
 
@@ -467,8 +458,7 @@ public class Dispatcher extends Controller {
 					.isValid()) {
 				nextState = State.DownStop;
 				// #transition DPT.1
-			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
-					.getBothClosed()) || CurrentFloor != -1) {
+			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
 				nextState = State.StopUp;
 			}
 
