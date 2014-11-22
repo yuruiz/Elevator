@@ -437,7 +437,7 @@ public class Dispatcher extends Controller {
         if (currentState != nextState) {
         	log("Transition from " + currentState + " --> " + nextState);
         }
-        System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " " + mDesiredFloor.getDirection() + "  " +  mDesiredFloor.getHallway());
+        //System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " " + mDesiredFloor.getDirection() + "  " +  mDesiredFloor.getHallway());
         this.currentState = nextState;
         timer.start(period);
     }

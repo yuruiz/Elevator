@@ -195,13 +195,28 @@ public class DriveControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		if (currentFloor < mDesiredFloor.getFloor()) {
-			desiredDirection = Direction.UP;
-		} else {
-			if (currentFloor > mDesiredFloor.getFloor())
-				desiredDirection = Direction.DOWN;
-			else
-				desiredDirection = Direction.STOP;
+		System.out.println("D:" + mDesiredFloor.getFloor());
+		System.out.println(currentFloor);
+
+		/*
+		 * If the elevator is ready to set new direction
+		 */
+		if (atFloor.getCurrentFloor() != -1
+				&& driveSpeedPayload.speed() <= DriveObject.LevelingSpeed) {
+			if (currentFloor < mDesiredFloor.getFloor()) {
+				desiredDirection = Direction.UP;
+			} else {
+				if (currentFloor > mDesiredFloor.getFloor())
+					desiredDirection = Direction.DOWN;
+				else
+					desiredDirection = Direction.STOP;
+			}
+		}
+		/*
+		 * Remain in the same direction so drive command is adjacent to speed
+		 */
+		else {
+			desiredDirection = driveSpeedPayload.direction();
 		}
 
 		boolean allClosed = doorClosedFront.getBothClosed()
