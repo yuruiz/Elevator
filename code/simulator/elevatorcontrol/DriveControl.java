@@ -195,8 +195,8 @@ public class DriveControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		System.out.println("D:" + mDesiredFloor.getFloor());
-		System.out.println(currentFloor);
+		// System.out.println("D:" + mDesiredFloor.getFloor());
+		// System.out.println(currentFloor);
 
 		/*
 		 * If the elevator is ready to set new direction
@@ -277,7 +277,7 @@ public class DriveControl extends Controller {
 			this.setOutput(Speed.LEVEL, Direction.UP);
 			// #transition 'DC.T.2'
 			if (mLevelUp.getValue()) {
-				log("level up to stop");
+				System.out.println("level up to stop");
 				newState = State.STOP;
 				currentFloor = atFloor.getCurrentFloor();
 			}
