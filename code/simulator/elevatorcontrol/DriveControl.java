@@ -187,9 +187,9 @@ public class DriveControl extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 
-		// System.out.println("D:" + mDesiredFloor.getFloor());
+		System.out.println("D:" + mDesiredFloor.getFloor());
 		// System.out.println(currentFloor);
-
+		System.out.println(currentState);
 		/*
 		 * If the elevator is ready to set new direction
 		 */
@@ -244,7 +244,8 @@ public class DriveControl extends Controller {
 				newState = State.EMERGENCY;
 				break;
 			}
-
+			
+			System.out.println(atFloor.getCurrentFloor() + " " + driveSpeedPayload.speed());
 			if (atFloor.getCurrentFloor() == mDesiredFloor.getFloor()
 					&& driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
 				// #transition `DC.T.6`
@@ -319,7 +320,7 @@ public class DriveControl extends Controller {
 		double speed = driveSpeedPayload.speed() * 1000d;
 		double stopDist = Math.pow(speed, 2)
 				/ (2 * DriveObject.Acceleration * 1000);
-		if (currPos + stopDist >= desiredPosition) {
+		if (currPos + stopDist + 500 >= desiredPosition) {
 			return true;
 		}
 

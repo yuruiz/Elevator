@@ -103,13 +103,17 @@ public class Dispatcher extends Controller {
 		canInterface.sendTimeTriggered(networkDesiredFloor, period);
 
 		networkFrontDesiredDwell = CanMailbox
-				.getWriteableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(Hallway.FRONT));
+				.getWriteableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID
+						+ ReplicationComputer
+								.computeReplicationId(Hallway.FRONT));
 		mFrontDesiredDwell = new IntegerCanPayloadTranslator(
 				networkFrontDesiredDwell);
 		canInterface.sendTimeTriggered(networkFrontDesiredDwell, period);
 
 		networkBackDesiredDwell = CanMailbox
-				.getWriteableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(Hallway.BACK));
+				.getWriteableCanMailbox(MessageDictionary.DESIRED_DWELL_BASE_CAN_ID
+						+ ReplicationComputer
+								.computeReplicationId(Hallway.BACK));
 		mBackDesiredDwell = new IntegerCanPayloadTranslator(
 				networkBackDesiredDwell);
 		canInterface.sendTimeTriggered(networkBackDesiredDwell, period);
@@ -124,7 +128,7 @@ public class Dispatcher extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 		log("Executing state " + currentState);
-		System.out.println("Executing state " + currentState);
+		// System.out.println("Executing state " + currentState);
 		State nextState = currentState;
 
 		// CurrentFloor = mAtFloor.getCurrentFloor(); // TODO: Make this work:
@@ -139,7 +143,8 @@ public class Dispatcher extends Controller {
 		/* Avoid duplicate declarations of variables here */
 		CallRequest closestCarCallAbove = mCarCallArray.closestCallAbove(
 				previousFloorSeen, this.canCommit);
-		CallRequest closestHallCallAbove = mHallCallArray.closestCallAbove(previousFloorSeen, this.canCommit);
+		CallRequest closestHallCallAbove = mHallCallArray.closestCallAbove(
+				previousFloorSeen, this.canCommit);
 		CallRequest closestCarCallBelow = mCarCallArray.closestCallBelow(
 				previousFloorSeen, this.canCommit);
 		CallRequest closestHallCallBelow = mHallCallArray.closestCallBelow(
@@ -156,7 +161,7 @@ public class Dispatcher extends Controller {
 			currentState = State.Emergency;
 		}
 
-		System.out.println("Current floor is " + CurrentFloor);
+		// System.out.println("Current floor is " + CurrentFloor);
 
 		switch (currentState) {
 		case Initial:
@@ -278,7 +283,8 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+						.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopStop;
 				}
 				break;
@@ -315,7 +321,8 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+						.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopStop;
 				}
 				break;
@@ -355,7 +362,8 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+						.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopUp;
 				}
 				break;
@@ -384,7 +392,8 @@ public class Dispatcher extends Controller {
 				desiredHallway = targetRequest.hallway;
 			} else {
 				// #transition DPT.1
-				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+				if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+						.getBothClosed()) && CurrentFloor != -1) {
 					nextState = State.StopDown;
 				}
 				break;
@@ -425,7 +434,8 @@ public class Dispatcher extends Controller {
 					.isValid()) {
 				nextState = State.UpStop;
 				// #transition DPT.1
-			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+					.getBothClosed()) && CurrentFloor != -1) {
 				nextState = State.StopDown;
 			}
 
@@ -458,7 +468,8 @@ public class Dispatcher extends Controller {
 					.isValid()) {
 				nextState = State.DownStop;
 				// #transition DPT.1
-			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
+			} else if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed
+					.getBothClosed()) && CurrentFloor != -1) {
 				nextState = State.StopUp;
 			}
 
