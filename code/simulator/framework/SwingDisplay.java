@@ -229,6 +229,7 @@ public class SwingDisplay extends javax.swing.JFrame implements BreakpointListen
             public void update() {
                 setSelected(call.pressed());
                 setBackground(light.lighted() ? Color.GREEN : Color.getHSBColor(0.0f, 0.0f, 0.93f));
+                setOpaque(true);
             }
         }
 
@@ -251,6 +252,7 @@ public class SwingDisplay extends javax.swing.JFrame implements BreakpointListen
             public void update() {
                 setSelected(call.pressed());
                 setBackground(light.lighted() ? Color.GREEN : Color.getHSBColor(0.0f, 0.0f, 0.93f));
+                setOpaque(true);
             }
         }
     }
@@ -356,6 +358,7 @@ public class SwingDisplay extends javax.swing.JFrame implements BreakpointListen
                 rev.isReversing() ?
                 Color.RED :
                 Color.getHSBColor(0.0f, 0.0f, 0.93f));
+            revCheckBox.setOpaque(true);
             posSlider.setValue((int)pos.position());
         }
     }
@@ -370,6 +373,13 @@ public class SwingDisplay extends javax.swing.JFrame implements BreakpointListen
          * guest.  --KSS
          */
         super();
+        
+        /* see if we can override mac's gui problems, since setopaque seems not to work sometimes.*/ 
+        try {
+            UIManager.setLookAndFeel( UIManager.getCrossPlatformLookAndFeelClassName() );
+         } catch (Exception e) {
+                    e.printStackTrace();
+         }
 
         this.verbose = verbose;
         this.passengerHandler = passengerHandler;
@@ -883,13 +893,17 @@ public class SwingDisplay extends javax.swing.JFrame implements BreakpointListen
         weightField.setBackground(alarmPayload.isRinging() ? Color.getHSBColor(0.0f, 0.5f, 1.0f) : Color.WHITE);
         upLanternCheckBox.setSelected(upLanternPayload.lighted());
         upLanternCheckBox.setBackground(upLanternPayload.lighted() ? UP_LANTERN_COLOR : OFF_LANTERN_COLOR);
+        upLanternCheckBox.setOpaque(true);
         downLanternCheckBox.setSelected(downLanternPayload.lighted());
         downLanternCheckBox.setBackground(downLanternPayload.lighted() ? DOWN_LANTERN_COLOR : OFF_LANTERN_COLOR);
+        downLanternCheckBox.setOpaque(true);
 
         upLevelSensorCheckBox.setSelected(upLevelPayload.getValue());
         upLevelSensorCheckBox.setBackground(upLevelPayload.getValue() ? LEVEL_ON_COLOR : LEVEL_OFF_COLOR);
+        upLevelSensorCheckBox.setOpaque(true);
         downLevelSensorCheckBox.setSelected(downLevelPayload.getValue());
         downLevelSensorCheckBox.setBackground(downLevelPayload.getValue() ? LEVEL_ON_COLOR : LEVEL_OFF_COLOR);
+        downLevelSensorCheckBox.setOpaque(true);
 
         //update passenger counts
         for (int i=0; i < Elevator.numFloors; i++) {
