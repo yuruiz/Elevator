@@ -129,7 +129,8 @@ public class Dispatcher extends Controller {
         log("Executing state " + currentState);
         State nextState = currentState;
 
-        CurrentFloor = mAtFloor.getCurrentFloor(); // TODO: Make this work: getApproxCurrentFloor();
+//        CurrentFloor = mAtFloor.getCurrentFloor(); // TODO: Make this work: getApproxCurrentFloor();
+	    CurrentFloor = getApproxCurrentFloor();
         if (CurrentFloor != -1) {
             this.previousFloorSeen = CurrentFloor;
         }
@@ -150,6 +151,8 @@ public class Dispatcher extends Controller {
         if (CurrentFloor == -1 && !(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed())) {
         	currentState = State.Emergency;
         }
+
+	    System.out.println("Current floor is " + CurrentFloor);
         
         switch (currentState) {
         	case Initial:
@@ -437,7 +440,7 @@ public class Dispatcher extends Controller {
         if (currentState != nextState) {
         	log("Transition from " + currentState + " --> " + nextState);
         }
-        System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " " + mDesiredFloor.getDirection() + "  " +  mDesiredFloor.getHallway());
+//        System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " " + mDesiredFloor.getDirection() + "  " +  mDesiredFloor.getHallway());
         this.currentState = nextState;
         timer.start(period);
     }
@@ -497,7 +500,7 @@ public class Dispatcher extends Controller {
     	int currPos = mCarLevelPosition.getPosition() + threshold/2;
     	int error = currPos % this.mmDistBetweenFloors;
     	if (error < threshold) {
-    		return (currPos / this.mmDistBetweenFloors);
+    		return (currPos / this.mmDistBetweenFloors) + 1;
     	} else {
     		return -1;
     	}
