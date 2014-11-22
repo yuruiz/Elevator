@@ -71,7 +71,7 @@ public class Dispatcher extends Controller {
 		this.period = period;
 		this.Target = 1;
 		this.currentState = State.Initial;
-		this.DesiredDwell = 1000;
+		this.DesiredDwell = 200;
 		this.previousFloorSeen = 1;
 
 		mAtFloor = new AtFloorArray(canInterface);
@@ -128,6 +128,7 @@ public class Dispatcher extends Controller {
 	@Override
 	public void timerExpired(Object callbackData) {
 		log("Executing state " + currentState);
+		System.out.println("Executing state " + currentState);
 		// System.out.println("Executing state " + currentState);
 		State nextState = currentState;
 
@@ -554,7 +555,7 @@ public class Dispatcher extends Controller {
 	 * not close to a floor
 	 */
 	private int getApproxCurrentFloor() {
-		int threshold = 30; // in mm.
+		int threshold = 200; // in mm.
 		int currPos = mCarLevelPosition.getPosition() + threshold / 2;
 		int error = currPos % this.mmDistBetweenFloors;
 		if (error < threshold) {
