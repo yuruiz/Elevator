@@ -303,7 +303,7 @@ public class Dispatcher extends Controller {
 
                 CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(practicalFloor, Direction.UP, canCommit);
                 CallRequest closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
-                targetRequest = computeTarget(upUpHallCall, closesetCarCallAboveEuqal, Direction.UP);
+                targetRequest = computeTarget(closesetCarCallAboveEuqal, upUpHallCall, Direction.UP);
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
@@ -329,10 +329,11 @@ public class Dispatcher extends Controller {
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(practicalFloor, Direction.DOWN, canCommit);
 
                 CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
-                targetRequest = computeTarget(downDownHallCall, closesetCarCallBelowEuqal, Direction.DOWN);
+                targetRequest = computeTarget(closesetCarCallBelowEuqal, downDownHallCall, Direction.DOWN);
 
-//                System.out.println("Down Hal Call " + downDownHallCall.floor);
-
+//                System.out.println("Down Hal Call " + downDownHallCall.floor + downDownHallCall.direction );
+//                System.out.println("Down Car Call " + closesetCarCallBelowEuqal.floor + closesetCarCallBelowEuqal.isValid());
+//                System.out.println("Target " + targetRequest.floor);
 
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -449,7 +450,6 @@ public class Dispatcher extends Controller {
         } else {
             // There is both a hall and car call below the current floor,
             // compute the closest one
-
             if (closestHallCall.direction != dir) {
                 floor = closestCarCall.floor;
                 hallway = closestCarCall.hallway;
