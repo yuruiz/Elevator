@@ -218,9 +218,6 @@ public class DriveControl extends Controller {
 			} else {
 				desiredDirection = Direction.DOWN;
 			}
-		} else {
-			// correct position, stop
-			desiredDirection = Direction.STOP;
 		}
 
 		boolean allClosed = doorClosedFront.getBothClosed()
