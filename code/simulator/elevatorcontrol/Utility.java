@@ -145,7 +145,7 @@ public class Utility {
         	// Called by current floor up, return true
         	CallRequest c;
         	// Called by one of higher floors
-        	for (int i = curFloor + 1; i <= Elevator.numFloors; i++) {
+        	for (int i = curFloor; i <= Elevator.numFloors; i++) {
         		if ((c = isCalled(i, direction)).isValid() && canCommit[i]) {
         			return c;
         		}
@@ -156,13 +156,14 @@ public class Utility {
         public CallRequest closestCallBelowInDirection(int curFloor, Direction direction, boolean[] canCommit) {
         	CallRequest c;
         	// Called by one of lower floors
-        	for (int i = curFloor - 1; i >= 1; i--) {
+        	for (int i = curFloor; i >= 1; i--) {
         		if ((c = isCalled(i, direction)).isValid() && canCommit[i]) {
         			return c;
         		}
         	}
         	return new CallRequest();
         }
+
     	/* Return true if called at a floor above the current floor or up by curFloor */
         public CallRequest closestCallAbove(int curFloor, boolean[] canCommit) {
         	// Called by current floor up, return true
@@ -316,6 +317,17 @@ public class Utility {
         	}
 			return new CallRequest();
 		}
+
+        public CallRequest closestCallAboveEqual(int curFloor, boolean[] canCommit) {
+            //XXX: Potentially include curFloor (for case of someone making a car call while at the current floor?)
+            CallRequest c;
+            for (int i = curFloor; i <= Elevator.numFloors; i++) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
         
         public CallRequest isCalled(int floor) {
         	boolean backCalled = isCalled(floor, Hallway.BACK);

@@ -5,7 +5,7 @@ Vijay Jayaram
 James Sakai*
 Siyu Wei
 Yurui Zhou
- */
+*/
 
 package simulator.elevatorcontrol;
 
@@ -117,7 +117,7 @@ public class Dispatcher extends Controller {
 
         State nextState = currentState;
 
-        // CurrentFloor = mAtFloor.getCurrentFloor(); // TODO: Make this work:
+        // CurrentFloor = mAtFloor.getCurrentFloor();
         CurrentFloor = getApproxCurrentFloor();
         if (CurrentFloor != -1) {
             this.previousFloorSeen = CurrentFloor;
@@ -302,7 +302,8 @@ public class Dispatcher extends Controller {
                 CountDown = DesiredDwell;
 
                 CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP, canCommit);
-                targetRequest = computeTarget(upUpHallCall, closestCarCallAbove, Direction.UP);
+                CallRequest closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
+                targetRequest = computeTarget(upUpHallCall, closesetCarCallAboveEuqal, Direction.UP);
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
@@ -324,8 +325,6 @@ public class Dispatcher extends Controller {
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
                 CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(downDownHallCall, closesetCarCallBelowEuqal, Direction.DOWN);
-
-                System.out.println("closesetCarCallBelowEuqal is " + closesetCarCallBelowEuqal.floor);
 
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -517,8 +516,6 @@ public class Dispatcher extends Controller {
 			/* Moving down: All floors below stopping point can be reached */
                 stoppingPoint = currPos - stoppingDistance;
                 nearestFloor = (int) Math.floor(stoppingPoint / this.mmDistBetweenFloors) + 1;
-
-                System.out.println("Nereast Floor is " + nearestFloor);
 
                 for (int i = nearestFloor; i >= 1; i--) {
                     this.canCommit[i] = true;
