@@ -321,11 +321,15 @@ public class DriveControl extends Controller {
 		double speed = driveSpeedPayload.speed() * 1000d;
 		double stopDist = Math.pow(speed, 2)
 				/ (2 * DriveObject.Acceleration * 1000);
-		if (currPos + stopDist + 500 >= desiredPosition) {
-			return true;
+		switch (driveSpeedPayload.direction()) {
+		case UP:
+			return currPos + stopDist + 500 >= desiredPosition;
+		case DOWN:
+			return currPos - stopDist - 500 <= desiredPosition;
+		default:
+			return false;
 		}
 
-		return false;
 	}
 
 	private void setOutput(Speed speed, Direction direction) {
