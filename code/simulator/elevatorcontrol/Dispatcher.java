@@ -190,7 +190,7 @@ public class Dispatcher extends Controller {
                             desiredHallway = curFloorCall.hallway;
                         }
                     }
-                } // TODO: Handle else case (countdown and go to stop stop)
+                }
 
                 // #transition DPT.8
                 if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
@@ -217,7 +217,7 @@ public class Dispatcher extends Controller {
                         if (curFloorCall.isValid()) {
                             Target = CurrentFloor;
                             desiredHallway = curFloorCall.hallway;
-                        } // TODO: Handle else case (countdown and go to stop stop)
+                        }
                     }
                 }
 
