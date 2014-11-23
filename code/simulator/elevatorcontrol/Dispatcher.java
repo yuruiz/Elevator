@@ -504,7 +504,7 @@ public class Dispatcher extends Controller {
             return 8;
         }
 
-        if (mDriveSpeed.getSpeed() == 0) {
+        if (mDriveSpeed.getSpeed() < DriveObject.LevelingSpeed) {
             return curFloor;
         }
 
