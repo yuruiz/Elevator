@@ -137,8 +137,8 @@ public class Dispatcher extends Controller {
 
         // #transition DPT.12
         if (CurrentFloor == -1 && !(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed())) {
-            currentState = State.Emergency;
-//            nextState = currentState;
+            nextState = State.Emergency;
+            currentState = nextState;
         }
 
 //        System.out.println("Current floor is " + CurrentFloor);
