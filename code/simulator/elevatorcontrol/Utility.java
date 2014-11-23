@@ -294,6 +294,17 @@ public class Utility {
         	}
 			return new CallRequest();
 		}
+
+        public CallRequest closestCallBelowEqual(int curFloor, boolean[] canCommit) {
+            //XXX: Potentially include curFloor (for case of someone making a car call while at the current floor?)
+            CallRequest c;
+            for (int i = curFloor; i >= 1; i--) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
 		
 		public CallRequest closestCallAbove(int curFloor, boolean[] canCommit) {
 			//XXX: Potentially include curFloor (for case of someone making a car call while at the current floor?)

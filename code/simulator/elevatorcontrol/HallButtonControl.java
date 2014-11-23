@@ -15,7 +15,6 @@ import simulator.framework.Controller;
 import simulator.framework.Direction;
 import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
-import simulator.framework.Side;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
@@ -34,17 +33,13 @@ public class HallButtonControl extends Controller {
     //local physical state
     private ReadableHallCallPayload localHallCall;
     private WriteableHallLightPayload localHallLight;
-    
-    //network interface
-    private WriteableCanMailbox networkHallLightOut;
-    
+
     // network interface
     private WriteableCanMailbox networkHallCall;
     private HallCallCanPayloadTranslator mHallCall;
 
     //received door closed message
-    private ReadableCanMailbox networkDoorClosedLeft;
-    private ReadableCanMailbox networkDoorClosedRight;
+    private Utility.DoorClosedArray mDoorClosed;
     
     //translator for the AtFloor message -- this translator is specific
     //to this message and is provided elevatormodules package
@@ -111,17 +106,14 @@ public class HallButtonControl extends Controller {
         mDesiredFloor = new DesiredFloorCanPayloadTranslator(networkDesiredFloor);
         
         // mDoorClosedLeft, mDoorClosedRight
-        networkDoorClosedLeft = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.LEFT));
-        networkDoorClosedRight = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.RIGHT));
-        
+        mDoorClosed  = new Utility.DoorClosedArray(hallway, canInterface);
+
         // HallCall
         localHallCall = HallCallPayload.getReadablePayload(floor, hallway, direction);
 
         // Register input messages periodically
         canInterface.registerTimeTriggered(networkAtFloor);
         canInterface.registerTimeTriggered(networkDesiredFloor);
-        canInterface.registerTimeTriggered(networkDoorClosedLeft);
-        canInterface.registerTimeTriggered(networkDoorClosedRight);
         physicalInterface.registerTimeTriggered(localHallCall);
         
         
@@ -163,7 +155,8 @@ public class HallButtonControl extends Controller {
             	mHallCall.set(true);
             	//#transition HBC.2
             	//XXX: Change: Removed && !localHallCall.pressed() (Should turn off as soon as floor is reached)
-            	if (mAtFloor.getValue() && mDesiredFloor.getDirection().equals(direction)) {
+            	if (mAtFloor.getValue() && mDesiredFloor.getDirection().equals(direction) && !mDoorClosed
+                        .getBothClosed()) {
             		newState = State.STATE_IDLE;
             	}
                 break;

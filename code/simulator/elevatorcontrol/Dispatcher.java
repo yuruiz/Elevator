@@ -306,17 +306,12 @@ public class Dispatcher extends Controller {
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
-                } else {
-                    // #transition DPT.1
-                    if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
-                        nextState = State.StopUp;
-                    }
-                    break;
                 }
 
                 // #transition DPT.1
-                if (!mFrontDoorClosed.getBothClosed() && CurrentFloor != -1) {
+                if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
                     nextState = State.StopUp;
+                    break;
                 }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
@@ -327,22 +322,21 @@ public class Dispatcher extends Controller {
                 CountDown = DesiredDwell;
 
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+                CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
+                targetRequest = computeTarget(downDownHallCall, closesetCarCallBelowEuqal, Direction.DOWN);
 
-                targetRequest = computeTarget(downDownHallCall, closestCarCallBelow, Direction.DOWN);
+                System.out.println("closesetCarCallBelowEuqal is " + closesetCarCallBelowEuqal.floor);
+
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
-                } else {
-                    // #transition DPT.1
-                    if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
-                        nextState = State.StopDown;
-                    }
-                    break;
                 }
 
+
                 // #transition DPT.1
-                if (!mFrontDoorClosed.getBothClosed() && CurrentFloor != -1) {
+                if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
                     nextState = State.StopDown;
+                    break;
                 }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
@@ -482,7 +476,7 @@ public class Dispatcher extends Controller {
      */
     private int getApproxCurrentFloor() {
         int threshold_down = 200; // in mm.
-        int threshold_up = 800;
+        int threshold_up = 4800;
         int currPos = mCarLevelPosition.getPosition();
         int error = currPos % this.mmDistBetweenFloors;
         if (error < threshold_down || error > threshold_up) {
@@ -493,7 +487,7 @@ public class Dispatcher extends Controller {
     }
 
     void updateCommitPoints() {
-		/* Update this.commitPoints array here */
+        /* Update this.commitPoints array here */
         double currSpeed = mDriveSpeed.getSpeed();
         Direction currDir = mDriveSpeed.getDirection();
         int currPos = mCarLevelPosition.getPosition();
@@ -510,7 +504,7 @@ public class Dispatcher extends Controller {
                 break;
             case UP:
 			/* Moving up: All floors above stopping point can be reached */
-                stoppingPoint = currPos + stoppingDistance + 500;
+                stoppingPoint = currPos + stoppingDistance;
                 nearestFloor = (int) Math.ceil(stoppingPoint / this.mmDistBetweenFloors) + 1;
                 Arrays.fill(this.canCommit, false);
 
@@ -521,8 +515,10 @@ public class Dispatcher extends Controller {
                 break;
             case DOWN:
 			/* Moving down: All floors below stopping point can be reached */
-                stoppingPoint = currPos - stoppingDistance - 500;
+                stoppingPoint = currPos - stoppingDistance;
                 nearestFloor = (int) Math.floor(stoppingPoint / this.mmDistBetweenFloors) + 1;
+
+                System.out.println("Nereast Floor is " + nearestFloor);
 
                 for (int i = nearestFloor; i >= 1; i--) {
                     this.canCommit[i] = true;

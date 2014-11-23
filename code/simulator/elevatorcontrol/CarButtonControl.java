@@ -14,7 +14,6 @@ import simulator.elevatormodules.AtFloorCanPayloadTranslator;
 import simulator.framework.Controller;
 import simulator.framework.Hallway;
 import simulator.framework.ReplicationComputer;
-import simulator.framework.Side;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
 import simulator.payloads.CanMailbox.WriteableCanMailbox;
@@ -33,18 +32,15 @@ public class CarButtonControl extends Controller {
     //local physical state
     private ReadableCarCallPayload localCarCall;
     private WriteableCarLightPayload localCarLight;
-    
-    //network interface
-    private WriteableCanMailbox networkCarLightOut;
+
 
     // network interface
     private WriteableCanMailbox networkCarCall;
     private CarCallCanPayloadTranslator mCarCall;
 
     //received door closed message
-    private ReadableCanMailbox networkDoorClosedLeft;
-    private ReadableCanMailbox networkDoorClosedRight;
-    
+    private Utility.DoorClosedArray mDoorClosed;
+
     //translator for the AtFloor message -- this translator is specific
     //to this message and is provided elevatormodules package
     private ReadableCanMailbox networkAtFloor;
@@ -108,17 +104,15 @@ public class CarButtonControl extends Controller {
         mDesiredFloor = new DesiredFloorCanPayloadTranslator(networkDesiredFloor);
         
         // mDoorClosedLeft, mDoorClosedRight
-        networkDoorClosedLeft = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.LEFT));
-        networkDoorClosedRight = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_CLOSED_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.RIGHT));
-        
+        mDoorClosed  = new Utility.DoorClosedArray(hallway, canInterface);
+
+
         // HallCall
         localCarCall = CarCallPayload.getReadablePayload(floor, hallway);
 
         // Register input messages periodically
         canInterface.registerTimeTriggered(networkAtFloor);
         canInterface.registerTimeTriggered(networkDesiredFloor);
-        canInterface.registerTimeTriggered(networkDoorClosedLeft);
-        canInterface.registerTimeTriggered(networkDoorClosedRight);
         physicalInterface.registerTimeTriggered(localCarCall);
         
         
@@ -159,7 +153,7 @@ public class CarButtonControl extends Controller {
             	mCarCall.set(true);
             	//#transition CBC.2
             	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
-            			mDesiredFloor.getHallway().equals(hallway)) {
+            			mDesiredFloor.getHallway().equals(hallway) && !mDoorClosed.getBothClosed()) {
             		newState = State.STATE_IDLE;
             	}
                 break;
