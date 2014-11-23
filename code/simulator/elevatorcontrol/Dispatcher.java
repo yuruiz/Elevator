@@ -504,6 +504,10 @@ public class Dispatcher extends Controller {
             return 8;
         }
 
+        if (mDriveSpeed.getSpeed() == 0) {
+            return curFloor;
+        }
+
         switch (direction) {
             case UP:
                 if (currPos >= (curFloor - 1) * this.mmDistBetweenFloors) {

@@ -195,7 +195,7 @@ public class LanternControl extends Controller {
 
         if (newState != currentState) {
             log(currentState.toString() + " -> " + newState.toString());
-            System.out.println(currentState.toString() + " -> " + newState.toString());
+//            System.out.println(currentState.toString() + " -> " + newState.toString());
         }
         currentState = newState;
 
