@@ -198,9 +198,10 @@ public class DriveControl extends Controller {
 			/*
 			 * If currently moving down but speed is slower than slow speed
 			 */
-			if (driveSpeedPayload.direction() == Direction.DOWN
-					&& driveSpeedPayload.speed() < DriveObject.SlowSpeed) {
-				desiredDirection = Direction.STOP;
+			if (driveSpeedPayload.direction() == Direction.DOWN) {
+				if (driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
+					desiredDirection = Direction.STOP;
+				}
 			} else {
 				desiredDirection = Direction.UP;
 			}
@@ -210,9 +211,10 @@ public class DriveControl extends Controller {
 			/*
 			 * if moving in the opposite direction but speed is slow
 			 */
-			if (driveSpeedPayload.direction() == Direction.UP
-					&& driveSpeedPayload.speed() < DriveObject.SlowSpeed) {
-				desiredDirection = Direction.STOP;
+			if (driveSpeedPayload.direction() == Direction.UP) {
+				if (driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
+					desiredDirection = Direction.STOP;
+				}
 			} else {
 				desiredDirection = Direction.DOWN;
 			}
