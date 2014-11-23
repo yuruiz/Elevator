@@ -43,9 +43,8 @@ public class CarWeightSensor extends PassengerModule implements TimeSensitive {
      * The time between <code>CarWeightPayload</code> and
      * <code>CarWeightAlarmPayload</code> messages.
      * 
-     * @param verbose
-     * Whether to generate log messages about passenger weights and the state of
-     * the alarm when {@link #receive(CarWeightPayload)} is called.
+     * @param verbose if true, all messages that use the log() method will be
+     * printed to the commandline.
      */
     public CarWeightSensor(SimTime period, boolean verbose) {
         super(period, "CarWeightSensor", verbose);

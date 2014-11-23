@@ -306,7 +306,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     callAction.cancel();
                     break;
                 case WAITING_IN_HALL:
-                    state = state.OVERWEIGHT_BACKOFF;
+                    state = State.OVERWEIGHT_BACKOFF;
                     doorAction.set(new OverweightBackoffAction(DOOR_CHECK_PERIOD));
                     callAction.cancel();
                     break;
@@ -333,19 +333,20 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
     }
 
     /**
-     * Return true if the floor and hall are the start floor and hall
-     * and the direction is consistent with our direction of travel
      * @param floor
      * @param hallway
      * @param direction
-     * @return
+     * @return true if the floor and hall are the start floor and hall
+     * and the direction is consistent with our direction of travel
      */
     boolean mightEnter(int floor, Hallway hallway, Direction direction) {
         return (floor == info.startFloor && hallway == info.startHallway && checkHallDirection(pc.carLanterns.getLanternDirection()));
     }
 
     /**
-     * return true if the floor and hall are where we want to exit
+     * @param floor
+     * @param hallway
+     * @return true if the floor and hall are where we want to exit
      */
     boolean mightExit(int floor, Hallway hallway) {
         return (floor == info.endFloor && hallway == info.endHallway);
@@ -583,7 +584,10 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                  * made here, it should also be made there.
                  */
                 //start the next action depending on our end floor
-                if (pc.driveMonitor.getCurrentFloor() != info.endFloor) {
+                if (pc.driveMonitor.getCurrentFloor() == info.endFloor) {
+                    //end floor same as start, so initiate door checking
+                    doorAction.set(new CheckCarDoorAction(DOOR_CHECK_PERIOD));
+                } else {
                     //end floor is somewhere else, so initiate lantern checking
                     doorAction.set(new CheckLanternDirectionAction(DOOR_CHECK_PERIOD));
                 }
@@ -694,7 +698,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     && passengerHandler.getDoorQueue(info.startHallway).isNext(Passenger.this)) {
                 //block the doors and try to enter
                 log("Blocking door ", info.startHallway, "(", info.width, ")");
-                if (!theDoor.block(info.width)) {
+                if (theDoor.block(info.width)) {
                     state = State.EXITING;
                     doorAction.set(new FinishExitAtStartAction(info.doorTraversalDelay));
                     log("Attempting to exit car at ", info.startFloor, ", ", info.startHallway);
@@ -910,6 +914,15 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                 passengerHandler.getDoorQueue(info.endHallway).requestExit(Passenger.this);
                 isQueued = true;
             }
+            
+            //if the door is closed, then don't attempt to exit: recheck the button and door in a bit
+            if (theDoor.getDoorState() == Door.DoorState.CLOSED){
+                log("Desired door ", info.endHallway, " is closed. Pressing call");
+                passengerHandler.getDoorQueue(info.endHallway).remove(Passenger.this);
+                isQueued = false;
+                callAction.set(new CarCallCheckAction(CALL_CHECK_PERIOD));
+                return;
+            }
 
 
             //check the door width
@@ -921,7 +934,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     && passengerHandler.getDoorQueue(info.endHallway).isNext(Passenger.this)) {
                 //block the doors and try to enter
                 log("Blocking door ", info.endHallway, "(", info.width, ")");
-                if (!theDoor.block(info.width)) {
+                if (theDoor.block(info.width)) {
                     state = State.EXITING;
                     doorAction.set(new ExitCarAction(info.doorTraversalDelay));
                     log("Attempting to exit car at ", info.endFloor, ", ", info.endHallway);
@@ -1119,7 +1132,16 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     //someone else has blocked the door, so wait a little while and try again
                     doorAction.set(new OverweightExitStartAction(DOOR_CHECK_PERIOD));
                 }
-            } else if (!pc.carWeightAlarm.isRinging()) {
+            } 
+            /*
+             *FGH-OCT-14-2014
+             *Removed this because it doesn't seem to make a whole lot of sense,
+             * and was dependent on a broken method in CarWeightAlarm that always
+             * returned the result of an assigment to false (which gives false 
+             * for most compilers)
+             */
+            
+            //else if (!pc.carWeightAlarm.isRinging()) {
                 /*
                  * JDR-20110429
                  * added this condition to resolve an issue where a passenger
@@ -1131,7 +1153,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                  *
                  * Note that these are the same actions issued at the end of FinishCarEnterAction
                  */
-                //set new state
+            /*    //set new state
                 state = State.WAITING_IN_CAR;
                 //dequeue
                 if (isQueued) {
@@ -1140,13 +1162,17 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     isQueued = false;
                 }
                 //start the next action depending on our end floor
-                if (pc.driveMonitor.getCurrentFloor() != info.endFloor) {
+                if (pc.driveMonitor.getCurrentFloor() == info.endFloor) {
+                    //end floor same as start, so initiate door checking
+                    doorAction.set(new CheckCarDoorAction(DOOR_CHECK_PERIOD));
+                } else {
                     //end floor is somewhere else, so initiate lantern checking
                     doorAction.set(new CheckLanternDirectionAction(DOOR_CHECK_PERIOD));
                 }
                 //always start the car call check action
                 callAction.set(new CarCallCheckAction(CALL_CHECK_PERIOD));
-            } else {
+            } */
+            else {
                 //conditions not met, so keep reissuing the check action
                 doorAction.set(new OverweightExitStartAction(DOOR_CHECK_PERIOD));
             }
@@ -1244,7 +1270,9 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
 
                 log("Doors are not closed, starting overweight backoff, then returning to hall wait at ", info.startFloor, ",", info.startHallway);
                 state = State.WAITING_IN_HALL;
-
+                passengerHandler.getDoorQueue(info.startHallway).remove(Passenger.this);
+                isQueued = false;
+                
                 //do not issue a door check command.  That will come when the doors open at this floor
                 //doorAction.set(new CheckHallDoorAction(DOOR_CHECK_PERIOD));
 
@@ -1322,10 +1350,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                 }
                 //use the recheck period since we just pushed the button
                 callAction.set(new HallCallCheckAction(CALL_RECHECK_PERIOD));
-            } else if (currentFloor == info.startFloor && theDoor.isNotClosed()) {
-				//If we are at the floor with the doors open begin door action
-				doorAction.set(new CheckHallDoorAction(DOOR_CHECK_PERIOD));
-			} else {
+            } else {
                 //check every so often to see if the button is still pressed.
                 callAction.set(new HallCallCheckAction(CALL_CHECK_PERIOD));
             }
@@ -1373,10 +1398,7 @@ public class Passenger implements PassengerEventReceiver, Comparable<Passenger> 
                     satisfaction.addDeduction(REPEAT_PRESS_SCORE, "Repeated car call press");
                 }
                 callAction.set(new CarCallCheckAction(CALL_RECHECK_PERIOD));
-            } else if (theDoor.isNotClosed()){
-				//If we are at the floor with the doors open begin door action
-				doorAction.set(new CheckCarDoorAction(DOOR_CHECK_PERIOD));
-			} else{
+            } else{
                 callAction.set(new CarCallCheckAction(CALL_CHECK_PERIOD));
             }
 

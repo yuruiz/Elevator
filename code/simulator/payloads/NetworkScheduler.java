@@ -31,10 +31,13 @@ class Pair<T1, T2> {
  * messages according to their <code>compareTo</code> method. Both
  * event-triggered and time-triggered facilities are provided for sending and
  * receiving messages. Network components that have only time-triggered
- * message behavior can simply call {@link #getConnection()} to acquire
- * a connection to this network. Components that want to perform
- * event-triggered behavior must implement {@link Networkable} and call {@link
- * #getConnection(Networkable)}.
+ * message behavior can simply call 
+ * {@link NetworkScheduler.Connection#NetworkScheduler.Connection()} followed by 
+ * {@link Connection#registerTimeTriggered(ReadablePayload)} to acquire a connection
+ * to this network. Components that want to perform event-triggered behavior must 
+ * implement {@link Networkable} and call 
+ * {@link NetworkScheduler.Connection#NetworkScheduler.Connection(Networkable)} 
+ * followed by {@link Connection#registerEventTriggered(ReadablePayload)}.
  *
  * The network connections and adapters have been modified so that send methods
  * only accept writeable payloads, and receive methods only accept readable payloads.
@@ -116,10 +119,18 @@ public abstract class NetworkScheduler implements TimeSensitive {
         private boolean enabled = true;
         private final Networkable networkNode;
 
+        /**
+         * Constructor for Time Triggered Messages Only
+         *
+         */
         public Connection() {
             networkNode = null;
         }
-
+        
+        /**
+         * Constructor for Event Triggered Messages
+         *
+         */
         public Connection(Networkable networkNode) {
             this.networkNode = networkNode;
             log(this, ": created");

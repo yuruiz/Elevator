@@ -166,7 +166,7 @@ public class SpecificMessageFault extends Fault {
             //create payload for framework payload object
             payload = (Payload)refFactory.createObjectFromStrings(payloadName, packagePath, strings);
         } catch (Exception e) {
-            throw new ParseException("could not call constructor for " + payloadName + " with arguments " + refFactory.commaConcatenate(strings) + ":  " + e, -1);
+            throw new ParseException("could not call constructor for " + payloadName + " with arguments " + ReflectionFactory.commaConcatenate(strings) + ":  " + e, -1);
         }
         return payload.getType();
     }

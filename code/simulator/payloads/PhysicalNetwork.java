@@ -123,7 +123,6 @@ public class PhysicalNetwork extends NetworkScheduler
     /**
      * Get a connection that is limited to time-triggered interfaces
      * @param networkNode
-     * @return
      */
     public PhysicalConnection getConnection(Networkable networkNode)
     {
@@ -132,7 +131,6 @@ public class PhysicalNetwork extends NetworkScheduler
 
     /**
      * Get a connection that is limited to time-triggered interfaces
-     * @return
      */
     public PhysicalConnection getConnection()
     {
@@ -144,7 +142,6 @@ public class PhysicalNetwork extends NetworkScheduler
      * This is used for system objects and runtime monitors, and may not be used
      * by students directly.
      *
-     * @return
      */
     public Connection getFrameworkConnection()
     {
@@ -155,8 +152,7 @@ public class PhysicalNetwork extends NetworkScheduler
      * Get a connection with both time- and event-triggered interfaces.
      * This is used for system objects and runtime monitors, and may not be used
      * by students directly.
-     * 
-     * @return
+     *
      */
     public Connection getFrameworkConnection(Networkable networkNode)
     {

@@ -1,17 +1,19 @@
 SOURCE=$(shell find jSimPack simulator -name '*.java')
 CLASSES=$(subst .java,.class,$(SOURCE))
+SUBCLASSES=$(subst .java,\$$*.class,$(SOURCE))
 
 .PHONY: all code clean
 
 all: code
 
-code: $(CLASSES)
+code: $(CLASSES) $(SUBCLASES)
 
 clean:
-	find . -name '*'.class -exec rm -f {} ';'
+#	-for file in $(SUBCLASSES) $(CLASSES); do if [ -d $$file ]; then rm $$file; fi; done
+	-for file in $(SUBCLASSES) $(CLASSES); do if [ -e $$file ]; then rm -v $$file; fi; done
 
 $(CLASSES): %.class: %.java
-	javac -source 1.5 -O -Xlint:all -cp $(PWD) $<
+	javac -O -Xlint:all -cp $(PWD) $<
 
 # ensure the next line is always the last line in this file.
 # vi:noet

@@ -18,8 +18,8 @@ public interface TimeSensitive {
    * Called when a <code>Timer</code> expires.
    *
    * @param callbackData
-   * the value that was passed to {@link Timer#start(long,Object)}, or
-   * <code>null</code> if {@link Timer#start(long)} was called instead.
+   * the value that was passed to {@link Timer#start(SimTime,Object)}, or
+   * <code>null</code> if {@link Timer#start(SimTime)} was called instead.
    */
   public abstract void timerExpired(Object callbackData);
 

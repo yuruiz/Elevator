@@ -351,7 +351,7 @@ public abstract class RuntimeMonitor extends Networkable implements TimeSensitiv
      * Use reflection to create and return a monitor class of the specified name.
      * Note that the monitor must have a default (no arguments) constructor.
      * @param monitorName
-     * @return
+     * @return constructed monitor
      */
     public final static RuntimeMonitor createMonitor(String monitorName) {
         ReflectionFactory rf = new ReflectionFactory();

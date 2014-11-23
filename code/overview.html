@@ -45,14 +45,14 @@ simulator.framework.Harness#log(String,Object...)}.
 <h2> Interacting with Other Simulation Modules </h2>
 <h3> Networks </h3>
 There are two networks provided by the Harness:
-A "physical" network object {@link simulator.framework.PhysicalNetwork}
+A "physical" network object {@link simulator.payloads.PhysicalNetwork}
 (interactions with system objects are implemented using a message
 passing architecture)
 and a
-A CAN network object {@link simulator.framework.CANNetwork}. You do not
+A CAN network object {@link simulator.payloads.CANNetwork}. You do not
 access
 these object directly, but rather through {@link
-simulator.framework.NetworkConnection}
+simulator.payloads.NetworkConnection}
 objects. The connection objects you need are already provided in the
 {@link simulator.framework.Controller} object. These connection objects
 enforce

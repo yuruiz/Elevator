@@ -12,7 +12,6 @@ package simulator.elevatorcontrol;
 import jSimPack.SimTime;
 import simulator.elevatorcontrol.Utility.AtFloorArray;
 import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
-import simulator.elevatormodules.DriveObject;
 import simulator.framework.Controller;
 import simulator.framework.Elevator;
 import simulator.payloads.CanMailbox;
@@ -56,7 +55,7 @@ public class CarPositionControl extends Controller {
 
         canInterface.registerTimeTriggered(networkDriveSpeed);
         canInterface.registerTimeTriggered(networkCarLevelPosition);
-		
+
 		/* Output */
 
         localCarPositionIndicator = CarPositionIndicatorPayload.getWriteablePayload();
@@ -68,40 +67,23 @@ public class CarPositionControl extends Controller {
     @Override
     public void timerExpired(Object callbackData) {
 
-        State nextState = state;
+//        State nextState = state;
         int currPos = mCarLevelPosition.getPosition();
         log("State " + state);
 
-        switch (state) {
-            case MOVING:
-                localCarPositionIndicator.set(CurrentFloor);
-                switch (mDriveSpeed.getDirection()) {
-                    case DOWN:
-                        // Moving down, get the nearest floor above
-                        CurrentFloor = (int) Math.floor(currPos / this.mmDistBetweenFloors) + 1;
-                        break;
-                    case UP:
-                        // Moving up, get the nearest floor below
-                        CurrentFloor = (int) Math.ceil(currPos / this.mmDistBetweenFloors) + 1;
-                        break;
-                    case STOP:
-                        //#transition CPC T.1
-                        nextState = State.ARRIVE;
-                        break;
-                }
-                break;
-            case ARRIVE:
-                localCarPositionIndicator.set(CurrentFloor);
-                // #transition CPC T.2
-                if (mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
-                    nextState = State.MOVING;
-                }
-                break;
+        localCarPositionIndicator.set(CurrentFloor);
+        if (currPos < 0) {
+            CurrentFloor = 1;
+        } else if (currPos % this.mmDistBetweenFloors >= 2500) {
+            CurrentFloor = (int) Math.ceil(currPos / this.mmDistBetweenFloors) + 1;
+        } else {
+            CurrentFloor = (int) Math.floor(currPos / this.mmDistBetweenFloors) + 1;
         }
-        if (state != nextState) {
-            log("Transition: " + state + " -> " + nextState);
-        }
-        state = nextState;
+
+//        if (state != nextState) {
+//            log("Transition: " + state + " -> " + nextState);
+//        }
+//        state = nextState;
         timer.start(period);
     }
 }

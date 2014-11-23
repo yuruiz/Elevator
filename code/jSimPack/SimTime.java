@@ -69,13 +69,18 @@ public class SimTime implements Comparable<SimTime>, Cloneable {
 
     /**
      * Creates a new SimTime object
-     * @param timeValue  the amount time
+     * @param scaledTime  the amount time
      * @param unit time unit the value refers to
      */
     public SimTime(long scaledTime, SimTimeUnit unit) {
         nativeTime = scaledTime * unit.conversion;
     }
-
+    
+    /**
+     * Creates a new SimTime object
+     * @param scaledTime  the amount time
+     * @param unit time unit the value refers to
+     */
     public SimTime(double scaledTime, SimTimeUnit unit) {
         nativeTime = Math.round(scaledTime * unit.conversion);
     }

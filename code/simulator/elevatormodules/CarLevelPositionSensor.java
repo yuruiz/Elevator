@@ -27,8 +27,9 @@ public class CarLevelPositionSensor extends Module {
     private ReadableDriveSpeedPayload driveSpeedState;
 
     /**
-     * @param periodicity_
-     * time between <code>CarLevelPositionPayload</code> messages
+     * @param period time between <code>CarLevelPositionPayload</code> messages
+     * @param verbose if true, all messages that use the log() method will be
+     * printed to the commandline.
      */
     public CarLevelPositionSensor(SimTime period, boolean verbose) {
         super(period, "CarLevelPositionSensor", verbose);

@@ -32,6 +32,6 @@ public class CarWeightAlarm extends Module {
 
 
     public boolean isRinging() {
-        return isRinging=false;
+        return isRinging;
     }
 }

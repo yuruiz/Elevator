@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Dispatches abstract events that occur at discrete points in time.  Events
  * are dispatched in increasing order of their release time.  The release time
  * of an event is calculated when it is scheduled via  {@link
- * #schedule(FutureEventListener,long,Object)}.  Each event is associated with
+ * #schedule(FutureEventListener,SimTime,Object)}.  Each event is associated with
  * an <code>FutureEventListener</code> that takes an arbitrary action when the
  * event occurs.  While an <code>FutureEventListener</code> is processing an
  * event, it can freely add further events to, or remove other events from,
@@ -131,7 +131,7 @@ public class FutureEventList {
 
     /**
      * Halt the simulator at a specified time
-     * @param endTime When to stop the simulator.  This should be interpreted as
+     * @param time When to stop the simulator.  This should be interpreted as
      * clock time.
      */
     public void setEndTime(SimTime time) {
@@ -169,7 +169,7 @@ public class FutureEventList {
      * when the event occurs.
      * 
      * @return
-     * A unique object that can be passed to {@link #cancelEvent(Object, boolean)}
+     * A unique object that can be passed to {@link #cancelEvent(FutureEvent)}
      * to identify this event.
      * 
      * @throws IllegalArgumentException
@@ -204,8 +204,6 @@ public class FutureEventList {
     /**
      * Works jsut like cancelEvent but for nonsimulation events.
      * @param event
-     * @param deleteNow
-     * @return
      */
     public void cancelNonsimulationEvent(FutureEvent event) {
         if (!event.isScheduled()) {
@@ -229,7 +227,7 @@ public class FutureEventList {
 
     /**
      * Start the simulator
-     * @param howLong how long to run the simulator.  This value should be interpreted as an
+     * @param end how long to run the simulator.  This value should be interpreted as an
      * interval.
      */
     public void runSimulationUntil(SimTime end) {
@@ -438,7 +436,7 @@ public class FutureEventList {
     /**
      * Remove a breakpoint
      * @param breakpointTime
-     * @return
+     * @return true if breakpoint was removed
      */
     public boolean removeBreakpoint(SimTime breakpointTime) {
         if (!breakpoints.containsKey(breakpointTime)) {
@@ -502,7 +500,7 @@ public class FutureEventList {
     /**
      * stop listeneing to breakpoint callbacks.
      * @param l
-     * @return
+     * @return true if breakpointListener was removed (breakpoints will no longer be listened to)
      */
     public boolean removeBreakpointListener(BreakpointListener l) {
         return breakpointListeners.remove(l);

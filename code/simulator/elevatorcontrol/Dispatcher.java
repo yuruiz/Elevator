@@ -322,9 +322,12 @@ public class Dispatcher extends Controller {
                 DesiredDirection = Direction.DOWN;
                 CountDown = DesiredDwell;
 
+//                System.out.println("Previous Seen " + previousFloorSeen);
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
                 CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(downDownHallCall, closesetCarCallBelowEuqal, Direction.DOWN);
+
+//                System.out.println("Down Hal Call " + downDownHallCall.floor);
 
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -440,26 +443,26 @@ public class Dispatcher extends Controller {
             switch (dir) {
                 case UP:
                     if (closestCarCall.floor < closestHallCall.floor) {
-                        floor = closestHallCall.floor;
-                        hallway = closestHallCall.hallway;
+                        floor = closestCarCall.floor;
+                        hallway = closestCarCall.hallway;
                     } else if (closestCarCall.floor == closestHallCall.floor) {
                         floor = closestCarCall.floor;
                         hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
                     } else {
-                        floor = closestCarCall.floor;
-                        hallway = closestCarCall.hallway;
+                        floor = closestHallCall.floor;
+                        hallway = closestHallCall.hallway;
                     }
                     break;
                 case DOWN:
                     if (closestCarCall.floor > closestHallCall.floor) {
-                        floor = closestHallCall.floor;
-                        hallway = closestHallCall.hallway;
+                        floor = closestCarCall.floor;
+                        hallway = closestCarCall.hallway;
                     } else if (closestCarCall.floor == closestHallCall.floor) {
                         floor = closestCarCall.floor;
                         hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
                     } else {
-                        floor = closestCarCall.floor;
-                        hallway = closestCarCall.hallway;
+                        floor = closestHallCall.floor;
+                        hallway = closestHallCall.hallway;
                     }
                     break;
                 default:
@@ -517,6 +520,7 @@ public class Dispatcher extends Controller {
                 stoppingPoint = currPos - stoppingDistance;
                 nearestFloor = (int) Math.floor(stoppingPoint / this.mmDistBetweenFloors) + 1;
 
+//                System.out.println("Nerest floor " + nearestFloor);
                 for (int i = nearestFloor; i >= 1; i--) {
                     this.canCommit[i] = true;
                 }

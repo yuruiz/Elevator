@@ -2,13 +2,17 @@ package simulator.framework;
 
 import jSimPack.BreakpointPrinter;
 import jSimPack.SimTime;
-import simulator.elevatormodules.Modules;
-import simulator.elevatormodules.SafetyViolationException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import simulator.elevatormodules.*;
 import simulator.elevatormodules.passengers.PassengerControl;
 import simulator.elevatormodules.passengers.PassengerHandler;
-
-import java.io.*;
-import java.util.ArrayList;
 
 /**
  * Provides command-line interface to and instantiates all objects for the
@@ -46,8 +50,8 @@ public class Elevator {
     };
     public static final int numFloors = landings.length;
     private static final SimTime PROGRESS_INTERVAL = new SimTime(1, SimTime.SimTimeUnit.MINUTE);
-    private static double fastElevatorSpeed = 5.0; //m/s
-    private static boolean ignoreLeveling = false;
+    private static double fastElevatorSpeed = 1.0; //m/s
+    private static boolean ignoreLeveling = false; 
 
     /**
      * 

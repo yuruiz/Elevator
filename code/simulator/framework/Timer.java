@@ -33,7 +33,7 @@ public class Timer extends AbstractTimer {
         Test test = new Test();
         t = new Timer(test);
         test.setTimer(t);
-        t.setVerbosity(15);
+        AbstractTimer.setVerbosity(15);
 
         t.start(new SimTime(1, SimTime.SimTimeUnit.SECOND), true);
         t.start(new SimTime(2, SimTime.SimTimeUnit.SECOND), 1);

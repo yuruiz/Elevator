@@ -80,7 +80,7 @@ public abstract class Controller extends Networkable implements TimeSensitive {
      * State assertions depend on you correctly implementing calls to setState(),
      * e.g. correctly reporting the current state).
      *
-     * @see setState()
+     * @see #setState
      *
      * @return the current set of state values.
      * @throws IllegalArgumentException if the key does not exist.
@@ -107,7 +107,8 @@ public abstract class Controller extends Networkable implements TimeSensitive {
      * checkState().
      *
      *
-     * @param values  new state values
+     * @param key
+     * @param value new state value
      */
     protected final void setState(String key, String value) {
         if (key == null) throw new NullPointerException("key");

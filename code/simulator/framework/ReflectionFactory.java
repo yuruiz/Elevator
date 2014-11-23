@@ -31,7 +31,7 @@ public class ReflectionFactory {
      *
      * @param className
      * @param packagePath
-     * @return
+     * @return object of class <code>className</code>
      * @throws ClassNotFoundException
      */
 
@@ -47,7 +47,7 @@ public class ReflectionFactory {
      * @param className
      * @param packagePath
      * @param parameters
-     * @return
+     * @return object of class <code>className</code>
      * @throws ClassNotFoundException
      */
 
@@ -62,7 +62,7 @@ public class ReflectionFactory {
      * @param className
      * @param packagePath
      * @param strings
-     * @return
+     * @return object of class <code>className</code>
      * @throws ClassNotFoundException
      */
     public Object createObjectFromStrings(String className, List<String> packagePath, String[] strings) throws ClassNotFoundException {
@@ -231,10 +231,12 @@ public class ReflectionFactory {
     }
 
     /**
-     * Overload for when we have an object instead of a class type
-     * @param theClass
+     * Overload for when we have an object instead of a class type, for methods with 
+     * no arguments
+     * @param targetObject
      * @param methodName
-     * @return
+     * @return method <code>methodName</code> in the class of 
+     * <code>targetObject</code> that has zero arguments 
      * @throws java.lang.NoSuchMethodException
      */
     public Method getMethod(Object targetObject, String methodName) throws NoSuchMethodException {
@@ -245,8 +247,10 @@ public class ReflectionFactory {
      * Use this getMethod call for methods with no arguments
      * @param theClass
      * @param methodName
-     * @return
-     * @throws java.lang.NoSuchMethodException
+     * @return method <code>methodName</code> in class <code>theClass</code> that
+     * has zero arguments 
+     * @throws java.lang.NoSuchMethodException if there exists no method with name
+     * <code>methodName</code> that has zero arguments
      */
     public Method getMethod(Class<?> theClass, String methodName)
             throws NoSuchMethodException {
@@ -274,8 +278,10 @@ public class ReflectionFactory {
      * @param theClass target class to search for methods
      * @param methodName name of method
      * @param args list of string arguments
-     * @return
-     * @throws NoSuchMethodException
+     * @return method <code>methodName</code> in class <code>theClass</code> 
+     * that matches the argument list 
+     * @throws NoSuchMethodException if there does not exist a method of name 
+     * <code>methodName</code> with arguments that match <code>args</code>
      */
     public Method getMethod(Class<?> theClass, String methodName, List<String> args)
             throws NoSuchMethodException {
@@ -305,15 +311,17 @@ public class ReflectionFactory {
 
     /**
      * Overload for getMethod if what we have is a source object and not a class
-     * @param sourceObject
+     * @param targetObject
      * @param methodName
      * @param args
-     * @return
-     * @throws NoSuchMethodException
+     * @return method <code>methodName</code> in the class of 
+     * <code>targetObject</code> that matches the argument list <code>args</code>
+     * @throws NoSuchMethodException if there does not exist a method of name 
+     * <code>methodName</code> with arguments that match <code>args</code>
      */
-    public Method getMethod(Object sourceObject, String methodName, List<String> args)
+    public Method getMethod(Object targetObject, String methodName, List<String> args)
             throws NoSuchMethodException {
-        return getMethod(sourceObject.getClass(), methodName, args);
+        return getMethod(targetObject.getClass(), methodName, args);
     }
 
     public Method getStaticMethod(Class<?> theClass, String methodName, List<String> args)
@@ -367,20 +375,22 @@ public class ReflectionFactory {
 
     /**
      * Overload for when we have an object instead of a class
-     * @param theClass
+     * @param targetObject
      * @param fieldName
-     * @return
+     * @return the field <code>fieldName</code> in the class of 
+     * object <code>theClass</code>
      * @throws NoSuchFieldException
      */
-    public Field getField(Object target, String fieldName) throws NoSuchFieldException {
-        return getField(target.getClass(), fieldName);
+    public Field getField(Object targetObject, String fieldName) throws NoSuchFieldException {
+        return getField(targetObject.getClass(), fieldName);
     }
 
     /**
      * Get a field by name from a given class
      * @param theClass
      * @param fieldName
-     * @return
+     * @return the field <code>fieldName</code> in the class 
+     * <code>theClass</code>
      * @throws NoSuchFieldException
      */
     public Field getField(Class<?> theClass, String fieldName) throws NoSuchFieldException {
@@ -389,15 +399,16 @@ public class ReflectionFactory {
 
     /**
      * Get a value from a field of a given name in a class.
-     * @param sourceClass
+     * @param theClass
      * @param fieldName
-     * @return
+     * @return the value of the field <code>fieldName</code> in the class 
+     * <code>theClass</code>
      * @throws NoSuchFieldException
      * @throws IllegalArgumentException
      * @throws IllegalAccessException
      */
-    public Object getStaticFieldValue(Class<?> sourceClass, String fieldName) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-        Field idField = getField(sourceClass, fieldName);
+    public Object getStaticFieldValue(Class<?> theClass, String fieldName) throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        Field idField = getField(theClass, fieldName);
         return idField.get(null);
     }
 
@@ -412,7 +423,8 @@ public class ReflectionFactory {
      * Tries to parse the value string into an object that matches the type of the field.
      * @param field
      * @param value
-     * @return
+     * @return an object of the same type as <code>field</code> with the value
+     * contained in the string <code>value</code>
      */
     public Object createFieldType(Field field, String value) {
         return parseString(field.getType(), value);
@@ -428,7 +440,7 @@ public class ReflectionFactory {
      * @param obj object to call the method on -- can be null if it is a static
      * method.
      * @param args
-     * @return
+     * @return result of the method
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
@@ -473,7 +485,7 @@ public class ReflectionFactory {
      * Attempt to convert the string value to an object of the given type.
      */
     @SuppressWarnings(value = "unchecked")
-    private static Object parseString(Class type, String value)
+    private static Object parseString(Class<?> type, String value)
             throws IllegalArgumentException {
         if (value == null) {
             return null;
@@ -520,7 +532,7 @@ public class ReflectionFactory {
          * The next line will generate a compiler warning. I don't know how
          * to fix it.
          */ {
-            return Enum.valueOf(type, value);
+            return Enum.valueOf((Class<Enum>)type, value);
         }
         throw new IllegalArgumentException("value \"" + value + "\" could not"
                 + " be interpreted as " + type);

@@ -31,10 +31,23 @@ public class BERFaultModel extends Logger implements NetworkFaultModel, TimeSens
      * 
      * @param inverseBitErrorRate - Inverse of the bit error rate.  If the bit error rate
      * is lambda (1E-3/s), then specify * 1000 (1e3)
-     * @param verbose
      */
     public BERFaultModel(long inverseBitErrorRate) {
         super("BERFaultModel");
+        this.inverseBitErrorRate = inverseBitErrorRate;
+        this.random = Harness.getRandomSource().getRandom();
+        log("Inverse Bit Error Rate=",inverseBitErrorRate);
+        this.startTime = Harness.getTime();
+    }
+    
+     /**
+     * 
+     * @param inverseBitErrorRate - Inverse of the bit error rate.  If the bit error rate
+     * is lambda (1E-3/s), then specify * 1000 (1e3)
+     * @param verbose
+     */
+    public BERFaultModel(long inverseBitErrorRate, boolean verbose) {
+        super("BERFaultModel", verbose);
         this.inverseBitErrorRate = inverseBitErrorRate;
         this.random = Harness.getRandomSource().getRandom();
         log("Inverse Bit Error Rate=",inverseBitErrorRate);

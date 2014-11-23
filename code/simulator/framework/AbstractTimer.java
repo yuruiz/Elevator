@@ -20,7 +20,7 @@ import jSimPack.SimTime;
  * call <code>start</code> after each time <code>timerExpired</code> is
  * executed.  If a handler creates more than one <code>Timer</code>, it can
  * distinguish between their calls to <code>timerExpired</code> by specifying
- * different callback objects to the {@link #start(long, Object)} method of
+ * different callback objects to the {@link #start(SimTime, Object)} method of
  * each <code>Timer</code>.
  *
  * This abstract class can be implemented on different time bases by subclassing
@@ -57,7 +57,6 @@ public abstract class AbstractTimer implements FutureEventListener {
      * Cancel a pending event - this method is implemented to cancel Timer events
      * on a specific event queue.
      * @param event event to cancel
-     * @return true if the event was cancelled
      */
     protected abstract void cancelEvent(FutureEvent event);
 

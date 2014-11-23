@@ -185,14 +185,12 @@ public final class CanMailbox extends Payload {
     }
 
     /**
-     * Create a new CAN payload with the specified ID and payload size.  Since
+     * Create a new CAN payload with the specified ID.  Since
      * CAN headers are 29 bits long, only the 29 least significant bits of the
      * message ID are used.
      * 
      * @param messageId
      *        the message ID
-     * @param payloadSize
-     *        the size of the payload in bytes
      */
     CanMailbox(int messageId) {
         super(messageId & MESSAGE_ID_MASK);
@@ -278,7 +276,6 @@ public final class CanMailbox extends Payload {
     /**
      * Override toString method prints ID and payload - if a CanPayloadTranslator is set,
      * it is used to generate a human-readable message.
-     * @return
      */
     @Override
     public String toString() {
@@ -308,7 +305,6 @@ public final class CanMailbox extends Payload {
 
     /**
      * Compute the size of the CAN message with headers and bitstuffing
-     * @return
      */
     @Override
     public int getSize() {

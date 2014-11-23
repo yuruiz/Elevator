@@ -159,7 +159,6 @@ public abstract class CanPayloadTranslator
     
     /**
      * the expected byte size of the message
-     * @return
      */
     public final int getByteSize() {
         return byteSize;
@@ -385,7 +384,6 @@ public abstract class CanPayloadTranslator
      * Utility method to convert bitset to a hex string
      * 
      * @param b
-     * @return
      */
     public static String bitSetToHex(BitSet b)
     {
@@ -420,7 +418,6 @@ public abstract class CanPayloadTranslator
      * Utility method to convert bitset to a binary string
      * 
      * @param b
-     * @return
      */
     public static String bitSetToBinary(BitSet b)
     {
@@ -437,7 +434,6 @@ public abstract class CanPayloadTranslator
      * @param b
      * @param minLength
      *        the minimum number of characters in the return value.
-     * @return
      */
     public static String bitSetToBinary(BitSet b, int minLength)
     {
