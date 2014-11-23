@@ -145,6 +145,7 @@ public class LanternControl extends Controller {
     @Override
     public void timerExpired(Object callbackData) {
         log("current state is " + currentState);
+        State newState = currentState;
 
         switch (currentState) {
             case STATE_NO_DIRECTION:
@@ -152,7 +153,7 @@ public class LanternControl extends Controller {
                 desiredDirection = Direction.STOP;
                 //#transition TL.T.1
                 if ((mDesiredFloor.getDirection() != desiredDirection) && (desiredDirection == Direction.STOP)) {
-                    currentState = State.STATE_DIRECTION_SET;
+                    newState = State.STATE_DIRECTION_SET;
                 }
 
                 break;
@@ -162,25 +163,21 @@ public class LanternControl extends Controller {
                 desiredDirection = mDesiredFloor.getDirection();
 
                 //#transition TL.T.2
-                if (mAtFloor.isAtFloor(mDesiredFloor.getFloor(), mDesiredFloor.getHallway()) &&
-                        (mDoorClosedBackHallway.getBothClosed() == false || mDoorClosedFrontHallway.getBothClosed() == false)) {
+                if (mAtFloor.getCurrentFloor() != -1 && (!mDoorClosedBackHallway.getBothClosed() || !mDoorClosedFrontHallway.getBothClosed())) {
                     if ((desiredDirection == direction)) {
-                        currentState = State.STATE_LANTERN_ON;
+                        newState = State.STATE_LANTERN_ON;
                         //#transition TL.T.4
                     } else {
-                        currentState = State.STATE_Lantern_NOT_ON;
+                        newState = State.STATE_Lantern_NOT_ON;
                     }
-
                 }
-
                 break;
 
             case STATE_LANTERN_ON:
                 localCarLantern.set(true);
-
                 // #transition TL.T.3
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
-                    currentState = State.STATE_NO_DIRECTION;
+                    newState = State.STATE_NO_DIRECTION;
                 }
 
                 break;
@@ -189,15 +186,18 @@ public class LanternControl extends Controller {
                 localCarLantern.set(false);
 
                 if ((mDoorClosedFrontHallway.getBothClosed() && mDoorClosedBackHallway.getBothClosed())) {
-                    currentState = State.STATE_NO_DIRECTION;
+                    newState = State.STATE_NO_DIRECTION;
                 }
                 break;
             default:
                 throw new RuntimeException("State " + currentState + " was not recognized.");
         }
 
-        //log(state.toString() + " -> " + newState.toString());
-        //state = newState;
+        if (newState != currentState) {
+            log(currentState.toString() + " -> " + newState.toString());
+//            System.out.println(currentState.toString() + " -> " + newState.toString());
+        }
+        currentState = newState;
 
         timer.start(period);
     }
