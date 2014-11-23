@@ -116,7 +116,7 @@ public class Dispatcher extends Controller {
         log("Executing state " + currentState);
 
         State nextState = currentState;
-
+        int practicalFloor;
         // CurrentFloor = mAtFloor.getCurrentFloor();
         CurrentFloor = getApproxCurrentFloor();
         if (CurrentFloor != -1) {
@@ -250,16 +250,15 @@ public class Dispatcher extends Controller {
 
                 // Check for calls above Target
                 CallRequest nextCarCallAbove = mCarCallArray.closestCallAbove(Target, canCommit);
-                CallRequest nextHallCallAbove = mHallCallArray.closestCallAbove(Target, canCommit);
+                CallRequest nextHallCallAbove = mHallCallArray.closestCallAboveInDirection(Target, Direction.UP, canCommit);
 
                 // #transition DPT.3
-                if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) || (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
+                if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
+                    nextState = State.UpDown;
+                }else if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) || (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
                     nextState = State.UpUp;
                 }
                 // #transition DPT.4
-                else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
-                    nextState = State.UpDown;
-                }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
             case DownStop:
@@ -283,16 +282,16 @@ public class Dispatcher extends Controller {
 
                 // Check for calls below Target
                 CallRequest nextCarCallBelow = mCarCallArray.closestCallBelow(Target, canCommit);
-                CallRequest nextHallCallBelow = mHallCallArray.closestCallBelow(Target, canCommit);
+                CallRequest nextHallCallBelow = mHallCallArray.closestCallBelowInDirection(Target, Direction.DOWN, canCommit);
 
                 // #transition DPT.9
-                if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) || (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
+                if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
+                    nextState = State.DownUp;
+                }else if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) ||
+                    (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
                     nextState = State.DownDown;
                 }
                 // #transition DPT.10
-                else if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
-                    nextState = State.DownUp;
-                }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
             case UpUp:
@@ -301,7 +300,9 @@ public class Dispatcher extends Controller {
                 DesiredDirection = Direction.UP;
                 CountDown = DesiredDwell;
 
-                CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP, canCommit);
+                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
+
+                CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(practicalFloor, Direction.UP, canCommit);
                 CallRequest closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(upUpHallCall, closesetCarCallAboveEuqal, Direction.UP);
                 if (targetRequest.isValid()) {
@@ -323,7 +324,11 @@ public class Dispatcher extends Controller {
                 CountDown = DesiredDwell;
 
 //                System.out.println("Previous Seen " + previousFloorSeen);
-                CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+
+                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
+
+                CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(practicalFloor, Direction.DOWN, canCommit);
+
                 CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(downDownHallCall, closesetCarCallBelowEuqal, Direction.DOWN);
 
@@ -350,7 +355,8 @@ public class Dispatcher extends Controller {
                 // Find the minimum hall call below the target
                 CallRequest minDownHallCallAboveTarget = mHallCallArray.maxGoingDown(Target - 1, canCommit);
                 // Get the next up hall call above the current floor
-                CallRequest upHallCallAboveCurFloor = mHallCallArray.minGoingUp(previousFloorSeen, canCommit);
+                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
+                CallRequest upHallCallAboveCurFloor = mHallCallArray.closestCallAboveInDirection(practicalFloor, Direction.UP, canCommit);
                 carCallBeforeTarget = mCarCallArray.lowestCallBetween(previousFloorSeen, Target, canCommit);
                 if (minDownHallCallAboveTarget.isValid()) {
                     Target = minDownHallCallAboveTarget.floor;
@@ -380,7 +386,8 @@ public class Dispatcher extends Controller {
                 // Find the minimum hall call below the target
                 CallRequest minUpHallCallBelowTarget = mHallCallArray.minGoingUp(Target + 1, canCommit);
                 // Get the next down hall call below the current floor
-                CallRequest downHallCallBelowCurFloor = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
+                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
+                CallRequest downHallCallBelowCurFloor = mHallCallArray.closestCallBelowInDirection(practicalFloor, Direction.DOWN, canCommit);
                 carCallBeforeTarget = mCarCallArray.highestCallBetween(previousFloorSeen, Target, canCommit);
                 if (minUpHallCallBelowTarget.isValid()) {
                     Target = minUpHallCallBelowTarget.floor;
@@ -488,6 +495,34 @@ public class Dispatcher extends Controller {
         }
     }
 
+    private int getPracticalFloor(int curFloor, Direction direction) {
+        int currPos = mCarLevelPosition.getPosition();
+
+        if (currPos < 0) {
+            return 1;
+        } else if (currPos > 7 * this.mmDistBetweenFloors) {
+            return 8;
+        }
+
+        switch (direction) {
+            case UP:
+                if (currPos >= (curFloor - 1) * this.mmDistBetweenFloors) {
+                    return curFloor + 1;
+                }
+                break;
+            case DOWN:
+                if (currPos <= (curFloor - 1) * this.mmDistBetweenFloors) {
+                    return curFloor - 1;
+                }
+                break;
+            default:
+                break;
+        }
+
+        return curFloor;
+
+    }
+
     void updateCommitPoints() {
         /* Update this.commitPoints array here */
         double currSpeed = mDriveSpeed.getSpeed();
@@ -505,7 +540,7 @@ public class Dispatcher extends Controller {
                 Arrays.fill(this.canCommit, true);
                 break;
             case UP:
-			/* Moving up: All floors above stopping point can be reached */
+            /* Moving up: All floors above stopping point can be reached */
                 stoppingPoint = currPos + stoppingDistance;
                 nearestFloor = (int) Math.ceil(stoppingPoint / this.mmDistBetweenFloors) + 1;
                 Arrays.fill(this.canCommit, false);
@@ -516,7 +551,7 @@ public class Dispatcher extends Controller {
 
                 break;
             case DOWN:
-			/* Moving down: All floors below stopping point can be reached */
+            /* Moving down: All floors below stopping point can be reached */
                 stoppingPoint = currPos - stoppingDistance;
                 nearestFloor = (int) Math.floor(stoppingPoint / this.mmDistBetweenFloors) + 1;
 

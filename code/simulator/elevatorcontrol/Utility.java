@@ -140,6 +140,16 @@ public class Utility {
         	}
         	return new CallRequest();
         }
+
+        public CallRequest minGoingUpAbove(int curFloor, boolean[] canCommit) {
+            CallRequest c;
+            for (int i = curFloor; i <= Elevator.numFloors; i++) {
+                if ((c = isCalled(i, Direction.UP)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
         
         public CallRequest closestCallAboveInDirection(int curFloor, Direction direction, boolean[] canCommit) {
         	// Called by current floor up, return true
