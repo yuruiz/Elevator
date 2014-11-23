@@ -380,7 +380,7 @@ public class Dispatcher extends Controller {
                 // Find the minimum hall call below the target
                 CallRequest minUpHallCallBelowTarget = mHallCallArray.minGoingUp(Target + 1, canCommit);
                 // Get the next down hall call below the current floor
-                CallRequest downHallCallBelowCurFloor = mHallCallArray.maxGoingDown(previousFloorSeen, canCommit);
+                CallRequest downHallCallBelowCurFloor = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN, canCommit);
                 carCallBeforeTarget = mCarCallArray.highestCallBetween(previousFloorSeen, Target, canCommit);
                 if (minUpHallCallBelowTarget.isValid()) {
                     Target = minUpHallCallBelowTarget.floor;
@@ -501,7 +501,7 @@ public class Dispatcher extends Controller {
 
         switch (currDir) {
             case STOP:
-			/* If stopped at a floor, it is possible to reach any floor */
+            /* If stopped at a floor, it is possible to reach any floor */
                 Arrays.fill(this.canCommit, true);
                 break;
             case UP:
