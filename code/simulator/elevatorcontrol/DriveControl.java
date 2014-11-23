@@ -191,19 +191,33 @@ public class DriveControl extends Controller {
 		 */
 
 		int desiredPosition = (mDesiredFloor.getFloor() - 1) * 5000;
+		/*
+		 * If desired position is higher
+		 */
 		if (mCarLevelPosition.getPosition() < desiredPosition) {
-			if (driveSpeedPayload.direction() == Direction.DOWN) {
+			/*
+			 * If currently moving down but speed is slower than slow speed
+			 */
+			if (driveSpeedPayload.direction() == Direction.DOWN
+					&& driveSpeedPayload.speed() < DriveObject.SlowSpeed) {
 				desiredDirection = Direction.STOP;
 			} else {
 				desiredDirection = Direction.UP;
 			}
-		} else if (mCarLevelPosition.getPosition() > desiredPosition) {
-			if (driveSpeedPayload.direction() == Direction.UP) {
+		}
+		// if desired position is lower
+		else if (mCarLevelPosition.getPosition() > desiredPosition) {
+			/*
+			 * if moving in the opposite direction but speed is slow
+			 */
+			if (driveSpeedPayload.direction() == Direction.UP
+					&& driveSpeedPayload.speed() < DriveObject.SlowSpeed) {
 				desiredDirection = Direction.STOP;
 			} else {
 				desiredDirection = Direction.DOWN;
 			}
 		} else {
+			// correct position, stop
 			desiredDirection = Direction.STOP;
 		}
 
