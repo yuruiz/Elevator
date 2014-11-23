@@ -253,9 +253,9 @@ public class Dispatcher extends Controller {
                 CallRequest nextHallCallAbove = mHallCallArray.closestCallAboveInDirection(Target, Direction.UP, canCommit);
 
                 // #transition DPT.3
-                if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
+                if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid() && !closestCarCallAbove.isValid()) {
                     nextState = State.UpDown;
-                }else if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) || (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
+                } else if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) || (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
                     nextState = State.UpUp;
                 }
                 // #transition DPT.4
@@ -287,8 +287,7 @@ public class Dispatcher extends Controller {
                 // #transition DPT.9
                 if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
                     nextState = State.DownUp;
-                }else if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) ||
-                    (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
+                } else if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) || (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
                     nextState = State.DownDown;
                 }
                 // #transition DPT.10
@@ -334,10 +333,13 @@ public class Dispatcher extends Controller {
 
 //                System.out.println("Down Hal Call " + downDownHallCall.floor);
 
+
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
                 }
+
+
 
 
                 // #transition DPT.1
@@ -447,37 +449,47 @@ public class Dispatcher extends Controller {
         } else {
             // There is both a hall and car call below the current floor,
             // compute the closest one
-            switch (dir) {
-                case UP:
-                    if (closestCarCall.floor < closestHallCall.floor) {
-                        floor = closestCarCall.floor;
-                        hallway = closestCarCall.hallway;
-                    } else if (closestCarCall.floor == closestHallCall.floor) {
-                        floor = closestCarCall.floor;
-                        hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
-                    } else {
-                        floor = closestHallCall.floor;
-                        hallway = closestHallCall.hallway;
-                    }
-                    break;
-                case DOWN:
-                    if (closestCarCall.floor > closestHallCall.floor) {
-                        floor = closestCarCall.floor;
-                        hallway = closestCarCall.hallway;
-                    } else if (closestCarCall.floor == closestHallCall.floor) {
-                        floor = closestCarCall.floor;
-                        hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
-                    } else {
-                        floor = closestHallCall.floor;
-                        hallway = closestHallCall.hallway;
-                    }
-                    break;
-                default:
-                    return new CallRequest();
+
+            if (closestHallCall.direction != dir) {
+                floor = closestCarCall.floor;
+                hallway = closestCarCall.hallway;
+            } else {
+                switch (dir) {
+                    case UP:
+                        if (closestCarCall.floor < closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = closestCarCall.hallway;
+                        } else if (closestCarCall.floor == closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
+                        } else {
+                            floor = closestHallCall.floor;
+                            hallway = closestHallCall.hallway;
+                        }
+
+                        break;
+                    case DOWN:
+                        if (closestCarCall.floor > closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = closestCarCall.hallway;
+                        } else if (closestCarCall.floor == closestHallCall.floor) {
+                            floor = closestCarCall.floor;
+                            hallway = CallRequest.union(closestCarCall.hallway, closestHallCall.hallway);
+                        } else {
+                            floor = closestHallCall.floor;
+                            hallway = closestHallCall.hallway;
+                        }
+
+                        break;
+                    default:
+                        return new CallRequest();
+                }
             }
         }
-        return new CallRequest(floor, Direction.STOP, hallway);
-    }
+
+    return new CallRequest(floor, Direction.STOP, hallway);
+
+}
 
     /*
      * Helper to return approximation to current floor based on position. -1 if
