@@ -250,13 +250,17 @@ public class DriveControl extends Controller {
 			if (atFloor.getCurrentFloor() == mDesiredFloor.getFloor()
 					&& driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
 				// #transition `DC.T.6`
-				if (!mLevelUp.getValue()) {
+				if (!mLevelUp.getValue()
+						&& driveSpeedPayload.direction() != Direction.DOWN) {
 					newState = State.LEVEL_UP;
 				}
 				// #transition `DC.T.7`
 				else {
-					log("slow to level down");
-					newState = State.LEVEL_DOWN;
+					if (driveSpeedPayload.direction() != Direction.UP) {
+
+						log("slow to level down");
+						newState = State.LEVEL_DOWN;
+					}
 				}
 				break;
 			}
