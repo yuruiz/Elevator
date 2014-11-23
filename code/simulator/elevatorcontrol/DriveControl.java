@@ -216,13 +216,15 @@ public class DriveControl extends Controller {
 			this.setOutput(Speed.STOP, Direction.STOP);
 
 			// #transition 'DC.T.1'
-			if (!mLevelUp.getValue()) {
+			if (!mLevelUp.getValue()
+					&& driveSpeedPayload.direction() != Direction.DOWN) {
 				newState = State.LEVEL_UP;
 				break;
 			}
 
 			// #transition 'DC.T.3'
-			if (!mLevelDown.getValue()) {
+			if (!mLevelDown.getValue()
+					&& driveSpeedPayload.direction() != Direction.UP) {
 				newState = State.LEVEL_DOWN;
 				break;
 			}
