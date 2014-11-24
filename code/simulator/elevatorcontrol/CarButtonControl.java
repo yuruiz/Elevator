@@ -24,15 +24,16 @@ import simulator.payloads.CarLightPayload.WriteableCarLightPayload;
 
 /* Author: Vijay Jayaram (vijayj) */
 public class CarButtonControl extends Controller {
-	
-    /***************************************************************************
+
+    /**
+     * ************************************************************************
      * Declarations
-     **************************************************************************/
-	
+     * ************************************************************************
+     */
+
     //local physical state
     private ReadableCarCallPayload localCarCall;
     private WriteableCarLightPayload localCarLight;
-
 
     // network interface
     private WriteableCanMailbox networkCarCall;
@@ -45,16 +46,16 @@ public class CarButtonControl extends Controller {
     //to this message and is provided elevatormodules package
     private ReadableCanMailbox networkAtFloor;
     private AtFloorCanPayloadTranslator mAtFloor;
-    
+
     //translator for the DesiredFloor message -- this translator is specific
     //to this message and is provided elevatormodules package
     private ReadableCanMailbox networkDesiredFloor;
     private DesiredFloorCanPayloadTranslator mDesiredFloor;
-    
+
     //these variables keep track of which instance this is.
     private final Hallway hallway;
     private final int floor;
-    
+
     //store the period for the controller
     private SimTime period;
 
@@ -63,21 +64,21 @@ public class CarButtonControl extends Controller {
         STATE_IDLE,
         STATE_CAR_CALLED
     }
-    
+
     //state variable initialized to the initial state FLASH_OFF
     private State currentState = State.STATE_IDLE;
 
     /**
      * The arguments listed in the .cf configuration file should match the order and
      * type given here.
-     *
+     * <p/>
      * For your elevator controllers, you should make sure that the constructor matches
      * the method signatures in ControllerBuilder.makeAll().
      */
     public CarButtonControl(int floor, Hallway hallway, SimTime period, boolean verbose) {
         //call to the Controller superclass constructor is required
         super("CarButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway), verbose);
-        
+
         //stored the constructor arguments in internal state
         this.period = period;
         this.hallway = hallway;
@@ -94,17 +95,17 @@ public class CarButtonControl extends Controller {
          * Create readable payloads and translators for all messages in input interface
          * 		- mAtFloor[f,b,d], mDesiredFloor, mDoorClosed[b,r], HallCall[f,b,d]
          */
-       
+
         // mAtFloor
         networkAtFloor = CanMailbox.getReadableCanMailbox(MessageDictionary.AT_FLOOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mAtFloor = new AtFloorCanPayloadTranslator(networkAtFloor, floor, hallway);
-        
+
         // mDesiredFloor
         networkDesiredFloor = CanMailbox.getReadableCanMailbox(MessageDictionary.DESIRED_FLOOR_CAN_ID);
         mDesiredFloor = new DesiredFloorCanPayloadTranslator(networkDesiredFloor);
-        
+
         // mDoorClosedLeft, mDoorClosedRight
-        mDoorClosed  = new Utility.DoorClosedArray(hallway, canInterface);
+        mDoorClosed = new Utility.DoorClosedArray(hallway, canInterface);
 
 
         // HallCall
@@ -120,14 +121,14 @@ public class CarButtonControl extends Controller {
          * Create writeable payloads for all messages in output interface
          * 		- CarLight[f,b,d], mCarLight[f,b,d], mCarCall[f,b,d]
          */
-        
+
         // HallLight
         localCarLight = CarLightPayload.getWriteablePayload(floor, hallway);
 
         // mCarCall
         networkCarCall = CanMailbox.getWriteableCanMailbox(MessageDictionary.CAR_CALL_BASE_CAN_ID + ReplicationComputer.computeReplicationId(floor, hallway));
         mCarCall = new CarCallCanPayloadTranslator(networkCarCall);
-        
+
         // Send/broadcast output messages periodically
         physicalInterface.sendTimeTriggered(localCarLight, period);
         canInterface.sendTimeTriggered(networkCarCall, period);
@@ -136,39 +137,40 @@ public class CarButtonControl extends Controller {
         timer.start(period);
     }
 
-	@Override
-	public void timerExpired(Object callbackData) {
-		State newState = currentState;
-        switch(currentState) {
+    @Override
+    public void timerExpired(Object callbackData) {
+        State newState = currentState;
+        switch (currentState) {
             case STATE_IDLE:
-            	localCarLight.set(false);
-            	mCarCall.set(false);
-            	//#transition CBC.1
-            	if (localCarCall.pressed()) {
-            		newState = State.STATE_CAR_CALLED;
-            	}
+                localCarLight.set(false);
+                mCarCall.set(false);
+                //#transition CBC.1
+                if (localCarCall.pressed()) {
+                    newState = State.STATE_CAR_CALLED;
+                }
                 break;
             case STATE_CAR_CALLED:
-            	localCarLight.set(true);
-            	mCarCall.set(true);
-            	//#transition CBC.2
-            	if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
-            			mDesiredFloor.getHallway().equals(hallway) && !mDoorClosed.getBothClosed()) {
-            		newState = State.STATE_IDLE;
-            	}
+                localCarLight.set(true);
+                mCarCall.set(true);
+                //#transition CBC.2
+                if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
+                        (mDesiredFloor.getHallway().equals(hallway) || mDesiredFloor.getHallway() == Hallway.BOTH) &&
+                        !mDoorClosed.getBothClosed()) {
+                    newState = State.STATE_IDLE;
+                }
                 break;
             default:
-            	throw new RuntimeException("State " + currentState + " was not recognized.");
+                throw new RuntimeException("State " + currentState + " was not recognized.");
         }
-        
-    	log(currentState.toString() + " -> " + newState.toString());
+
+        log(currentState.toString() + " -> " + newState.toString());
         currentState = newState;
 
         timer.start(period);
-	}
-	
-	private String getReplicationName() {
-		return "CarButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway);
-	}
+    }
+
+    private String getReplicationName() {
+        return "CarButtonControl" + ReplicationComputer.makeReplicationString(floor, hallway);
+    }
 
 }
