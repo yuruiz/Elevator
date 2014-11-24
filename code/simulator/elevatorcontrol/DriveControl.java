@@ -216,6 +216,7 @@ public class DriveControl extends Controller {
 					desiredDirection = Direction.STOP;
 				}
 			} else {
+				double a = DriveObject.LevelingSpeed;
 				desiredDirection = Direction.DOWN;
 			}
 		}
