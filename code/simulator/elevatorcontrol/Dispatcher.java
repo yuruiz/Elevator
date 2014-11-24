@@ -331,9 +331,6 @@ public class Dispatcher extends Controller {
                 CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(closesetCarCallBelowEuqal, downDownHallCall, Direction.DOWN);
 
-//                System.out.println("Down Hal Call " + downDownHallCall.floor + downDownHallCall.direction );
-//                System.out.println("Down Car Call " + closesetCarCallBelowEuqal.floor + closesetCarCallBelowEuqal.isValid());
-//                System.out.println("Target " + targetRequest.floor);
 
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
