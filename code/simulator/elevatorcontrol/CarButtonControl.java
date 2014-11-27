@@ -153,9 +153,7 @@ public class CarButtonControl extends Controller {
                 localCarLight.set(true);
                 mCarCall.set(true);
                 //#transition CBC.2
-                if (mAtFloor.getValue() && mDesiredFloor.getFloor() == floor &&
-                        (mDesiredFloor.getHallway().equals(hallway) || mDesiredFloor.getHallway() == Hallway.BOTH) &&
-                        !mDoorClosed.getBothClosed()) {
+                if (mAtFloor.getValue() && !mDoorClosed.getBothClosed()) {
                     newState = State.STATE_IDLE;
                 }
                 break;
