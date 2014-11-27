@@ -245,7 +245,7 @@ public class DriveControl extends Controller {
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
 			if (allClosed && currentFloor != mDesiredFloor.getFloor()) {
-				log("level up to slow");
+				log("stop to slow");
 				newState = State.SLOW;
 			}
 			break;
@@ -269,7 +269,6 @@ public class DriveControl extends Controller {
 				// #transition `DC.T.7`
 				else {
 					if (driveSpeedPayload.direction() != Direction.UP) {
-
 						log("slow to level down");
 						newState = State.LEVEL_DOWN;
 					}
