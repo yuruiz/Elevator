@@ -173,7 +173,6 @@ public class DoorControl extends Controller {
                                 && (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP)) {
 
                     newState = State.OPENING;
-                    System.out.println("Here");
                 }
 //                System.out.println("Hallway " + hallway);
 //                System.out.println("Desired floor" + mDesiredFloor.getFloor() + mDesiredFloor.getHallway());
