@@ -54,8 +54,11 @@ public class DoorControl extends Controller {
     private Utility.AtFloorArray mAtFloor;
     private ReadableCanMailbox networkDriveSpeed;
     private DriveSpeedCanPayloadTranslator mDriveSpeed;
-    private ReadableCanMailbox networkDoorReversal;
-    private DoorReversalCanPayloadTranslator mDoorReversal;
+    private ReadableCanMailbox networkDoorReversalleft;
+    private DoorReversalCanPayloadTranslator mDoorReversalleft;
+    private ReadableCanMailbox networkDoorReversalright;
+    private DoorReversalCanPayloadTranslator mDoorReversalright;
+
 
     State currentState;
 
@@ -93,9 +96,13 @@ public class DoorControl extends Controller {
         mDriveSpeed = new DriveSpeedCanPayloadTranslator(networkDriveSpeed);
         canInterface.registerTimeTriggered(networkDriveSpeed);
 
-        networkDoorReversal = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_REVERSAL_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, side));
-        mDoorReversal = new DoorReversalCanPayloadTranslator(networkDoorReversal, hallway, side);
-        canInterface.registerTimeTriggered(networkDoorReversal);
+        networkDoorReversalleft = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_REVERSAL_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.LEFT));
+        mDoorReversalleft = new DoorReversalCanPayloadTranslator(networkDoorReversalleft, hallway, Side.LEFT);
+        canInterface.registerTimeTriggered(networkDoorReversalleft);
+
+        networkDoorReversalright = CanMailbox.getReadableCanMailbox(MessageDictionary.DOOR_REVERSAL_SENSOR_BASE_CAN_ID + ReplicationComputer.computeReplicationId(hallway, Side.RIGHT));
+        mDoorReversalright = new DoorReversalCanPayloadTranslator(networkDoorReversalright, hallway, Side.RIGHT);
+        canInterface.registerTimeTriggered(networkDoorReversalright);
 
         localDoorMotor = DoorMotorPayload.getWriteablePayload(hallway, side);
         physicalInterface.sendTimeTriggered(localDoorMotor, period);
@@ -168,10 +175,10 @@ public class DoorControl extends Controller {
                     newState = State.OPENING;
                     System.out.println("Here");
                 }
-                System.out.println("Hallway " + hallway);
-                System.out.println("Desired floor" + mDesiredFloor.getFloor() + mDesiredFloor.getHallway());
-                System.out.println("Current floor" + mAtFloor.getCurrentFloor());
-                System.out.println("Is atfloor 7" + mAtFloor.isAtFloor(7, Hallway.FRONT));
+//                System.out.println("Hallway " + hallway);
+//                System.out.println("Desired floor" + mDesiredFloor.getFloor() + mDesiredFloor.getHallway());
+//                System.out.println("Current floor" + mAtFloor.getCurrentFloor());
+//                System.out.println("Is atfloor 7" + mAtFloor.isAtFloor(7, Hallway.FRONT));
                 break;
             case CLOSING: /* State 5 Closing */
                 localDoorMotor.set(DoorCommand.CLOSE);
@@ -182,7 +189,7 @@ public class DoorControl extends Controller {
                     break;
                 }
                 // #transition T.9
-                if (mDoorReversal.getValue()) {
+                if (mDoorReversalleft.getValue() || mDoorReversalright.getValue()) {
                     newState = State.REVERSAL;
                     break;
                 }
@@ -209,9 +216,9 @@ public class DoorControl extends Controller {
         }
 
         // log(currentState.toString() + " -> " + newState.toString());
-        if (newState != currentState) {
-            System.out.println(currentState.toString() + " -> " + newState.toString());
-        }
+//        if (newState != currentState) {
+//            System.out.println(currentState.toString() + " -> " + newState.toString());
+//        }
         currentState = newState;
         timer.start(period);
 
