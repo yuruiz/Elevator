@@ -286,7 +286,7 @@ public class DriveControl extends Controller {
 			this.setOutput(Speed.LEVEL, Direction.UP);
 			// #transition 'DC.T.2'
 			if (mLevelUp.getValue()) {
-				System.out.println("level up to stop");
+//				System.out.println("level up to stop");
 				newState = State.STOP;
 				currentFloor = atFloor.getCurrentFloor();
 			}
