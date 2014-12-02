@@ -128,7 +128,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	public void receive(ReadableDoorReversalPayload msg) {
-
+		doorState.receive(msg);
 	}
 
 	/**************************************************************************
@@ -155,6 +155,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		}
 		hadPendingDoorCall = false;
 		totalOpeningCount += 1;
+		hadReversal[hallway.ordinal()] = false;
+
 	}
 
 	private void speedViolate() {
@@ -172,7 +174,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void noCallDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = false;
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -185,7 +186,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void callDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = true;
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -230,8 +230,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					+ " with no reversal triggered.");
 			wastedNudgeCount++;
 		}
-
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	private void callDoorReversal(Hallway hallway) {
@@ -277,8 +275,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		public void receive(ReadableDoorReversalPayload msg) {
 			Hallway h = msg.getHallway();
 			if (doorReversals[h.ordinal()][Side.LEFT.ordinal()].isReversing()
-					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()]
-							.isReversing()) {
+					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()].isReversing()) {
 				if (!isReversaling[h.ordinal()]) {
 					callDoorReversal(h);
 					isReversaling[h.ordinal()] = true;
