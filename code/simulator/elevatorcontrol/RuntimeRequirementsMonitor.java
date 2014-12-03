@@ -1,4 +1,3 @@
-
 /*
 18-649 (Fall 2014)
 Group 5:
@@ -12,16 +11,21 @@ RuntimeRequirementsMonitor
 package simulator.elevatorcontrol;
 
 import simulator.elevatorcontrol.Utility.AtFloorArray;
+import simulator.elevatorcontrol.Utility.CarCallArray;
+import simulator.elevatorcontrol.Utility.DoorClosedArray;
+import simulator.elevatorcontrol.Utility.HallCallArray;
 import simulator.elevatormodules.CarLevelPositionCanPayloadTranslator;
 import simulator.elevatormodules.DriveObject;
 import simulator.framework.Direction;
 import simulator.framework.DoorCommand;
+import simulator.framework.Elevator;
 import simulator.framework.Hallway;
 import simulator.framework.RuntimeMonitor;
 import simulator.framework.Side;
 import simulator.framework.Speed;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
+import simulator.payloads.CarLanternPayload.ReadableCarLanternPayload;
 import simulator.payloads.DoorClosedPayload.ReadableDoorClosedPayload;
 import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
 import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
@@ -57,6 +61,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(
 			canInterface));
 	SpeedStateMachine speedState = new SpeedStateMachine();
+	LanternStateMachine lanternState = new LanternStateMachine();
 	CarLevelPositionCanPayloadTranslator mCarPosition;
 	private ReadableCanMailbox carPosition;
 
@@ -87,13 +92,15 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	protected String[] summarize() {
-		String[] arr = new String[3];
+		String[] arr = new String[5];
 		arr[0] = wastedStopCount + " unnecessary stops out of "
 				+ totalStopCount + " total.";
 		arr[1] = wastedOpeningCount + " unnecessary openings out of "
 				+ totalOpeningCount + " total.";
 		arr[2] = wastedNudgeCount + " unnecessary nudge out of "
 				+ totalNudgeCount + " total";
+		arr[3] = unnecessarySlow
+				+ " times drive is commanded to slow unnecessarily";
 		return arr;
 	}
 
@@ -129,7 +136,12 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	public void receive(ReadableDoorReversalPayload msg) {
-		doorState.receive(msg);
+
+	}
+
+	@Override
+	public void receive(ReadableCarLanternPayload msg) {
+		lanternState.receive(msg);
 	}
 
 	/**************************************************************************
@@ -148,21 +160,23 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void doorClosed(Hallway hallway, int currentFloor) {
 		// System.out.println(hallway.toString() + " Door Closed");
 		// Once all doors are closed, check to see if opening was wasted
-		if (!hadPendingDoorCall) {
-			warning("Violation of R-T7: Door opened at floor " + currentFloor
-					+ " and hallway " + hallway
-					+ " where there were no pending calls.");
-			this.wastedOpeningCount += 1;
-		}
+		// if (!hadPendingDoorCall) {
+		// warning("Violation of R-T7: Door opened at floor " + currentFloor
+		// + " and hallway " + hallway
+		// + " where there were no pending calls.");
+		// this.wastedOpeningCount += 1;
+		// }
 		hadPendingDoorCall = false;
 		totalOpeningCount += 1;
-		hadReversal[hallway.ordinal()] = false;
-
 	}
 
 	private void speedViolate() {
 		unnecessarySlow++;
-		warning("Violation of R-T9: Drive.speed is commanded as SLOW while it can be commanded as fast");
+		// warning("Violation of R-T9: Drive.speed is commanded as SLOW while it can be commanded as fast");
+	}
+
+	private void lanternViolate() {
+		warning("Violation of R-T8.1: Lantern is not lighted while there is pending call at other floor");
 	}
 
 	/**
@@ -175,6 +189,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void noCallDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = false;
+		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -187,6 +202,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void callDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = true;
+		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -194,11 +210,11 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void driveMoving(int currentFloor) {
 		// Once drive starts moving again, check if stop was wasted
-		if (!hadPendingCall) {
-			warning("Violation of R-T6: Drive stopped at floor " + currentFloor
-					+ " with no pending calls.");
-			this.wastedStopCount += 1;
-		}
+		// if (!hadPendingCall) {
+		// warning("Violation of R-T6: Drive stopped at floor " + currentFloor
+		// + " with no pending calls.");
+		// this.wastedStopCount += 1;
+		// }
 		hadPendingCall = false;
 		totalStopCount += 1;
 	}
@@ -231,6 +247,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					+ " with no reversal triggered.");
 			wastedNudgeCount++;
 		}
+
+		hadReversal[hallway.ordinal()] = false;
 	}
 
 	private void callDoorReversal(Hallway hallway) {
@@ -276,7 +294,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		public void receive(ReadableDoorReversalPayload msg) {
 			Hallway h = msg.getHallway();
 			if (doorReversals[h.ordinal()][Side.LEFT.ordinal()].isReversing()
-					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()].isReversing()) {
+					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()]
+							.isReversing()) {
 				if (!isReversaling[h.ordinal()]) {
 					callDoorReversal(h);
 					isReversaling[h.ordinal()] = true;
@@ -493,12 +512,11 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		private void update() {
 			desiredFloor = mDesiredFloor.getFloor();
 			position = mCarPosition.getPosition();
-			
-			
+
 			if (!initialized()) {
 				return;
 			}
-			
+
 			SpeedState newState = currState;
 			switch (currState) {
 			case SLOW:
@@ -531,5 +549,134 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		}
 	}
 
-}
+	private enum LanternState {
+		CLOSED, OFF, UP, DOWN;
+	}
 
+	private class LanternStateMachine {
+
+		private LanternState state = LanternState.CLOSED;
+		private int count = 0;
+
+		private CarCallArray carCalls = new CarCallArray(canInterface);
+		private HallCallArray hallCalls = new HallCallArray(canInterface);
+		private AtFloorArray atFloor = new AtFloorArray(canInterface);
+		private ReadableCarLanternPayload upLantern = null;
+		private ReadableCarLanternPayload downLantern = null;
+		private DoorClosedArray frontDoors = new DoorClosedArray(Hallway.FRONT,
+				canInterface);
+		private DoorClosedArray backDoors = new DoorClosedArray(Hallway.BACK,
+				canInterface);
+
+		public void receive(ReadableCarLanternPayload msg) {
+			if (msg.getDirection() == Direction.UP) {
+				upLantern = msg;
+			} else {
+				downLantern = msg;
+			}
+			update();
+		}
+
+		private boolean allClosed() {
+			return frontDoors.getBothClosed() && backDoors.getBothClosed();
+		}
+
+		private boolean initialized() {
+			return upLantern != null && downLantern != null;
+		}
+
+		private boolean otherPendingCall() {
+			for (int i = 1; i <= Elevator.numFloors; i++) {
+				if (atFloor.getCurrentFloor() == i) {
+					continue;
+				}
+				if (carCalls.isCalled(i).isValid()
+						|| hallCalls.isCalled(i).isValid()) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		public void update() {
+
+			if (!initialized() || atFloor.getCurrentFloor() == -1) {
+				return;
+			}
+
+			LanternState newState = state;
+			switch (state) {
+			case OFF:
+				if (otherPendingCall()) {
+					count++;
+				}
+
+				if (count == 8) {
+					lanternViolate();
+				}
+
+				if (allClosed()) {
+					newState = LanternState.CLOSED;
+					break;
+				}
+				if (upLantern.lighted()) {
+					newState = LanternState.UP;
+					break;
+				}
+				if (downLantern.lighted()) {
+					newState = LanternState.DOWN;
+					break;
+				}
+				break;
+			case UP:
+				if (allClosed()) {
+					newState = LanternState.CLOSED;
+					break;
+				}
+				if (downLantern.lighted()) {
+					newState = LanternState.DOWN;
+					break;
+				}
+				if (!downLantern.lighted() && !upLantern.lighted()) {
+					newState = LanternState.OFF;
+					count = 0;
+					break;
+				}
+				break;
+			case DOWN:
+				if (allClosed()) {
+					newState = LanternState.CLOSED;
+					break;
+				}
+				if (upLantern.lighted()) {
+					newState = LanternState.DOWN;
+					break;
+				}
+				if (!downLantern.lighted() && !upLantern.lighted()) {
+					newState = LanternState.OFF;
+					count = 0;
+					break;
+				}
+				break;
+			case CLOSED:
+				if (!allClosed()) {
+					if (upLantern.lighted()) {
+						newState = LanternState.UP;
+						break;
+					}
+					if (downLantern.lighted()) {
+						newState = LanternState.DOWN;
+						break;
+					}
+					newState = LanternState.OFF;
+					count = 0;
+
+				}
+				break;
+			}
+			state = newState;
+		}
+	}
+
+}
