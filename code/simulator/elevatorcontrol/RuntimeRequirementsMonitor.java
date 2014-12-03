@@ -612,7 +612,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					count++;
 				}
 
-				if (count == 8) {
+				if (count == 12) {
 					lanternViolate();
 				}
 
