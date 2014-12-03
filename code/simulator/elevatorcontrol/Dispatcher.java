@@ -220,7 +220,8 @@ public class Dispatcher extends Controller {
                         }
                     }
                 }
-
+//                System.out.println("Closest car call is " + closestCarCallAbove.floor);
+//                System.out.println("Closest hall call is " + closestHallCallAbove.floor + closestHallCallAbove.direction);
                 // #transition DPT.2
                 if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     nextState = State.UpStop;
@@ -308,6 +309,11 @@ public class Dispatcher extends Controller {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
                 }
+
+//                System.out.println("Closest car call is " + closesetCarCallAboveEuqal.floor);
+//                System.out.println("Closest hall call is " + upUpHallCall.floor + upUpHallCall.direction);
+//                System.out.println("Practical Floor is "+ practicalFloor + canCommit[2]);
+
 
                 // #transition DPT.1
                 if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
@@ -421,7 +427,7 @@ public class Dispatcher extends Controller {
 
         if (currentState != nextState) {
             log("Transition from " + currentState + " --> " + nextState);
-            System.out.println("Transition from " + currentState + " --> " + nextState);
+//            System.out.println("Transition from " + currentState + " --> " + nextState);
         }
 
         // System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " "
@@ -538,12 +544,12 @@ public class Dispatcher extends Controller {
 
     void updateCommitPoints() {
         /* Update this.commitPoints array here */
-        double currSpeed = mDriveSpeed.getSpeed();
+        double currSpeed = mDriveSpeed.getSpeed() * 1000d;
         Direction currDir = mDriveSpeed.getDirection();
         int currPos = mCarLevelPosition.getPosition();
 
         // |x| = vi^2/(2*a)
-        double stoppingDistance = (currSpeed * currSpeed) / (2 * DriveObject.Acceleration);
+        double stoppingDistance = (currSpeed * currSpeed) / (2 * DriveObject.Acceleration * 1000);
         double stoppingPoint;
         int nearestFloor;
 

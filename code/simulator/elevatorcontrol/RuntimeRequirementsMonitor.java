@@ -1,3 +1,4 @@
+
 /*
 18-649 (Fall 2014)
 Group 5:
@@ -21,8 +22,6 @@ import simulator.framework.Side;
 import simulator.framework.Speed;
 import simulator.payloads.CanMailbox;
 import simulator.payloads.CanMailbox.ReadableCanMailbox;
-import simulator.payloads.CarLanternPayload;
-import simulator.payloads.CarLanternPayload.ReadableCarLanternPayload;
 import simulator.payloads.DoorClosedPayload.ReadableDoorClosedPayload;
 import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
 import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
@@ -58,11 +57,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	DriveStateMachine driveState = new DriveStateMachine(new AtFloorArray(
 			canInterface));
 	SpeedStateMachine speedState = new SpeedStateMachine();
-	LanternStateMachine lanternState = new LanternStateMachine(new 
-			AtFloorArray(canInterface), this.carLanterns);
 	CarLevelPositionCanPayloadTranslator mCarPosition;
 	private ReadableCanMailbox carPosition;
-	
+
 	public RuntimeRequirementsMonitor() {
 		super();
 		carPosition = CanMailbox
@@ -81,12 +78,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	int wastedNudgeCount = 0;
 	int totalNudgeCount = 0;
 	int unnecessarySlow = 0;
-	int invalidLanternOff = 0;
-	int invalidLanternDirectionChange = 0;
-	int serviceWrongDirection = 0;
-	private boolean hadPendingCallLanternOff = false;
-	private boolean hadLanternLitDirectionChange = false;
-	private boolean hadCarServiceWrongDirection = false;
 
 	@Override
 	public void timerExpired(Object callbackData) {
@@ -103,7 +94,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				+ totalOpeningCount + " total.";
 		arr[2] = wastedNudgeCount + " unnecessary nudge out of "
 				+ totalNudgeCount + " total";
-		// TODO: Add all fields to summary
 		return arr;
 	}
 
@@ -117,12 +107,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		doorState.receive(msg);
 	}
 
-	@Override
-	public void receive(ReadableCarLanternPayload msg) {
-		lanternState.receive(msg);
-	}
-	
-	
 	@Override
 	public void receive(ReadableDoorMotorPayload msg) {
 		doorState.receive(msg);
@@ -145,7 +129,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	public void receive(ReadableDoorReversalPayload msg) {
-
+		doorState.receive(msg);
 	}
 
 	/**************************************************************************
@@ -161,38 +145,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 * @param hallway
 	 *            which door the event pertains to
 	 */
-	
-	private void doorOpenPendingCallLanternOff(int currentFloor, Hallway pendingHallway, int pendingFloor) {
-		if (!hadPendingCallLanternOff) {
-			warning("Violation of R-T8.1: Door opened at floor " + currentFloor
-					+ " and there is a pending call to floor " + pendingFloor + 
-					" and hallway " + pendingHallway);
-			invalidLanternOff++;
-			hadPendingCallLanternOff = true;
-		}
-		
-	}
-
-	private void lanternLitDirectionIndChanges(int currentFloor, Direction changedDirection) {
-		if (!hadLanternLitDirectionChange){
-			warning("Violation of R-T8.2: Door opened at floor " + currentFloor
-					+ " and the car lantern Direction changed to " +  changedDirection);
-			invalidLanternDirectionChange++;
-			hadLanternLitDirectionChange = true;
-		}
-	}
-
-	private void carServicesWrongDirection(Direction wrongDirection, Direction lanternDirection) {
-		if (!hadCarServiceWrongDirection) {
-			warning("Violation of R-T8.3: The car serviced in direction " + wrongDirection + 
-					" before servicing the direction dictated by the car lanterns, " + 
-					lanternDirection);
-			serviceWrongDirection++;
-			hadCarServiceWrongDirection = true;
-		}
-		
-	}
-
 	private void doorClosed(Hallway hallway, int currentFloor) {
 		// System.out.println(hallway.toString() + " Door Closed");
 		// Once all doors are closed, check to see if opening was wasted
@@ -204,6 +156,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		}
 		hadPendingDoorCall = false;
 		totalOpeningCount += 1;
+		hadReversal[hallway.ordinal()] = false;
+
 	}
 
 	private void speedViolate() {
@@ -221,7 +175,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void noCallDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = false;
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -234,7 +187,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void callDoorOpened(int floor, Hallway hallway) {
 		hadPendingDoorCall = true;
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	/**
@@ -279,119 +231,15 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					+ " with no reversal triggered.");
 			wastedNudgeCount++;
 		}
-
-		hadReversal[hallway.ordinal()] = false;
 	}
 
 	private void callDoorReversal(Hallway hallway) {
 		hadReversal[hallway.ordinal()] = true;
 	}
 
-	private static enum LanternState {
-		OFF, ON
-	}
-
-	/**
-	* Utility class for keeping track of the lantern state
-	*/
-	private class LanternStateMachine {
-
-		LanternState lanternState[] = new LanternState[2];
-		//DoorState doorState[] = new DoorState[2];
-		AtFloorArray atFloorArray;
-		ReadableCarLanternPayload[] carLanterns;
-
-		public LanternStateMachine(AtFloorArray atFloors, ReadableCarLanternPayload[] carLanterns) {
-			lanternState[Direction.UP.ordinal()] = LanternState.OFF;
-			lanternState[Direction.DOWN.ordinal()] = LanternState.OFF;
-			//doorState[Hallway.FRONT.ordinal()] = DoorState.CLOSED;
-			//doorState[Hallway.BACK.ordinal()] = DoorState.CLOSED;
-			this.atFloorArray = atFloors;
-			this.carLanterns = carLanterns;
-		}
-
-		public void receive(ReadableCarLanternPayload msg) {
-			//System.out.println("Lantern received message " + msg.getDirection());
-			updateState(msg.getDirection());
-			//System.out.println("received message " + msg.getDirection());
-		}
-
-
-		public boolean allDoorsClosed(Hallway h) {
-			return (doorCloseds[h.ordinal()][Side.LEFT.ordinal()].isClosed() 
-					&& doorCloseds[h.ordinal()][Side.RIGHT.ordinal()].isClosed());
-		}
-
-		private void updateState(Direction d) {
-			LanternState currentLanternState = lanternState[d.ordinal()];
-			LanternState newLanternState = currentLanternState;
-
-			//DoorState previousDoorState = doorState[h.ordinal()];
-			//DoorState newDoorState = previousDoorState;
-
-			int currentFloor = atFloorArray.getCurrentFloor();
-
-			if (currentFloor == MessageDictionary.NONE || (allDoorsClosed(Hallway.FRONT) && allDoorsClosed(Hallway.BACK))){
-				if (currentLanternState == LanternState.ON) {
-					//throw new RuntimeException("lantern on when doors are closed or not at a floor!");
-				}
-				hadCarServiceWrongDirection = false;
-				hadLanternLitDirectionChange = false;
-				hadPendingCallLanternOff = false;
-				newLanternState = LanternState.OFF;
-			}
-
-			if (!allDoorsClosed(Hallway.FRONT) || !allDoorsClosed(Hallway.BACK)){
-				if (currentLanternState == LanternState.OFF &&
-					mDesiredFloor.getFloor() >= 1 && mDesiredFloor.getFloor() <= 8
-					&& mDesiredFloor.getFloor() != currentFloor) {
-					// door open, pending call, but lanterns are OFF! => WARNING
-					doorOpenPendingCallLanternOff(currentFloor, mDesiredFloor.getHallway(), mDesiredFloor.getFloor());
-				}
-				
-				// lantern ON requirements
-				if (mDesiredFloor.getFloor() <= 8 && mDesiredFloor.getFloor() >= 1 
-					&& mDesiredFloor.getFloor() != currentFloor
-					&& d == mDesiredFloor.getDirection()) {
-					newLanternState = LanternState.ON;
-				}
-			}
-
-			if (!allDoorsClosed(Hallway.FRONT) || !allDoorsClosed(Hallway.BACK)) {
-				if (currentLanternState != newLanternState) {
-					// lantern state changes while door is still open => WARNING
-					lanternLitDirectionIndChanges(currentFloor, mDesiredFloor.getDirection());
-				}
-			}
-
-			if (mDesiredFloor.getDirection() != Direction.STOP &&
-				currentLanternState == LanternState.ON && 
-				mDesiredFloor.getDirection() != d) {
-				// car will move in desiredDirection, not in the direction
-				//   dictated by car lantern => WARNING
-				carServicesWrongDirection(mDesiredFloor.getDirection(), d);
-
-			}
-
-			/*if (newLanternState != currentLanternState) {
-				switch(newLanternState) {
-					case ON:
-						break;
-					case OFF:
-						break;
-				}
-			}*/
-
-			lanternState[d.ordinal()] = newLanternState;
-
-		}
-
-	}
-
 	private static enum DoorState {
 		CLOSED, CALL_OPEN, NO_CALL_OPEN
 	}
-
 
 	/**
 	 * Utility class for keeping track of the door state.
@@ -428,8 +276,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		public void receive(ReadableDoorReversalPayload msg) {
 			Hallway h = msg.getHallway();
 			if (doorReversals[h.ordinal()][Side.LEFT.ordinal()].isReversing()
-					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()]
-							.isReversing()) {
+					|| doorReversals[h.ordinal()][Side.RIGHT.ordinal()].isReversing()) {
 				if (!isReversaling[h.ordinal()]) {
 					callDoorReversal(h);
 					isReversaling[h.ordinal()] = true;
@@ -685,3 +532,4 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	}
 
 }
+

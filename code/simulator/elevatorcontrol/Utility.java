@@ -203,12 +203,12 @@ public class Utility {
         public CallRequest isCalled(int floor) {
         	CallRequest downCalled = isCalled(floor, Direction.DOWN);
         	CallRequest upCalled = isCalled(floor, Direction.UP);
-        	
-        	if (downCalled.isValid()) {
+
+            if  (upCalled.isValid()) {
+                return upCalled;
+            } else if (downCalled.isValid()) {
         		return downCalled;
-        	} else if  (upCalled.isValid()) {
-        		return upCalled;
-        	} else {
+        	} else  {
         		return new CallRequest();
         	}
         }

@@ -1,0 +1,195 @@
+; 18-649 (Fall 2014)
+; Group 5
+; Vijay Jayaram (vijayj)
+; James Sakai (jssakai)
+; Siyu Wei (siyuwei)
+; Yurui Zhou (yuruiz)
+; proj7acceptance2.out
+
+Simulator Parameters:
+Command line = -pf proj7acceptance2.pass -monitor RuntimeRequirementsMonitor
+RandomSeed = 1414715965239
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = null
+Real time rate = null
+Acceptance Test File = proj7acceptance2.pass
+Monitors: RuntimeRequirementsMonitor  
+
+
+[Elevator] @0.000000000: Starting Simulation
+[RuntimeMonitor] @31.320000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @31.320000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @31.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @60.000000000: Progress indicator
+[RuntimeMonitor] @83.820000000: WARNING:  Violation of R-T7: Door opened at floor 2 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @83.820000000: WARNING:  Violation of R-T6: Drive stopped at floor 2 with no pending calls.
+[Elevator] @120.000000000: Progress indicator
+[RuntimeMonitor] @136.420000000: WARNING:  Violation of R-T7: Door opened at floor 3 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @136.420000000: WARNING:  Violation of R-T6: Drive stopped at floor 3 with no pending calls.
+[Elevator] @180.000000000: Progress indicator
+[RuntimeMonitor] @189.020000000: WARNING:  Violation of R-T7: Door opened at floor 4 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @189.020000000: WARNING:  Violation of R-T6: Drive stopped at floor 4 with no pending calls.
+[Elevator] @240.000000000: Progress indicator
+[RuntimeMonitor] @241.720000000: WARNING:  Violation of R-T7: Door opened at floor 5 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @241.720000000: WARNING:  Violation of R-T6: Drive stopped at floor 5 with no pending calls.
+[RuntimeMonitor] @294.220000000: WARNING:  Violation of R-T7: Door opened at floor 6 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @294.220000000: WARNING:  Violation of R-T6: Drive stopped at floor 6 with no pending calls.
+[Elevator] @300.000000000: Progress indicator
+[RuntimeMonitor] @346.820000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @346.920000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @346.920000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @360.000000000: Progress indicator
+[RuntimeMonitor] @399.520000000: WARNING:  Violation of R-T7: Door opened at floor 8 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @399.520000000: WARNING:  Violation of R-T6: Drive stopped at floor 8 with no pending calls.
+[Elevator] @420.000000000: Progress indicator
+[Elevator] @480.000000000: Progress indicator
+[Elevator] @540.000000000: Progress indicator
+[RuntimeMonitor] @572.220000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @572.320000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @572.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @600.000000000: Progress indicator
+[Elevator] @660.000000000: Progress indicator
+[Elevator] @720.000000000: Progress indicator
+[Elevator] @780.000000000: Progress indicator
+[Elevator] @840.000000000: Progress indicator
+[RuntimeMonitor] @887.320000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @887.320000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @887.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @900.000000000: Progress indicator
+[RuntimeMonitor] @939.820000000: WARNING:  Violation of R-T7: Door opened at floor 8 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @939.820000000: WARNING:  Violation of R-T6: Drive stopped at floor 8 with no pending calls.
+[Elevator] @960.000000000: Progress indicator
+[Elevator] @1020.000000000: Progress indicator
+[Elevator] @1080.000000000: Progress indicator
+[RuntimeMonitor] @1112.420000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @1112.520000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1112.520000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @1140.000000000: Progress indicator
+[Elevator] @1200.000000000: Progress indicator
+[Elevator] @1260.000000000: Progress indicator
+[Elevator] @1320.000000000: Progress indicator
+[Elevator] @1380.000000000: Progress indicator
+[RuntimeMonitor] @1426.820000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1426.920000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @1426.920000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @1440.000000000: Progress indicator
+[RuntimeMonitor] @1479.520000000: WARNING:  Violation of R-T7: Door opened at floor 8 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1479.520000000: WARNING:  Violation of R-T6: Drive stopped at floor 8 with no pending calls.
+[Elevator] @1500.000000000: Progress indicator
+[Elevator] @1560.000000000: Progress indicator
+[Elevator] @1620.000000000: Progress indicator
+[RuntimeMonitor] @1652.020000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @1652.120000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1652.120000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @1680.000000000: Progress indicator
+[RuntimeMonitor] @1704.720000000: WARNING:  Violation of R-T7: Door opened at floor 2 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @1704.720000000: WARNING:  Violation of R-T6: Drive stopped at floor 2 with no pending calls.
+[Elevator] @1740.000000000: Progress indicator
+[RuntimeMonitor] @1757.220000000: WARNING:  Violation of R-T7: Door opened at floor 3 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1757.220000000: WARNING:  Violation of R-T6: Drive stopped at floor 3 with no pending calls.
+[Elevator] @1800.000000000: Progress indicator
+[RuntimeMonitor] @1809.320000000: WARNING:  Violation of R-T7: Door opened at floor 4 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1809.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 4 with no pending calls.
+[Elevator] @1860.000000000: Progress indicator
+[RuntimeMonitor] @1861.920000000: WARNING:  Violation of R-T7: Door opened at floor 5 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1861.920000000: WARNING:  Violation of R-T6: Drive stopped at floor 5 with no pending calls.
+[Elevator] @1920.000000000: Progress indicator
+[RuntimeMonitor] @1966.920000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @1966.920000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @1966.920000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @1980.000000000: Progress indicator
+[RuntimeMonitor] @2019.520000000: WARNING:  Violation of R-T7: Door opened at floor 8 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2019.520000000: WARNING:  Violation of R-T6: Drive stopped at floor 8 with no pending calls.
+[Elevator] @2040.000000000: Progress indicator
+[Elevator] @2100.000000000: Progress indicator
+[Elevator] @2160.000000000: Progress indicator
+[RuntimeMonitor] @2192.020000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @2192.120000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2192.120000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @2220.000000000: Progress indicator
+[RuntimeMonitor] @2244.720000000: WARNING:  Violation of R-T7: Door opened at floor 2 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @2244.720000000: WARNING:  Violation of R-T6: Drive stopped at floor 2 with no pending calls.
+[Elevator] @2280.000000000: Progress indicator
+[RuntimeMonitor] @2297.320000000: WARNING:  Violation of R-T7: Door opened at floor 3 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2297.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 3 with no pending calls.
+[Elevator] @2340.000000000: Progress indicator
+[Elevator] @2400.000000000: Progress indicator
+[RuntimeMonitor] @2455.020000000: WARNING:  Violation of R-T7: Door opened at floor 6 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2455.020000000: WARNING:  Violation of R-T6: Drive stopped at floor 6 with no pending calls.
+[Elevator] @2460.000000000: Progress indicator
+[RuntimeMonitor] @2507.620000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2507.720000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @2507.720000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @2520.000000000: Progress indicator
+[Elevator] @2580.000000000: Progress indicator
+[Elevator] @2640.000000000: Progress indicator
+[Elevator] @2700.000000000: Progress indicator
+[RuntimeMonitor] @2732.820000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2732.820000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[RuntimeMonitor] @2732.830000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[Elevator] @2760.000000000: Progress indicator
+[RuntimeMonitor] @2785.320000000: WARNING:  Violation of R-T7: Door opened at floor 2 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @2785.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 2 with no pending calls.
+[Elevator] @2820.000000000: Progress indicator
+[RuntimeMonitor] @2837.920000000: WARNING:  Violation of R-T7: Door opened at floor 3 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2837.920000000: WARNING:  Violation of R-T6: Drive stopped at floor 3 with no pending calls.
+[Elevator] @2880.000000000: Progress indicator
+[Elevator] @2940.000000000: Progress indicator
+[RuntimeMonitor] @2943.020000000: WARNING:  Violation of R-T7: Door opened at floor 5 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2943.020000000: WARNING:  Violation of R-T6: Drive stopped at floor 5 with no pending calls.
+[RuntimeMonitor] @2995.620000000: WARNING:  Violation of R-T7: Door opened at floor 6 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @2995.620000000: WARNING:  Violation of R-T6: Drive stopped at floor 6 with no pending calls.
+[Elevator] @3000.000000000: Progress indicator
+[RuntimeMonitor] @3048.220000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @3048.320000000: WARNING:  Violation of R-T7: Door opened at floor 7 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @3048.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 7 with no pending calls.
+[Elevator] @3060.000000000: Progress indicator
+[RuntimeMonitor] @3100.820000000: WARNING:  Violation of R-T7: Door opened at floor 8 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @3100.820000000: WARNING:  Violation of R-T6: Drive stopped at floor 8 with no pending calls.
+[Elevator] @3120.000000000: Progress indicator
+[Elevator] @3180.000000000: Progress indicator
+[Elevator] @3240.000000000: Progress indicator
+[RuntimeMonitor] @3273.320000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @3273.320000000: WARNING:  Violation of R-T7: Door opened at floor 1 and hallway BACK where there were no pending calls.
+[RuntimeMonitor] @3273.320000000: WARNING:  Violation of R-T6: Drive stopped at floor 1 with no pending calls.
+[Elevator] @3300.000000000: Progress indicator
+[Elevator] @3360.000000000: Progress indicator
+[RuntimeMonitor] @3378.520000000: WARNING:  Violation of R-T7: Door opened at floor 3 and hallway FRONT where there were no pending calls.
+[RuntimeMonitor] @3378.520000000: WARNING:  Violation of R-T6: Drive stopped at floor 3 with no pending calls.
+[Elevator] @3420.000000000: Progress indicator
+[Elevator] @3480.000000000: Progress indicator
+[Elevator] @3540.000000000: Progress indicator
+[Elevator] @3559.257000000: Simulation Finished
+
+Monitors Warning Results: 
+RuntimeMonitor generated 83 warnings.
+
+Monitors Summmary Results: 
+35 unnecessary stops out of 54 total.
+48 unnecessary openings out of 67 total.
+
+STATISTICS FOR ELEVATOR SIMULATION PASSENGER DELIVERY
+-----------------------------------------------------
+
+
+Passenger Delivery Summary
+Delivered: 51
+Stranded: 0
+Total: 51
+
+Deliver Stats (lower is better):
+Average_delivery_time: 1507.485
+Maximum_delivery_time:  3226.132
+Delivery_performance_score:  9256.071
+
+Satisfaction Stats (higher is better):
+Average_satisfaction_score: 95.294
+Min_satisfaction_score:  50.000
+Satisfaction_performance_score:  431.176
+
+
+
+3559.257s simulation seconds
+ 21.397 real seconds
+ effective rate 166.34
