@@ -244,7 +244,7 @@ public class DriveControl extends Controller {
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
-			if (allClosed && currentFloor != mDesiredFloor.getFloor()) {
+			if (allClosed && atFloor.getCurrentFloor() != mDesiredFloor.getFloor()) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
