@@ -139,6 +139,7 @@ public class Dispatcher extends Controller {
         if (CurrentFloor == -1 && !(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed())) {
             nextState = State.Emergency;
             currentState = nextState;
+            System.out.println("Now in Emergency State!!");
         }
 
 //        System.out.println("Current floor is " + CurrentFloor);
@@ -179,15 +180,18 @@ public class Dispatcher extends Controller {
                 DesiredDirection = Direction.DOWN;
                 CountDown -= 1;
                 targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, DesiredDirection);
-                if (targetRequest.isValid()) {
-                    Target = targetRequest.floor;
-                    desiredHallway = targetRequest.hallway;
-                } else {
-                    if (CurrentFloor != -1) {
-                        CallRequest curFloorCall = mHallCallArray.isCalled(CurrentFloor, Direction.DOWN);
-                        if (curFloorCall.isValid()) {
-                            Target = CurrentFloor;
-                            desiredHallway = curFloorCall.hallway;
+
+                if(mDriveSpeed.getSpeed() == 0){
+                    if (targetRequest.isValid()) {
+                        Target = targetRequest.floor;
+                        desiredHallway = targetRequest.hallway;
+                    } else {
+                        if (CurrentFloor != -1) {
+                            CallRequest curFloorCall = mHallCallArray.isCalled(CurrentFloor, Direction.DOWN);
+                            if (curFloorCall.isValid()) {
+                                Target = CurrentFloor;
+                                desiredHallway = curFloorCall.hallway;
+                            }
                         }
                     }
                 }
@@ -196,7 +200,7 @@ public class Dispatcher extends Controller {
                 if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     nextState = State.DownStop;
                     // #transition DPT.14
-                } else if (CountDown <= 0 && !(closestHallCallAbove.isValid() || closestCarCallAbove.isValid())) {
+                } else if (CountDown <= 0 && !(closestCarCallBelow.isValid() || closestHallCallBelow.isValid())) {
                     nextState = State.StopStop;
                 }
 
@@ -208,18 +212,22 @@ public class Dispatcher extends Controller {
                 DesiredDirection = Direction.UP;
                 CountDown -= 1;
                 targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, DesiredDirection);
-                if (targetRequest.isValid()) {
-                    Target = targetRequest.floor;
-                    desiredHallway = targetRequest.hallway;
-                } else {
-                    if (CurrentFloor != -1) {
-                        CallRequest curFloorCall = mHallCallArray.isCalled(CurrentFloor, Direction.UP);
-                        if (curFloorCall.isValid()) {
-                            Target = CurrentFloor;
-                            desiredHallway = curFloorCall.hallway;
+
+                if(mDriveSpeed.getSpeed() == 0){
+                    if (targetRequest.isValid()) {
+                        Target = targetRequest.floor;
+                        desiredHallway = targetRequest.hallway;
+                    } else {
+                        if (CurrentFloor != -1) {
+                            CallRequest curFloorCall = mHallCallArray.isCalled(CurrentFloor, Direction.UP);
+                            if (curFloorCall.isValid()) {
+                                Target = CurrentFloor;
+                                desiredHallway = curFloorCall.hallway;
+                            }
                         }
                     }
                 }
+
 //                System.out.println("Closest car call is " + closestCarCallAbove.floor);
 //                System.out.println("Closest hall call is " + closestHallCallAbove.floor + closestHallCallAbove.direction);
                 // #transition DPT.2
