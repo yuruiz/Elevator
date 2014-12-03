@@ -1,0 +1,14 @@
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_1.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_2.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_3.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_4.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_5.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_6.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_7.mf -b 200
+java simulator.framework.Elevator -cf dispatcher_unit.cf -mf dispatcher_unit_8.mf -b 200
+java simulator.framework.Elevator -cf carbuttoncontrol_unit.cf -mf carbuttoncontrol_unit.mf -b 200
+java simulator.framework.Elevator -cf carpositioncontrol_unit.cf -mf carpositioncontrol_unit.mf -b 200
+java simulator.framework.Elevator -cf doorcontrol_unit.cf -mf doorcontrol_unit.mf -b 200
+java simulator.framework.Elevator -cf drivecontrol_unit.cf -mf drivecontrol_unit.mf -b 200
+java simulator.framework.Elevator -cf hallbuttoncontrol_unit.cf -mf hallbuttoncontrol_unit.mf -b 200
+java simulator.framework.Elevator -cf carlanterncontrol_unit.cf -mf carlanterncontrol_unit.mf -b 200

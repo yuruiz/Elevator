@@ -1,0 +1,14 @@
+SOURCE_DIR = src
+
+.PHONY: doc
+
+doc:
+	rm -rf doc
+	javadoc -overview $(SOURCE_DIR)/overview.html -package \
+	    -sourcepath $(SOURCE_DIR) \
+	    -source 1.7 -use -d $@ \
+	    example io \
+	    master task \
+	    util worker \
+	   
+# vi:noet
