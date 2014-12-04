@@ -243,8 +243,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void callDoorNudge(Hallway hallway) {
 		totalNudgeCount++;
 		if (!hadReversal[hallway.ordinal()]) {
-			warning("Violation of R-T10: Door nudge at " + hallway
-					+ " with no reversal triggered.");
+//			warning("Violation of R-T10: Door nudge at " + hallway
+//					+ " with no reversal triggered.");
 			wastedNudgeCount++;
 		}
 
