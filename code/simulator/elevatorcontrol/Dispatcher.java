@@ -252,7 +252,14 @@ public class Dispatcher extends Controller {
                 CountDown = DesiredDwell;
                 closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
 //                targetRequest = computeTarget(closesetCarCallAboveEuqal, closestHallCallAbove, CurrentDirection);
-                if (closesetCarCallAboveEuqal.isValid()) {
+                if(closesetCarCallAboveEuqal.isValid() && mCarCallArray.isCalled(Target).isValid()) {
+                    if (closesetCarCallAboveEuqal.floor <= Target) {
+                        Target = closesetCarCallAboveEuqal.floor;
+                        desiredHallway = closesetCarCallAboveEuqal.hallway;
+                    }else{
+                        desiredHallway = mCarCallArray.isCalled(Target).hallway;
+                    }
+                } else if (closesetCarCallAboveEuqal.isValid()) {
                     Target = closesetCarCallAboveEuqal.floor;
                     desiredHallway = closesetCarCallAboveEuqal.hallway;
                 } else if (mCarCallArray.isCalled(Target).isValid()) {
@@ -303,13 +310,19 @@ public class Dispatcher extends Controller {
 
 //                targetRequest = computeTarget(closesetCarCallBelowEuqal, closestHallCallBelow, CurrentDirection);
 
-                if (closesetCarCallBelowEuqal.isValid()) {
+                if(closesetCarCallBelowEuqal.isValid() && mCarCallArray.isCalled(Target).isValid()) {
+                    if (closesetCarCallBelowEuqal.floor <= Target) {
+                        Target = closesetCarCallBelowEuqal.floor;
+                        desiredHallway = closesetCarCallBelowEuqal.hallway;
+                    }else{
+                        desiredHallway = mCarCallArray.isCalled(Target).hallway;
+                    }
+                } else if (closesetCarCallBelowEuqal.isValid()) {
                     Target = closesetCarCallBelowEuqal.floor;
                     desiredHallway = closesetCarCallBelowEuqal.hallway;
                 } else if (mCarCallArray.isCalled(Target).isValid()) {
                     desiredHallway = mCarCallArray.isCalled(Target).hallway;
-                }
-                else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
+                } else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
                     nextState = State.DownDown;
                     break;
                 } else if(mHallCallArray.isCalled(Target, Direction.DOWN).isValid()){
