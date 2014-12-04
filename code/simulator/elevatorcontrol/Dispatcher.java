@@ -132,6 +132,8 @@ public class Dispatcher extends Controller {
         CallRequest closestHallCallBelow = mHallCallArray.closestCallBelow(previousFloorSeen, this.canCommit);
 
         Hallway desiredHallway = Hallway.NONE;
+        CallRequest closesetCarCallAboveEuqal = null;
+        CallRequest closesetCarCallBelowEuqal = null;
         CallRequest targetRequest;
         CallRequest carCallBeforeTarget;
 
@@ -179,7 +181,8 @@ public class Dispatcher extends Controller {
                 CurrentDirection = Direction.STOP;
                 DesiredDirection = Direction.DOWN;
                 CountDown -= 1;
-                targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, DesiredDirection);
+                closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
+                targetRequest = computeTarget(closesetCarCallBelowEuqal, closestHallCallBelow, DesiredDirection);
 
                 if(mDriveSpeed.getSpeed() == 0){
                     if (targetRequest.isValid()) {
@@ -217,7 +220,9 @@ public class Dispatcher extends Controller {
                 CurrentDirection = Direction.STOP;
                 DesiredDirection = Direction.UP;
                 CountDown -= 1;
-                targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, DesiredDirection);
+
+                closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
+                targetRequest = computeTarget(closesetCarCallAboveEuqal, closestHallCallAbove, DesiredDirection);
 
                 if(mDriveSpeed.getSpeed() == 0){
                     if (targetRequest.isValid()) {
@@ -252,7 +257,8 @@ public class Dispatcher extends Controller {
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.STOP;
                 CountDown = DesiredDwell;
-                targetRequest = computeTarget(closestCarCallAbove, closestHallCallAbove, CurrentDirection);
+                closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
+                targetRequest = computeTarget(closesetCarCallAboveEuqal, closestHallCallAbove, CurrentDirection);
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
                     desiredHallway = targetRequest.hallway;
@@ -271,9 +277,13 @@ public class Dispatcher extends Controller {
                 // #transition DPT.3
                 if ((closestHallCallAbove.isValid() && closestHallCallAbove.direction == Direction.UP) || (nextCarCallAbove.isValid() || nextHallCallAbove.isValid())) {
                     nextState = State.UpUp;
-                }else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid() && !closestCarCallAbove.isValid()) {
+                }else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid() && !closestCarCallAbove.isValid()
+                 && !mCarCallArray.isCalled(Target).isValid()) {
                     nextState = State.UpDown;
                 }
+
+//                System.out.println("Closeset Car Call Above " + closestCarCallAbove.floor + closestCarCallAbove.isValid());
+//                System.out.println("Target is " + Target);
                 // #transition DPT.4
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
@@ -283,7 +293,9 @@ public class Dispatcher extends Controller {
                 DesiredDirection = Direction.STOP;
                 CountDown = DesiredDwell;
 
-                targetRequest = computeTarget(closestCarCallBelow, closestHallCallBelow, CurrentDirection);
+                closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
+
+                targetRequest = computeTarget(closesetCarCallBelowEuqal, closestHallCallBelow, CurrentDirection);
 
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -303,7 +315,8 @@ public class Dispatcher extends Controller {
                 // #transition DPT.9
                 if ((closestHallCallBelow.isValid() && closestHallCallBelow.direction == Direction.DOWN) || (nextCarCallBelow.isValid() || nextHallCallBelow.isValid())) {
                     nextState = State.DownDown;
-                }else if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
+                }else if (mHallCallArray.isCalled(Target, Direction.UP).isValid() && !closestCarCallBelow.isValid()
+                        && !mCarCallArray.isCalled(Target).isValid()) {
                     nextState = State.DownUp;
                 }
                 // #transition DPT.10
@@ -318,7 +331,7 @@ public class Dispatcher extends Controller {
                 practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
 
                 CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(practicalFloor, Direction.UP, canCommit);
-                CallRequest closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
+                closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(closesetCarCallAboveEuqal, upUpHallCall, Direction.UP);
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -349,7 +362,7 @@ public class Dispatcher extends Controller {
 
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(practicalFloor, Direction.DOWN, canCommit);
 
-                CallRequest closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
+                closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(closesetCarCallBelowEuqal, downDownHallCall, Direction.DOWN);
 
 
@@ -454,7 +467,7 @@ public class Dispatcher extends Controller {
 
         if (currentState != nextState) {
             log("Transition from " + currentState + " --> " + nextState);
-            System.out.println("Transition from " + currentState + " --> " + nextState);
+//            System.out.println("Transition from " + currentState + " --> " + nextState);
         }
 
         // System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " "
