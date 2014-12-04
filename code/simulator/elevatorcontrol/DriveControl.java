@@ -216,7 +216,6 @@ public class DriveControl extends Controller {
 					desiredDirection = Direction.STOP;
 				}
 			} else {
-				double a = DriveObject.LevelingSpeed;
 				desiredDirection = Direction.DOWN;
 			}
 		}
@@ -244,7 +243,8 @@ public class DriveControl extends Controller {
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
-			if (allClosed && atFloor.getCurrentFloor() != mDesiredFloor.getFloor()) {
+			if (allClosed
+					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
@@ -286,7 +286,7 @@ public class DriveControl extends Controller {
 			this.setOutput(Speed.LEVEL, Direction.UP);
 			// #transition 'DC.T.2'
 			if (mLevelUp.getValue()) {
-//				System.out.println("level up to stop");
+				// System.out.println("level up to stop");
 				newState = State.STOP;
 				currentFloor = atFloor.getCurrentFloor();
 			}
@@ -336,13 +336,15 @@ public class DriveControl extends Controller {
 		double speed = driveSpeedPayload.speed() * 1000d;
 		double stopDist = Math.pow(speed, 2)
 				/ (2 * DriveObject.Acceleration * 1000);
-		switch (driveSpeedPayload.direction()) {
-		case UP:
+
+		if (desiredPosition > currPos) {
 			return currPos + stopDist + 500 >= desiredPosition;
-		case DOWN:
-			return currPos - stopDist - 500 <= desiredPosition;
-		default:
-			return false;
+		} else {
+			if (currPos > desiredPosition) {
+				return currPos - stopDist - 500 <= desiredPosition;
+			} else {
+				return true;
+			}
 		}
 
 	}
