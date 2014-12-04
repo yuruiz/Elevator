@@ -200,9 +200,15 @@ public class Dispatcher extends Controller {
                 if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     nextState = State.DownStop;
                     // #transition DPT.14
-                } else if (CountDown <= 0 && !(closestCarCallBelow.isValid() || closestHallCallBelow.isValid())) {
+                } else if (CountDown <= 0 && !(closestCarCallBelow.isValid() || closestHallCallBelow.isValid()) &&
+                        mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) {
                     nextState = State.StopStop;
                 }
+
+//                System.out.println("Closest car call below is " + closestCarCallBelow.isValid());
+//                System.out.println("Closest hall call below is " + closestHallCallBelow.isValid());
+//                System.out.println("Current floor is "+ CurrentFloor);
+//                System.out.println("Previous floor is "+ previousFloorSeen);
 
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
                 break;
@@ -234,7 +240,8 @@ public class Dispatcher extends Controller {
                 if (mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     nextState = State.UpStop;
                     // #transition DPT.14
-                } else if (CountDown <= 0 && !(closestHallCallAbove.isValid() || closestCarCallAbove.isValid())) {
+                } else if (CountDown <= 0 && !(closestHallCallAbove.isValid() || closestCarCallAbove.isValid()) &&
+                        mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) {
                     nextState = State.StopStop;
                 }
 
@@ -435,7 +442,7 @@ public class Dispatcher extends Controller {
 
         if (currentState != nextState) {
             log("Transition from " + currentState + " --> " + nextState);
-//            System.out.println("Transition from " + currentState + " --> " + nextState);
+            System.out.println("Transition from " + currentState + " --> " + nextState);
         }
 
         // System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " "
