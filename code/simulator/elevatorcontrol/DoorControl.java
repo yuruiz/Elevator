@@ -59,7 +59,6 @@ public class DoorControl extends Controller {
     private ReadableCanMailbox networkDoorReversalright;
     private DoorReversalCanPayloadTranslator mDoorReversalright;
 
-
     State currentState;
 
     public DoorControl(Hallway hallway, Side side, SimTime period, boolean verbose) {
@@ -151,10 +150,10 @@ public class DoorControl extends Controller {
                 dwell = mDesiredDwell.getValue();
 
                 // #transition T.5
-                if (this.isOverweight()) {
-                    newState = State.OPENING;
-                    break;
-                }
+//                if (this.isOverweight()) {
+//                    newState = State.OPENING;
+//                    break;
+//                }
                 // #transition T.3
                 if (mDoorClosed.getValue()) {
                     newState = State.CLOSED;
@@ -167,7 +166,13 @@ public class DoorControl extends Controller {
 
                 // #transition T.4 XXX: Make sure this is reflected in the state
                 // chart
-                if ((this.isOverweight() || mAtFloor.getCurrentFloor() != -1) &&
+                int CurrentFloor = mAtFloor.getCurrentFloor();
+                if (this.isOverweight() && CurrentFloor != -1 && mAtFloor.isAtFloor(CurrentFloor, hallway) &&
+                        (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP)) {
+
+                    newState = State.OPENING;
+
+                } else if (mAtFloor.getCurrentFloor() != -1 &&
                         (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor()) &&
                         (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
                         (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP)) {
@@ -201,7 +206,7 @@ public class DoorControl extends Controller {
                 break;
             case REVERSAL:
             /*
-			 * State 6 Reversal
+             * State 6 Reversal
 			 */
                 localDoorMotor.set(DoorCommand.OPEN);
                 countdown = dwell;

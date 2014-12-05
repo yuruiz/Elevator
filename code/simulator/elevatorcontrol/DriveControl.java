@@ -243,8 +243,8 @@ public class DriveControl extends Controller {
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
-			if (allClosed
-					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()) {
+			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity && atFloor.getCurrentFloor() !=
+					mDesiredFloor.getFloor()) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
