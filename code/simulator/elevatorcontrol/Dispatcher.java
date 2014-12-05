@@ -380,7 +380,7 @@ public class Dispatcher extends Controller {
 
 //                System.out.println("Closest car call is " + closesetCarCallAboveEuqal.floor);
 //                System.out.println("Closest hall call is " + upUpHallCall.floor + upUpHallCall.direction);
-//                System.out.println("Practical Floor is "+ practicalFloor + canCommit[2]);
+//                System.out.println("Practical Floor is "+ practicalFloor + canCommit[practicalFloor]);
 
 
                 // #transition DPT.1
