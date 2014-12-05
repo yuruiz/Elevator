@@ -338,10 +338,10 @@ public class DriveControl extends Controller {
 				/ (2 * DriveObject.Acceleration * 1000);
 
 		if (desiredPosition > currPos) {
-			return currPos + stopDist + 500 >= desiredPosition;
+			return currPos + stopDist + 650 >= desiredPosition;
 		} else {
 			if (currPos > desiredPosition) {
-				return currPos - stopDist - 500 <= desiredPosition;
+				return currPos - stopDist - 650 <= desiredPosition;
 			} else {
 				return true;
 			}

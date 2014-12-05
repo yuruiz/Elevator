@@ -197,7 +197,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	private void lanternViolate_3() {
 		confusedLantern++;
-		warning("Violation of R-T8.2: Lantern is lit and the car does not service that direction first");
+		warning("Violation of R-T8.3: Lantern is lit and the car does not service that direction first");
 	}
 
 	/**
