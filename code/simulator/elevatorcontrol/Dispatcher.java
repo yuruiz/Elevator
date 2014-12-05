@@ -71,7 +71,7 @@ public class Dispatcher extends Controller {
         this.period = period;
         this.Target = 1;
         this.currentState = State.Initial;
-        this.DesiredDwell = 200;
+        this.DesiredDwell = 300;
         this.previousFloorSeen = 1;
 
         mAtFloor = new AtFloorArray(canInterface);
@@ -162,7 +162,7 @@ public class Dispatcher extends Controller {
                 CurrentDirection = Direction.STOP;
                 Target = CurrentFloor;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
                 CallRequest curFloorCarCall = mCarCallArray.isCalled(CurrentFloor);
                 desiredHallway = (curFloorCarCall.isValid()) ? curFloorCarCall.hallway : Hallway.NONE;
@@ -263,7 +263,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
                 closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
 //                targetRequest = computeTarget(closesetCarCallAboveEuqal, closestHallCallAbove, CurrentDirection);
                 if(closesetCarCallAboveEuqal.isValid() && mCarCallArray.isCalled(Target).isValid()) {
@@ -316,7 +316,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.DOWN;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
                 closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
 
@@ -366,7 +366,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.UP;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
                 practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
 
@@ -394,7 +394,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.DOWN;
                 DesiredDirection = Direction.DOWN;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
 //                System.out.println("Previous Seen " + previousFloorSeen);
 
@@ -422,7 +422,7 @@ public class Dispatcher extends Controller {
             case UpDown:
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.DOWN;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
                 // Find the minimum hall call below the target
                 CallRequest minDownHallCallAboveTarget = mHallCallArray.maxGoingDown(Target - 1, canCommit);
@@ -458,7 +458,7 @@ public class Dispatcher extends Controller {
             case DownUp:
                 CurrentDirection = Direction.DOWN;
                 DesiredDirection = Direction.UP;
-                CountDown = DesiredDwell;
+                CountDown = DesiredDwell * 2;
 
                 // Find the minimum hall call below the target
                 CallRequest minUpHallCallBelowTarget = mHallCallArray.minGoingUp(Target + 1, canCommit);
