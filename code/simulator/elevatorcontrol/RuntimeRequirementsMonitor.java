@@ -83,6 +83,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	int wastedNudgeCount = 0;
 	int totalNudgeCount = 0;
 	int unnecessarySlow = 0;
+	int incorrectOff = 0;
+	int incorrectChange = 0;
+	int confusedLantern = 0;
 
 	@Override
 	public void timerExpired(Object callbackData) {
@@ -92,7 +95,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	@Override
 	protected String[] summarize() {
-		String[] arr = new String[5];
+		String[] arr = new String[7];
 		arr[0] = wastedStopCount + " unnecessary stops out of "
 				+ totalStopCount + " total.";
 		arr[1] = wastedOpeningCount + " unnecessary openings out of "
@@ -101,6 +104,12 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				+ totalNudgeCount + " total";
 		arr[3] = unnecessarySlow
 				+ " times drive is commanded to slow unnecessarily";
+		arr[4] = "Lantern is of while there are pending calls " + incorrectOff
+				+ " times";
+		arr[5] = "Lantern is lit and then changed during doors open "
+				+ incorrectChange + " times";
+		arr[6] = "Lantern is lit and elevator does not service that direction first "
+				+ confusedLantern + " times";
 		return arr;
 	}
 
@@ -173,11 +182,22 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 
 	private void speedViolate() {
 		unnecessarySlow++;
-		// warning("Violation of R-T9: Drive.speed is commanded as SLOW while it can be commanded as fast");
+		warning("Violation of R-T9: Drive.speed is commanded as SLOW while it can be commanded as fast");
 	}
 
-	private void lanternViolate() {
+	private void lanternViolate_1() {
+		incorrectOff++;
 		warning("Violation of R-T8.1: Lantern is not lighted while there is pending call at other floor");
+	}
+
+	private void lanternViolate_2() {
+		incorrectChange++;
+		warning("Violation of R-T8.2: Lantern is lit and the state is changed before door close");
+	}
+
+	private void lanternViolate_3() {
+		confusedLantern++;
+		warning("Violation of R-T8.2: Lantern is lit and the car does not service that direction first");
 	}
 
 	/**
@@ -485,6 +505,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		private int desiredFloor = -1;
 		private Speed drive;
 		private static final double RESIDUAL = 700;
+		private int count = 0;
 
 		/**
 		 * Helper method for deciding if fast is possible
@@ -522,18 +543,24 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			switch (currState) {
 			case SLOW:
 				if (this.fastAvailable() && drive != Speed.FAST) {
+					count = 0;
 					newState = SpeedState.SLOW_F;
-					speedViolate();
+				}
+				if (drive == Speed.FAST) {
+					newState = SpeedState.FAST;
 				}
 				break;
 			case SLOW_F:
+				count++;
+				if (count == 10) {
+					speedViolate();
+				}
 				if (drive == Speed.FAST) {
 					newState = SpeedState.FAST;
 					break;
 				}
 				if (!this.fastAvailable()) {
 					newState = SpeedState.SLOW;
-
 				}
 				break;
 			case FAST:
@@ -541,7 +568,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					if (!this.fastAvailable()) {
 						newState = SpeedState.SLOW;
 					} else {
-						speedViolate();
+						count = 0;
 						newState = SpeedState.SLOW_F;
 					}
 				}
@@ -614,7 +641,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				}
 
 				if (count == 12) {
-					lanternViolate();
+					lanternViolate_1();
 				}
 
 				if (allClosed()) {
@@ -632,14 +659,23 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				break;
 			case UP:
 				if (allClosed()) {
+					if (mDesiredFloor.getFloor() < atFloor.getCurrentFloor()) {
+						lanternViolate_3();
+					}
 					newState = LanternState.CLOSED;
 					break;
 				}
 				if (downLantern.lighted()) {
+					if (!allClosed()) {
+						lanternViolate_2();
+					}
 					newState = LanternState.DOWN;
 					break;
 				}
 				if (!downLantern.lighted() && !upLantern.lighted()) {
+					if (!allClosed()) {
+						lanternViolate_2();
+					}
 					newState = LanternState.OFF;
 					count = 0;
 					break;
@@ -647,14 +683,23 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				break;
 			case DOWN:
 				if (allClosed()) {
+					if (mDesiredFloor.getFloor() > atFloor.getCurrentFloor()) {
+						lanternViolate_3();
+					}
 					newState = LanternState.CLOSED;
 					break;
 				}
 				if (upLantern.lighted()) {
+					if (!allClosed()) {
+						lanternViolate_2();
+					}
 					newState = LanternState.DOWN;
 					break;
 				}
 				if (!downLantern.lighted() && !upLantern.lighted()) {
+					if (!allClosed()) {
+						lanternViolate_2();
+					}
 					newState = LanternState.OFF;
 					count = 0;
 					break;
