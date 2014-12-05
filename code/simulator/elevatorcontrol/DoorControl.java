@@ -59,7 +59,6 @@ public class DoorControl extends Controller {
     private ReadableCanMailbox networkDoorReversalright;
     private DoorReversalCanPayloadTranslator mDoorReversalright;
 
-
     State currentState;
 
     public DoorControl(Hallway hallway, Side side, SimTime period, boolean verbose) {
@@ -149,6 +148,7 @@ public class DoorControl extends Controller {
             case NUDGE: /* State 4 Nudge */
                 localDoorMotor.set(DoorCommand.NUDGE);
                 dwell = mDesiredDwell.getValue();
+                numReversal = 0;
 
                 // #transition T.5
                 if (this.isOverweight()) {
@@ -201,7 +201,7 @@ public class DoorControl extends Controller {
                 break;
             case REVERSAL:
             /*
-			 * State 6 Reversal
+             * State 6 Reversal
 			 */
                 localDoorMotor.set(DoorCommand.OPEN);
                 countdown = dwell;
