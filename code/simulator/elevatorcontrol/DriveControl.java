@@ -39,6 +39,7 @@ import java.util.ArrayList;
 public class DriveControl extends Controller {
 
 	private static final String NAME = "DriveControl";
+	private static final double MAXIMUM_DELAY = 650d;
 
 	private Direction desiredDirection;
 	private SimTime period;
@@ -243,8 +244,8 @@ public class DriveControl extends Controller {
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
-			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity && atFloor.getCurrentFloor() !=
-					mDesiredFloor.getFloor()) {
+			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity
+					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
@@ -338,10 +339,10 @@ public class DriveControl extends Controller {
 				/ (2 * DriveObject.Acceleration * 1000);
 
 		if (desiredPosition > currPos) {
-			return currPos + stopDist + 650 >= desiredPosition;
+			return currPos + stopDist + MAXIMUM_DELAY >= desiredPosition;
 		} else {
 			if (currPos > desiredPosition) {
-				return currPos - stopDist - 650 <= desiredPosition;
+				return currPos - stopDist - MAXIMUM_DELAY <= desiredPosition;
 			} else {
 				return true;
 			}
