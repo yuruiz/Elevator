@@ -243,8 +243,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void callDoorNudge(Hallway hallway) {
 		totalNudgeCount++;
 		if (!hadReversal[hallway.ordinal()]) {
-//			warning("Violation of R-T10: Door nudge at " + hallway
-//					+ " with no reversal triggered.");
+			// warning("Violation of R-T10: Door nudge at " + hallway
+			// + " with no reversal triggered.");
 			wastedNudgeCount++;
 		}
 
@@ -486,6 +486,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		private int position = 0;
 		private int desiredFloor = -1;
 		private Speed drive;
+		private static final double RESIDUAL = 700;
 
 		/**
 		 * Helper method for deciding if fast is possible
@@ -497,7 +498,8 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			double stopDist = Math.pow(speed * 1000, 2)
 					/ (2 * DriveObject.Acceleration * 1000);
 
-			return (position + stopDist <= desiredPosition)
+			return ((position < desiredPosition && position + stopDist + RESIDUAL < desiredPosition) || (position > desiredPosition && position
+					- stopDist - RESIDUAL > desiredPosition))
 					&& speed > DriveObject.SlowSpeed;
 		}
 
