@@ -174,6 +174,19 @@ public class Utility {
         	return new CallRequest();
         }
 
+        /* Return true if called at a floor above or equal the current floor */
+        public CallRequest closestCallAboveEqual(int curFloor, boolean[] canCommit) {
+            // Called by current floor up, return true
+            CallRequest c;
+            // Called by one of higher floors
+            for (int i = curFloor; i <= Elevator.numFloors; i++) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
+        }
+
     	/* Return true if called at a floor above the current floor or up by curFloor */
         public CallRequest closestCallAbove(int curFloor, boolean[] canCommit) {
         	// Called by current floor up, return true
@@ -185,6 +198,19 @@ public class Utility {
         		}
         	}
         	return new CallRequest();
+        }
+
+        /* Return true if called at a floor below the current floor or down by curFloor */
+        public CallRequest closestCallBelowEqual(int curFloor, boolean[] canCommit) {
+            // Called by current floor down, return true
+            CallRequest c;
+            // Called by one of lower floors
+            for (int i = curFloor; i >= 1; i--) {
+                if ((c = isCalled(i)).isValid() && canCommit[i]) {
+                    return c;
+                }
+            }
+            return new CallRequest();
         }
         
         /* Return true if called at a floor below the current floor or down by curFloor */
