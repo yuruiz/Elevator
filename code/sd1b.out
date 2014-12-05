@@ -1,0 +1,97 @@
+Simulator Parameters:
+Command line = -cf integration_test/sd1b.cf -mf integration_test/sd1b.mf
+RandomSeed = 1417475050112
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = null
+Real time rate = null
+Message File = integration_test/sd1b.mf
+Controller File = integration_test/sd1b.cf
+
+
+[HallButtonControl[1][FRONT][UP]] @0.000000000: Created HallButtonControl[1][FRONT][UP] with period = 0.1s
+[Elevator] @0.000000000: Starting Simulation ***
+[AssertionMonitor] @0.041000000: *******************************************************************************************************
+[AssertionMonitor] @0.041000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@36baf30c :: command ?== STOP PASSED
+[AssertionMonitor] @0.041000000: *******************************************************************************************************
+[HallButtonControl[1][FRONT][UP]] @0.100000000: STATE_IDLE -> STATE_IDLE
+[AssertionMonitor] @0.101000000: ///////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.101000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@5ca881b5 :: command ?== OPEN FAILED
+[AssertionMonitor] @0.101000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[AssertionMonitor] @0.161000000: *******************************************************************************************************
+[AssertionMonitor] @0.161000000: PASSED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@4517d9a3 :: command ?== STOP PASSED
+[AssertionMonitor] @0.161000000: *******************************************************************************************************
+[HallButtonControl[1][FRONT][UP]] @0.200000000: STATE_IDLE -> STATE_IDLE
+[AssertionMonitor] @0.221000000: ////////////////////////////////////////////////////////////////////////////////////////////////////////
+[AssertionMonitor] @0.221000000: FAILED simulator.payloads.DoorMotorPayload$ReadableDoorMotorPayload@2f92e0f4 :: command ?== CLOSE FAILED
+[AssertionMonitor] @0.221000000: \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+[HallButtonControl[1][FRONT][UP]] @0.300000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[1][FRONT][UP]] @0.400000000: STATE_IDLE -> STATE_IDLE
+[HallButtonControl[1][FRONT][UP]] @0.500000000: STATE_IDLE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @0.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @0.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[AssertionMonitor] @0.722000000: *******************************************************************************************************
+[AssertionMonitor] @0.722000000: PASSED simulator.payloads.HallLightPayload$ReadableHallLightPayload@5305068a :: lighted ?== true PASSED
+[AssertionMonitor] @0.722000000: *******************************************************************************************************
+[AssertionMonitor] @0.722000000: ********************************************************************************************
+[AssertionMonitor] @0.722000000: PASSED simulator.payloads.CanMailbox$ReadableCanMailbox@279f2327 :: getValue ?== true PASSED
+[AssertionMonitor] @0.722000000: ********************************************************************************************
+[HallButtonControl[1][FRONT][UP]] @0.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @0.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @1.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @2.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @3.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @4.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.100000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.200000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.300000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.400000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.500000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.600000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.700000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.800000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @5.900000000: STATE_ACTIVE -> STATE_ACTIVE
+[HallButtonControl[1][FRONT][UP]] @6.000000000: STATE_ACTIVE -> STATE_ACTIVE
+[Elevator] @6.021000000: Simulation Finished ***
+******************Summary******************
+Passed:  4
+Failed:  2
+Total :  6
+
