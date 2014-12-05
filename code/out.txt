@@ -1,0 +1,66 @@
+Simulator Parameters:
+Command line = -pf AcceptTest_1 -monitor RuntimeRequirementsMonitor
+RandomSeed = 1417811485228
+CanNetworkBitTime = 0 ns
+Effective Can Bitrate = Infinity
+Run Time = null
+Real time rate = null
+Acceptance Test File = AcceptTest_1
+Monitors: RuntimeRequirementsMonitor  
+
+
+[Elevator] @0.000000000: Starting Simulation
+[Elevator] @60.000000000: Progress indicator
+[Elevator] @120.000000000: Progress indicator
+[Elevator] @180.000000000: Progress indicator
+[Elevator] @240.000000000: Progress indicator
+[Elevator] @300.000000000: Progress indicator
+[Elevator] @360.000000000: Progress indicator
+[Elevator] @420.000000000: Progress indicator
+[Elevator] @480.000000000: Progress indicator
+[Elevator] @540.000000000: Progress indicator
+[Elevator] @600.000000000: Progress indicator
+[Elevator] @660.000000000: Progress indicator
+[Elevator] @720.000000000: Progress indicator
+[Elevator] @780.000000000: Progress indicator
+[Elevator] @840.000000000: Progress indicator
+[Elevator] @900.000000000: Progress indicator
+[Elevator] @960.000000000: Progress indicator
+[Elevator] @1015.653000000: Simulation Finished
+
+Monitors Warning Results: 
+RuntimeMonitor generated 0 warnings.
+
+Monitors Summmary Results: 
+0 unnecessary stops out of 42 total.
+0 unnecessary openings out of 49 total.
+0 unnecessary nudge out of 1 total
+0 times drive is commanded to slow unnecessarily
+Lantern is of while there are pending calls 0 times
+Lantern is lit and then changed during doors open 0 times
+Lantern is lit and elevator does not service that direction first 0 times
+
+STATISTICS FOR ELEVATOR SIMULATION PASSENGER DELIVERY
+-----------------------------------------------------
+
+
+Passenger Delivery Summary
+Delivered: 93
+Stranded: 0
+Total: 93
+
+Deliver Stats (lower is better):
+Average_delivery_time: 311.196
+Maximum_delivery_time:  732.645
+Delivery_performance_score:  1977.428
+
+Satisfaction Stats (higher is better):
+Average_satisfaction_score: 100.000
+Min_satisfaction_score:  100.000
+Satisfaction_performance_score:  500.000
+
+
+
+1015.653s simulation seconds
+ 6.621 real seconds
+ effective rate 153.40
