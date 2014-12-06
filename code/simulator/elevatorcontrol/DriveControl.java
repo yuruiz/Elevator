@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class DriveControl extends Controller {
 
 	private static final String NAME = "DriveControl";
-	private static final double MAXIMUM_DELAY = 500d;
+	private static final double MAX_DELAY = 500d;
 
 	private Direction desiredDirection;
 	private SimTime period;
@@ -64,9 +64,8 @@ public class DriveControl extends Controller {
 
 	private DoorClosedArray doorClosedFront, doorClosedBack;
 	private AtFloorArray atFloor;
-	private int currentFloor = 1;
+	private Direction currentDirection = Direction.STOP;
 	private int ClosedCount = 0;
-	private long cycleCount = 0;
 
 	/*
 	 * Out put interfaces
@@ -223,6 +222,19 @@ public class DriveControl extends Controller {
 			}
 		}
 
+		/*
+		 * Prevent direction directly changes from UP to DOWN or DOWN to UP
+		 */
+		if ((currentDirection == Direction.UP && desiredDirection == Direction.DOWN)
+				|| (currentDirection == Direction.DOWN && desiredDirection == Direction.UP)) {
+			desiredDirection = Direction.STOP;
+		}
+
+		currentDirection = desiredDirection;
+
+		/*
+		 * check door all closed
+		 */
 		boolean allClosed = doorClosedFront.getBothClosed()
 				&& doorClosedBack.getBothClosed();
 
@@ -233,29 +245,31 @@ public class DriveControl extends Controller {
 
 			if (allClosed) {
 				ClosedCount++;
-//				System.out.println("Closed Count " + ClosedCount);
-			}else{
+				// System.out.println("Closed Count " + ClosedCount);
+			} else {
 				ClosedCount = 0;
 			}
 
 			// #transition 'DC.T.1'
 			if (!mLevelUp.getValue()
-					&& driveSpeedPayload.direction() != Direction.DOWN && driveSpeedPayload.speed() == 0) {
+					&& driveSpeedPayload.direction() != Direction.DOWN
+					&& driveSpeedPayload.speed() == 0) {
 				newState = State.LEVEL_UP;
 				break;
 			}
 
 			// #transition 'DC.T.3'
 			if (!mLevelDown.getValue()
-					&& driveSpeedPayload.direction() != Direction.UP && driveSpeedPayload.speed() == 0) {
+					&& driveSpeedPayload.direction() != Direction.UP
+					&& driveSpeedPayload.speed() == 0) {
 				newState = State.LEVEL_DOWN;
 				break;
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
 			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity
-					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor() && ClosedCount > 20
-					&& driveSpeedPayload.speed() == 0) {
+					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()
+					&& ClosedCount > 20 && driveSpeedPayload.speed() == 0) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
@@ -301,7 +315,6 @@ public class DriveControl extends Controller {
 			if (mLevelUp.getValue()) {
 				// System.out.println("level up to stop");
 				newState = State.STOP;
-				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
 		case LEVEL_DOWN: // #State 3 LEVEL DOWN
@@ -311,7 +324,6 @@ public class DriveControl extends Controller {
 			if (mLevelDown.getValue()) {
 				log("level down to stop");
 				newState = State.STOP;
-				currentFloor = atFloor.getCurrentFloor();
 			}
 			break;
 		case FAST: // #State 5 FAST
@@ -327,11 +339,6 @@ public class DriveControl extends Controller {
 			break;
 		}
 
-		cycleCount++;
-
-//		if(currentState != newState && cycleCount > 11000000){
-//			System.out.println("Transition from " + currentState + " --> " + newState);
-//		}
 		currentState = newState;
 
 		timer.start(period);
@@ -362,6 +369,7 @@ public class DriveControl extends Controller {
 		}
 
 		if (currPos < desiredPosition) {
+
 			return (currPos + stopDist + speed * 0.11 + 100) >= desiredPosition;
 		} else {
 			if (currPos > desiredPosition) {
