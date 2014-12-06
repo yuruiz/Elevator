@@ -282,14 +282,14 @@ public class Dispatcher extends Controller {
                     }else{
                         desiredHallway = mCarCallArray.isCalled(Target).hallway;
                     }
-                } else if (closesetCarCallAboveEuqal.isValid()) {
-                    Target = closesetCarCallAboveEuqal.floor;
-                    desiredHallway = closesetCarCallAboveEuqal.hallway;
                 } else if (mCarCallArray.isCalled(Target).isValid()) {
                     desiredHallway = mCarCallArray.isCalled(Target).hallway;
                 } else if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
                     nextState = State.UpUp;
                     break;
+                } else if (closesetCarCallAboveEuqal.isValid()) {
+                    Target = closesetCarCallAboveEuqal.floor;
+                    desiredHallway = closesetCarCallAboveEuqal.hallway;
                 } else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
                     nextState = State.UpDown;
                     break;
@@ -338,14 +338,14 @@ public class Dispatcher extends Controller {
                     }else{
                         desiredHallway = mCarCallArray.isCalled(Target).hallway;
                     }
-                } else if (closesetCarCallBelowEuqal.isValid()) {
-                    Target = closesetCarCallBelowEuqal.floor;
-                    desiredHallway = closesetCarCallBelowEuqal.hallway;
                 } else if (mCarCallArray.isCalled(Target).isValid()) {
                     desiredHallway = mCarCallArray.isCalled(Target).hallway;
                 } else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
                     nextState = State.DownDown;
                     break;
+                } else if (closesetCarCallBelowEuqal.isValid()) {
+                    Target = closesetCarCallBelowEuqal.floor;
+                    desiredHallway = closesetCarCallBelowEuqal.hallway;
                 } else if(mHallCallArray.isCalled(Target, Direction.UP).isValid()){
                     nextState = State.DownUp;
                     break;

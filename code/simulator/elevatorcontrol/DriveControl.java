@@ -66,6 +66,7 @@ public class DriveControl extends Controller {
 	private AtFloorArray atFloor;
 	private int currentFloor = 1;
 	private int ClosedCount = 0;
+	private long cycleCount = 0;
 
 	/*
 	 * Out put interfaces
@@ -274,12 +275,12 @@ public class DriveControl extends Controller {
 					&& driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
 				// #transition `DC.T.6`
 				if (!mLevelUp.getValue()
-						&& driveSpeedPayload.direction() != Direction.DOWN) {
+						&& driveSpeedPayload.direction() == Direction.UP) {
 					newState = State.LEVEL_UP;
 				}
 				// #transition `DC.T.7`
 				else {
-					if (driveSpeedPayload.direction() != Direction.UP) {
+					if (driveSpeedPayload.direction() == Direction.DOWN) {
 						log("slow to level down");
 						newState = State.LEVEL_DOWN;
 					}
@@ -326,7 +327,9 @@ public class DriveControl extends Controller {
 			break;
 		}
 
-//		if(currentState != newState){
+		cycleCount++;
+
+//		if(currentState != newState && cycleCount > 11000000){
 //			System.out.println("Transition from " + currentState + " --> " + newState);
 //		}
 		currentState = newState;
