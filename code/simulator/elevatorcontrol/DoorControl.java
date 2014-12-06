@@ -170,7 +170,7 @@ public class DoorControl extends Controller {
                 if ((this.isOverweight() || mAtFloor.getCurrentFloor() != -1) &&
                         (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor()) &&
                         (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
-                        (mDriveSpeed.getSpeed() == 0 || mDriveSpeed.getDirection() == Direction.STOP)) {
+                        (mDriveSpeed.getSpeed() == 0 && mDriveSpeed.getDirection() == Direction.STOP)) {
 
                     newState = State.OPENING;
                 }

@@ -271,6 +271,7 @@ public class DriveControl extends Controller {
 					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()
 					&& ClosedCount > 20 && driveSpeedPayload.speed() == 0) {
 				log("stop to slow");
+				ClosedCount = 0;
 				newState = State.SLOW;
 			}
 			break;

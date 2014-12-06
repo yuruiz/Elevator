@@ -388,7 +388,7 @@ public class Dispatcher extends Controller {
                 practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
 
                 CallRequest upUpHallCall = mHallCallArray.closestCallAboveInDirection(practicalFloor, Direction.UP, canCommit);
-                closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(practicalFloor, this.canCommit);
+                closesetCarCallAboveEuqal = mCarCallArray.closestCallAboveEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(closesetCarCallAboveEuqal, upUpHallCall, Direction.UP);
                 if (targetRequest.isValid()) {
                     Target = targetRequest.floor;
@@ -422,7 +422,7 @@ public class Dispatcher extends Controller {
 
                 CallRequest downDownHallCall = mHallCallArray.closestCallBelowInDirection(practicalFloor, Direction.DOWN, canCommit);
 
-                closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(practicalFloor, this.canCommit);
+                closesetCarCallBelowEuqal = mCarCallArray.closestCallBelowEqual(previousFloorSeen, this.canCommit);
                 targetRequest = computeTarget(closesetCarCallBelowEuqal, downDownHallCall, Direction.DOWN);
 
                 if (targetRequest.isValid()) {
