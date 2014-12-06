@@ -239,21 +239,22 @@ public class DriveControl extends Controller {
 
 			// #transition 'DC.T.1'
 			if (!mLevelUp.getValue()
-					&& driveSpeedPayload.direction() != Direction.DOWN) {
+					&& driveSpeedPayload.direction() != Direction.DOWN && driveSpeedPayload.speed() == 0) {
 				newState = State.LEVEL_UP;
 				break;
 			}
 
 			// #transition 'DC.T.3'
 			if (!mLevelDown.getValue()
-					&& driveSpeedPayload.direction() != Direction.UP) {
+					&& driveSpeedPayload.direction() != Direction.UP && driveSpeedPayload.speed() == 0) {
 				newState = State.LEVEL_DOWN;
 				break;
 			}
 			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
 			// #transition 'DC.T.5'
 			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity
-					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor() && ClosedCount > 20) {
+					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor() && ClosedCount > 20
+					&& driveSpeedPayload.speed() == 0) {
 				log("stop to slow");
 				newState = State.SLOW;
 			}
