@@ -526,7 +526,7 @@ public class Dispatcher extends Controller {
         cycleCount++;
         if (currentState != nextState) {
             log("Transition from " + currentState + " --> " + nextState);
-            System.out.println("Transition from " + currentState + " --> " + nextState);
+//            System.out.println("Transition from " + currentState + " --> " + nextState);
         }
 
         // System.out.println("Desired Floor: " + mDesiredFloor.getFloor() + " "
