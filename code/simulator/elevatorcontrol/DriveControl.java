@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class DriveControl extends Controller {
 
 	private static final String NAME = "DriveControl";
-	private static final double MAXIMUM_DELAY = 500d;
+	private static final double MAX_DELAY = 500d;
 
 	private Direction desiredDirection;
 	private SimTime period;
@@ -343,10 +343,10 @@ public class DriveControl extends Controller {
 		}
 
 		if (currPos < desiredPosition) {
-			return currPos + stopDist + 500 >= desiredPosition;
+			return currPos + stopDist + MAX_DELAY >= desiredPosition;
 		} else {
 			if (currPos > desiredPosition) {
-				return currPos - stopDist - 500 <= desiredPosition;
+				return currPos - stopDist - MAX_DELAY <= desiredPosition;
 			} else {
 				return true;
 			}

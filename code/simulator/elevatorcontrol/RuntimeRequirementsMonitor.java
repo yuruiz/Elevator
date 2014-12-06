@@ -170,11 +170,11 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void doorClosed(Hallway hallway, int currentFloor) {
 		// System.out.println(hallway.toString() + " Door Closed");
-		//Once all doors are closed, check to see if opening was wasted
+		// Once all doors are closed, check to see if opening was wasted
 		if (!hadPendingDoorCall()) {
 			warning("Violation of R-T7: Door opened at floor " + currentFloor
-			+ " and hallway " + hallway
-			+ " where there were no pending calls.");
+					+ " and hallway " + hallway
+					+ " where there were no pending calls.");
 			this.wastedOpeningCount += 1;
 		}
 		hadPendingDoorCall = false;
@@ -230,9 +230,10 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 * Called once when the drive is moving
 	 */
 	private void driveMoving(int currentFloor) {
-		//Once drive starts moving again, check if stop was wasted
+		// Once drive starts moving again, check if stop was wasted
 		if (!hadPendingCall()) {
-			warning("Violation of R-T6: Drive stopped at floor " + currentFloor + " with no pending calls.");
+			warning("Violation of R-T6: Drive stopped at floor " + currentFloor
+					+ " with no pending calls.");
 			this.wastedStopCount += 1;
 		}
 		hadPendingCall = false;
@@ -246,7 +247,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void noCallDriveStopped(int floor) {
 		// System.out.println("Drive stopped at floor " + f +
 		// " without a call.");
-		//hadPendingCall = false;
+		// hadPendingCall = false;
 	}
 
 	/**
@@ -409,7 +410,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 							.command() == DoorCommand.NUDGE;
 		}
 
-
 	}
 
 	private static enum DriveState {
@@ -490,7 +490,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				if (wasCalled(f, Hallway.FRONT, Direction.UP))
 					System.out.println(f + " FRONT UP");
 				if (wasCalled(f, Hallway.FRONT, Direction.DOWN))
-				System.out.println(f + " FRONT DOWN:");
+					System.out.println(f + " FRONT DOWN:");
 				if (wasCalled(f, Hallway.BACK, Direction.UP))
 					System.out.println(f + " BACK UP:");
 				if (wasCalled(f, Hallway.BACK, Direction.DOWN))
@@ -514,7 +514,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		}
 
 		private boolean wasCalled(int f, Hallway h, Direction d) {
-			return hallCalls[f-1][h.ordinal()][d.ordinal()].pressed();
+			return hallCalls[f - 1][h.ordinal()][d.ordinal()].pressed();
 		}
 	}
 
@@ -664,7 +664,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					count++;
 				}
 
-				if (count == 12) {
+				if (count == 3) {
 					lanternViolate_1();
 				}
 
@@ -748,7 +748,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			state = newState;
 		}
 	}
-
 
 	private boolean hadPendingCall() {
 		return hadPendingCall || pending;
