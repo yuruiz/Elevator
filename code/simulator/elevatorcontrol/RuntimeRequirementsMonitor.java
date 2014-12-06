@@ -576,7 +576,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				break;
 			case SLOW_F:
 				count++;
-				if (count == 10) {
+				if (count == 12) {
 					speedViolate();
 				}
 				if (drive == Speed.FAST) {
@@ -664,7 +664,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					count++;
 				}
 
-				if (count == 3) {
+				if (count == 12) {
 					lanternViolate_1();
 				}
 
