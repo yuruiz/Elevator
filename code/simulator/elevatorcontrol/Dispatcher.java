@@ -405,7 +405,7 @@ public class Dispatcher extends Controller {
                     CountDown = DesiredDwell * 2;
                     nextState = State.StopUp;
                     break;
-                } else if(CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0){
+                } else if(CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0 && desiredHallway == Hallway.NONE){
                     nextState = State.StopStop;
                 }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
@@ -437,7 +437,7 @@ public class Dispatcher extends Controller {
                     CountDown = DesiredDwell * 2;
                     nextState = State.StopDown;
                     break;
-                }else if(CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0){
+                }else if(CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0 && desiredHallway == Hallway.NONE){
                     nextState = State.StopStop;
                 }
                 mDesiredFloor.set(Target, DesiredDirection, desiredHallway);
