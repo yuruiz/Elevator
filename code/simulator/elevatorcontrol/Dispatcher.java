@@ -454,13 +454,21 @@ public class Dispatcher extends Controller {
                 CallRequest upHallCallAboveCurFloor = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP,
                         canCommit);
                 carCallBeforeTarget = mCarCallArray.lowestCallBetween(previousFloorSeen, Target, canCommit);
-                if (minDownHallCallAboveTarget.isValid()) {
+                if (minDownHallCallAboveTarget.isValid() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     Target = minDownHallCallAboveTarget.floor;
                     CallRequest curTarget = mCarCallArray.isCalled(Target);
                     if (curTarget.isValid()) {
                         desiredHallway = CallRequest.union(minDownHallCallAboveTarget.hallway, curTarget.hallway);
                     } else {
                         desiredHallway = minDownHallCallAboveTarget.hallway;
+                    }
+                } else if (mHallCallArray.isCalled(Target, Direction.DOWN).isValid()) {
+                    CallRequest CurHalltarget = mHallCallArray.isCalled(Target, Direction.DOWN);
+                    CallRequest curTarget = mCarCallArray.isCalled(Target);
+                    if (curTarget.isValid()) {
+                        desiredHallway = CallRequest.union(CurHalltarget.hallway, curTarget.hallway);
+                    } else {
+                        desiredHallway = CurHalltarget.hallway;
                     }
                 }
 
@@ -491,13 +499,21 @@ public class Dispatcher extends Controller {
                 CallRequest downHallCallBelowCurFloor = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN,
                         canCommit);
                 carCallBeforeTarget = mCarCallArray.highestCallBetween(previousFloorSeen, Target, canCommit);
-                if (minUpHallCallBelowTarget.isValid()) {
+                if (minUpHallCallBelowTarget.isValid() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
                     Target = minUpHallCallBelowTarget.floor;
                     CallRequest curTarget = mCarCallArray.isCalled(Target);
                     if (curTarget.isValid()) {
                         desiredHallway = CallRequest.union(minUpHallCallBelowTarget.hallway, curTarget.hallway);
                     } else {
                         desiredHallway = minUpHallCallBelowTarget.hallway;
+                    }
+                } else if (mHallCallArray.isCalled(Target, Direction.UP).isValid()) {
+                    CallRequest CurHalltarget = mHallCallArray.isCalled(Target, Direction.UP);
+                    CallRequest curTarget = mCarCallArray.isCalled(Target);
+                    if (curTarget.isValid()) {
+                        desiredHallway = CallRequest.union(CurHalltarget.hallway, curTarget.hallway);
+                    } else {
+                        desiredHallway = CurHalltarget.hallway;
                     }
                 }
 
