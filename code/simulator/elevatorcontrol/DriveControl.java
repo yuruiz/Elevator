@@ -245,7 +245,6 @@ public class DriveControl extends Controller {
 
 			if (allClosed) {
 				ClosedCount++;
-				// System.out.println("Closed Count " + ClosedCount);
 			} else {
 				ClosedCount = 0;
 			}
@@ -269,7 +268,7 @@ public class DriveControl extends Controller {
 			// #transition 'DC.T.5'
 			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity
 					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()
-					&& ClosedCount > 20 && driveSpeedPayload.speed() == 0) {
+					&& ClosedCount > 35 && driveSpeedPayload.speed() == 0) {
 				log("stop to slow");
 				ClosedCount = 0;
 				newState = State.SLOW;
