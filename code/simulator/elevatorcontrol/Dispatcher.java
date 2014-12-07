@@ -454,7 +454,7 @@ public class Dispatcher extends Controller {
                 CallRequest upHallCallAboveCurFloor = mHallCallArray.closestCallAboveInDirection(previousFloorSeen, Direction.UP,
                         canCommit);
                 carCallBeforeTarget = mCarCallArray.lowestCallBetween(previousFloorSeen, Target, canCommit);
-                if (minDownHallCallAboveTarget.isValid() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+                if (minDownHallCallAboveTarget.isValid() && mDriveSpeed.getSpeed() >= DriveObject.SlowSpeed) {
                     Target = minDownHallCallAboveTarget.floor;
                     CallRequest curTarget = mCarCallArray.isCalled(Target);
                     if (curTarget.isValid()) {
@@ -499,7 +499,7 @@ public class Dispatcher extends Controller {
                 CallRequest downHallCallBelowCurFloor = mHallCallArray.closestCallBelowInDirection(previousFloorSeen, Direction.DOWN,
                         canCommit);
                 carCallBeforeTarget = mCarCallArray.highestCallBetween(previousFloorSeen, Target, canCommit);
-                if (minUpHallCallBelowTarget.isValid() && mDriveSpeed.getSpeed() > DriveObject.LevelingSpeed) {
+                if (minUpHallCallBelowTarget.isValid() && mDriveSpeed.getSpeed() >= DriveObject.SlowSpeed) {
                     Target = minUpHallCallBelowTarget.floor;
                     CallRequest curTarget = mCarCallArray.isCalled(Target);
                     if (curTarget.isValid()) {
