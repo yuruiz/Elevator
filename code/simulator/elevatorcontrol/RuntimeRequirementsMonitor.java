@@ -31,6 +31,11 @@ import simulator.payloads.DoorMotorPayload.ReadableDoorMotorPayload;
 import simulator.payloads.DoorReversalPayload.ReadableDoorReversalPayload;
 import simulator.payloads.DrivePayload.ReadableDrivePayload;
 import simulator.payloads.DriveSpeedPayload.ReadableDriveSpeedPayload;
+import simulator.payloads.CarCallPayload.ReadableCarCallPayload;
+import simulator.payloads.HallCallPayload.ReadableHallCallPayload;
+
+import java.lang.Override;
+import java.util.HashSet;
 
 /**
  * High level requirements runtime monitor.
@@ -64,6 +69,9 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	LanternStateMachine lanternState = new LanternStateMachine();
 	CarLevelPositionCanPayloadTranslator mCarPosition;
 	private ReadableCanMailbox carPosition;
+	private HashSet<Integer> pendingFloorCalls = new HashSet<Integer>();
+	private HashSet<CallRequest> pendingDoorCalls = new HashSet<CallRequest>();
+
 
 	public RuntimeRequirementsMonitor() {
 		super();
@@ -155,6 +163,18 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		lanternState.receive(msg);
 	}
 
+	@Override
+	public void receive(ReadableCarCallPayload msg) {
+		driveState.receive(msg);
+		doorState.receive(msg);
+	}
+
+	@Override
+	public void receive(ReadableHallCallPayload msg) {
+		driveState.receive(msg);
+		doorState.receive(msg);
+	}
+
 	/**************************************************************************
 	 * high level event methods
 	 *
@@ -171,7 +191,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void doorClosed(Hallway hallway, int currentFloor) {
 		// System.out.println(hallway.toString() + " Door Closed");
 		// Once all doors are closed, check to see if opening was wasted
-		if (!hadPendingDoorCall()) {
+		if (!hadPendingDoorCall) {
 			warning("Violation of R-T7: Door opened at floor " + currentFloor
 					+ " and hallway " + hallway
 					+ " where there were no pending calls.");
@@ -223,6 +243,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 *            which door the event pertains to
 	 */
 	private void callDoorOpened(int floor, Hallway hallway) {
+		pendingDoorCalls.remove(new CallRequest(floor, hallway));
 		hadPendingDoorCall = true;
 	}
 
@@ -231,7 +252,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 */
 	private void driveMoving(int currentFloor) {
 		// Once drive starts moving again, check if stop was wasted
-		if (!hadPendingCall()) {
+		if (!hadPendingCall) {
 			warning("Violation of R-T6: Drive stopped at floor " + currentFloor
 					+ " with no pending calls.");
 			this.wastedStopCount += 1;
@@ -247,7 +268,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private void noCallDriveStopped(int floor) {
 		// System.out.println("Drive stopped at floor " + f +
 		// " without a call.");
-		// hadPendingCall = false;
+		hadPendingCall = false;
 	}
 
 	/**
@@ -255,6 +276,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	 * floor
 	 */
 	private void callDriveStopped(int floor) {
+		pendingFloorCalls.remove(floor);
 		hadPendingCall = true;
 	}
 
@@ -303,6 +325,17 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			this.atFloorArray = atFloors;
 		}
 
+
+		public void receive(ReadableCarCallPayload msg) {
+			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg.getHallway()));
+			updateState(msg.getHallway());
+		}
+
+		public void receive(ReadableHallCallPayload msg) {
+			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg.getHallway()));
+			updateState(msg.getHallway());
+		}
+
 		public void receive(ReadableDoorClosedPayload msg) {
 			updateState(msg.getHallway());
 		}
@@ -345,7 +378,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				newState = DoorState.CLOSED;
 			} else if (!allDoorsClosed(h) && !hadPendingDoorCall) {
 				// Doors opened, check if need to set hadPendingDoorCall
-				if (wasCalled(currentFloor, h)) {
+				if (pendingDoorCalls.contains(new CallRequest(currentFloor, h))) {
 					newState = DoorState.CALL_OPEN;
 				} else {
 					newState = DoorState.NO_CALL_OPEN;
@@ -443,6 +476,17 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			updateState();
 		}
 
+		public void receive(ReadableCarCallPayload msg) {
+			pendingFloorCalls.add(msg.getFloor());
+			updateState();
+		}
+
+
+		public void receive(ReadableHallCallPayload msg) {
+			pendingFloorCalls.add(msg.getFloor());
+			updateState();
+		}
+
 		private void updateState() {
 			DriveState newState = this.currentState;
 
@@ -455,7 +499,7 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				newState = DriveState.MOVING;
 			} else if (!hadPendingCall) {
 				// Drive is stopped, check whether there was a call here or not
-				if (wasCalled(currentFloor)) {
+				if (pendingFloorCalls.contains(currentFloor)) {
 					newState = DriveState.CALL_STOP;
 				} else {
 					newState = DriveState.NO_CALL_STOP;
@@ -749,11 +793,30 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 		}
 	}
 
-	private boolean hadPendingCall() {
-		return hadPendingCall || pending;
-	}
+	private class CallRequest {
+		int floor;
+		Hallway hallway;
 
-	private boolean hadPendingDoorCall() {
-		return hadPendingDoorCall || pending;
+		CallRequest(int floor, Hallway hallway) {
+			this.floor = floor;
+			this.hallway = hallway;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (!(o instanceof CallRequest)) {
+				return false;
+			} else {
+				CallRequest other = (CallRequest) o;
+				return (other.floor == this.floor) && (other.hallway.equals(this.hallway));
+			}
+		}
+
+
+		@Override
+		public int hashCode() {
+			return ("" + this.floor + " " + this.hallway).hashCode();
+		}
+
 	}
 }
