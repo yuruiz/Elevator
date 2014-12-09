@@ -163,7 +163,7 @@ public class Dispatcher extends Controller {
                 CurrentDirection = Direction.STOP;
                 Target = CurrentFloor;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell * 2;
+                CountDown = DesiredDwell * 4;
 
                 CallRequest curFloorCarCall = mCarCallArray.isCalled(CurrentFloor);
                 desiredHallway = (curFloorCarCall.isValid()) ? curFloorCarCall.hallway : Hallway.NONE;
@@ -294,7 +294,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell * 2;
+                CountDown = DesiredDwell * 4;
 
 //                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
 
@@ -350,7 +350,7 @@ public class Dispatcher extends Controller {
                 // DONE
                 CurrentDirection = Direction.DOWN;
                 DesiredDirection = Direction.STOP;
-                CountDown = DesiredDwell * 2;
+                CountDown = DesiredDwell * 4;
 
 //                practicalFloor = getPracticalFloor(previousFloorSeen, CurrentDirection);
 
@@ -423,7 +423,7 @@ public class Dispatcher extends Controller {
 
                 // #transition DPT.1
                 if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
-                    CountDown = DesiredDwell * 2;
+                    CountDown = DesiredDwell * 4;
                     nextState = State.StopUp;
                     break;
                 } else if (CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0 && desiredHallway == Hallway.NONE) {
@@ -454,7 +454,7 @@ public class Dispatcher extends Controller {
 
                 // #transition DPT.1
                 if (!(mFrontDoorClosed.getBothClosed() && mBackDoorClosed.getBothClosed()) && CurrentFloor != -1) {
-                    CountDown = DesiredDwell * 2;
+                    CountDown = DesiredDwell * 4;
                     nextState = State.StopDown;
                     break;
                 } else if (CountDown <= 0 && CurrentFloor != -1 && mDriveSpeed.getSpeed() == 0 && desiredHallway == Hallway.NONE) {
@@ -465,7 +465,7 @@ public class Dispatcher extends Controller {
             case UpDown:
                 CurrentDirection = Direction.UP;
                 DesiredDirection = Direction.DOWN;
-                CountDown = DesiredDwell * 2;
+                CountDown = DesiredDwell * 4;
 
                 // Find the minimum hall call below the target
                 CallRequest minDownHallCallAboveTarget = mHallCallArray.maxGoingDown(Target - 1, canCommit);
@@ -509,7 +509,7 @@ public class Dispatcher extends Controller {
             case DownUp:
                 CurrentDirection = Direction.DOWN;
                 DesiredDirection = Direction.UP;
-                CountDown = DesiredDwell * 2;
+                CountDown = DesiredDwell * 4;
 
                 // Find the minimum hall call below the target
                 CallRequest minUpHallCallBelowTarget = mHallCallArray.minGoingUp(Target + 1, canCommit);
