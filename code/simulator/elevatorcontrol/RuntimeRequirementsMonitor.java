@@ -741,9 +741,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					break;
 				}
 				if (!downLantern.lighted() && !upLantern.lighted()) {
-					if (!allClosed()) {
-						lanternViolate_2();
-					}
 					newState = LanternState.OFF;
 					count = 0;
 					break;
@@ -765,9 +762,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					break;
 				}
 				if (!downLantern.lighted() && !upLantern.lighted()) {
-					if (!allClosed()) {
-						lanternViolate_2();
-					}
 					newState = LanternState.OFF;
 					count = 0;
 					break;

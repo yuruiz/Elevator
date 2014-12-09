@@ -264,7 +264,7 @@ public class DriveControl extends Controller {
 				newState = State.LEVEL_DOWN;
 				break;
 			}
-			// log(allClosed + " " + currentFloor + mDesiredFloor.getFloor());
+			
 			// #transition 'DC.T.5'
 			if (allClosed && mCarWeight.getValue() < Elevator.MaxCarCapacity
 					&& atFloor.getCurrentFloor() != mDesiredFloor.getFloor()
@@ -283,8 +283,6 @@ public class DriveControl extends Controller {
 				break;
 			}
 
-			// System.out.println(atFloor.getCurrentFloor() + " " +
-			// driveSpeedPayload.speed());
 			if (atFloor.getCurrentFloor() == mDesiredFloor.getFloor()
 					&& driveSpeedPayload.speed() <= DriveObject.SlowSpeed) {
 				// #transition `DC.T.6`

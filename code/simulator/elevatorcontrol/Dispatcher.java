@@ -72,7 +72,7 @@ public class Dispatcher extends Controller {
         this.period = period;
         this.Target = 1;
         this.currentState = State.Initial;
-        this.DesiredDwell = 100;
+        this.DesiredDwell = 150;
         this.previousFloorSeen = 1;
 
         mAtFloor = new AtFloorArray(canInterface);

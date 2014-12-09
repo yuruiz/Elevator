@@ -129,6 +129,7 @@ public class DoorControl extends Controller {
                 }
                 break;
             case OPENED: /* State 2 Opened */
+            	log(currentState);
                 localDoorMotor.set(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 countdown--;
@@ -164,22 +165,16 @@ public class DoorControl extends Controller {
                 localDoorMotor.set(DoorCommand.STOP);
                 dwell = mDesiredDwell.getValue();
                 numReversal = 0;
-
+                
                 // #transition T.4 XXX: Make sure this is reflected in the state
                 // chart
                 if ((this.isOverweight() || mAtFloor.getCurrentFloor() != -1) &&
                         (mAtFloor.getCurrentFloor() == mDesiredFloor.getFloor()) &&
                         (mDesiredFloor.getHallway() == hallway || mDesiredFloor.getHallway() == Hallway.BOTH) &&
                         (mDriveSpeed.getSpeed() == 0 && mDriveSpeed.getDirection() == Direction.STOP)) {
-
                     newState = State.OPENING;
                 }
-//                if (newState != currentState) {
-//                    System.out.println("Hallway " + hallway);
-//                    System.out.println("Desired floor" + mDesiredFloor.getFloor() + mDesiredFloor.getHallway());
-//                    System.out.println("Current floor" + mAtFloor.getCurrentFloor());
-//                    System.out.println("Is atfloor 7" + mAtFloor.isAtFloor(7, Hallway.FRONT));
-//                }
+
                 break;
             case CLOSING: /* State 5 Closing */
                 localDoorMotor.set(DoorCommand.CLOSE);
