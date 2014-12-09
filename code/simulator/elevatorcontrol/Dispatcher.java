@@ -72,7 +72,7 @@ public class Dispatcher extends Controller {
         this.period = period;
         this.Target = 1;
         this.currentState = State.Initial;
-        this.DesiredDwell = 300;
+        this.DesiredDwell = 100;
         this.previousFloorSeen = 1;
 
         mAtFloor = new AtFloorArray(canInterface);
@@ -108,7 +108,7 @@ public class Dispatcher extends Controller {
         mBackDesiredDwell.set(this.DesiredDwell);
         mFrontDesiredDwell.set(this.DesiredDwell);
 
-        mDesiredFloor.set(1, Hallway.BOTH, Direction.STOP);
+        mDesiredFloor.set(1, Hallway.NONE, Direction.STOP);
         timer.start(period);
     }
 

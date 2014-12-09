@@ -1,9 +1,9 @@
-;18649 2014 Fall
+;18649 Fall 2014
 ;Group 5
-;Yurui Zhou (yuruiz)
-;Siyur Wei (siyuwei)
-;James Sakai (jssakai)
 ;Vijay Jayaram (vijayj)
+;James Sakai (jssakai)
+;Siyu Wei (siyuwei)
+;Yurui Zhou (yuruiz)
 ;integration_tests.txt
 
 SD1A sd1a.cf sd1a.mf
