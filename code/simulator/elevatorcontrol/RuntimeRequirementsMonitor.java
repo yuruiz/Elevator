@@ -72,7 +72,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 	private HashSet<Integer> pendingFloorCalls = new HashSet<Integer>();
 	private HashSet<CallRequest> pendingDoorCalls = new HashSet<CallRequest>();
 
-
 	public RuntimeRequirementsMonitor() {
 		super();
 		carPosition = CanMailbox
@@ -325,14 +324,15 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			this.atFloorArray = atFloors;
 		}
 
-
 		public void receive(ReadableCarCallPayload msg) {
-			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg.getHallway()));
+			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg
+					.getHallway()));
 			updateState(msg.getHallway());
 		}
 
 		public void receive(ReadableHallCallPayload msg) {
-			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg.getHallway()));
+			pendingDoorCalls.add(new CallRequest(msg.getFloor(), msg
+					.getHallway()));
 			updateState(msg.getHallway());
 		}
 
@@ -480,7 +480,6 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 			pendingFloorCalls.add(msg.getFloor());
 			updateState();
 		}
-
 
 		public void receive(ReadableHallCallPayload msg) {
 			pendingFloorCalls.add(msg.getFloor());
@@ -708,7 +707,11 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 					count++;
 				}
 
-				if (count == 12) {
+				/*
+				 * If the monitor does not light after door closed for 15
+				 * periods
+				 */
+				if (count == 15) {
 					lanternViolate_1();
 				}
 
@@ -802,10 +805,10 @@ public class RuntimeRequirementsMonitor extends RuntimeMonitor {
 				return false;
 			} else {
 				CallRequest other = (CallRequest) o;
-				return (other.floor == this.floor) && (other.hallway.equals(this.hallway));
+				return (other.floor == this.floor)
+						&& (other.hallway.equals(this.hallway));
 			}
 		}
-
 
 		@Override
 		public int hashCode() {
